@@ -17,6 +17,7 @@ const seedrandom = require("seedrandom");
 const Names = require("./names");
 const TerrainTypes = require("./enums/terrainTypes");
 const MathHelper = require("./helpers/math");
+const { param } = require("../server/api");
 
 var defaultExtent = {
   width: 1,
@@ -24,15 +25,6 @@ var defaultExtent = {
 };
 
 const MapGenerator = {
-  centroid: function(pts) {
-    var x = 0;
-    var y = 0;
-    for (var i = 0; i < pts.length; i++) {
-      x += pts[i][0];
-      y += pts[i][1];
-    }
-    return [x / pts.length, y / pts.length];
-  },
   renderTerrainLinks: function(svg, links) {
     svg
       .append("g")
@@ -113,6 +105,12 @@ const MapGenerator = {
     svg.attr("height", params.height);
     //svg.attr("height", (width * params.extent.height) / params.extent.width);
     svg.attr("id", "map");
+    svg.attr("seed", params.seed);
+    svg.attr("viewBox", `0 0 ${params.width} ${params.height}`);
+    svg.attr(
+      "onload",
+      `window.parent.postMessage({ event: 'register', elementId: this.id }, '*')`
+    );
     svg.selectAll().remove();
 
     svg
@@ -134,7 +132,7 @@ const MapGenerator = {
   */
   lloydRelaxCells: function(terrain, params) {
     for (cell in terrain.cells) {
-      terrain.cells[cell].point = MapGenerator.centroid(
+      terrain.cells[cell].point = MathHelper.centroid(
         terrain.cells[cell].polygons
       );
       terrain.points[cell] = terrain.cells[cell].point;
@@ -155,14 +153,17 @@ const MapGenerator = {
   },
   calculateTerrainType: function(cell, params) {
     // if we are at the edge, set the TerrainType to OCEAN
-    let terrainType = cell.isEdge ? TerrainTypes.OCEAN : TerrainTypes.LAND;
-    // if the cell center is more than 80% of the way from the center, set it to OCEAN
-    let distPercent = cell.centerDistance / (params.width / 2);
+    let terrainType =
+      cell.isEdge && cell.terrainType != TerrainTypes.PEAK
+        ? TerrainTypes.OCEAN
+        : _.get(cell, "terrainType", TerrainTypes.LAND);
     var i = 0;
-    let varDist = (Math.random() - 0.5) * 0.25;
-    if (distPercent > 0.85 + varDist) {
+    let distPercent = cell.peakDistance / (params.width / 2);
+    let varDist = (params.rng() - 0.25) * 0.25;
+    if (distPercent > 0.5 + varDist) {
       terrainType = TerrainTypes.OCEAN;
     }
+
     return terrainType;
   },
   assignCoast: function(cells) {
@@ -176,7 +177,8 @@ const MapGenerator = {
         ) {
           if (
             cells[cell.neighbors[neighborIndex]].terrainType ==
-            TerrainTypes.OCEAN
+              TerrainTypes.OCEAN &&
+            cells[cellIndex].terrainType == TerrainTypes.LAND
           ) {
             cells[cellIndex].terrainType = TerrainTypes.COAST;
           }
@@ -194,17 +196,66 @@ const MapGenerator = {
       }
     }
   },
+  assignOcean: function(cells, params) {
+    for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      cells[cellIndex].terrainType = MapGenerator.calculateTerrainType(
+        cells[cellIndex],
+        params
+      );
+    }
+  },
+  assignPeaks: function(cells, params, terrain) {
+    params.peaks = [];
+    let wUnit = (params.width / params.peakCount) * 0.9;
+    let hUnit = params.width * 0.9;
+
+    for (var peakCount = 0; peakCount < params.peakCount; peakCount++) {
+      let pX = params.rng() * wUnit + peakCount * wUnit + params.width * 0.05;
+      let pY = params.rng() * hUnit + params.width * 0.05;
+
+      params.peaks.push([Math.floor(pX), Math.floor(pY)]);
+    }
+
+    console.log(params.peaks);
+
+    for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      cells[cellIndex].peakDistance = cells[cellIndex].centerDistance;
+
+      for (var peakIndex = 0; peakIndex < params.peaks.length; peakIndex++) {
+        let peakPosition = params.peaks[peakIndex];
+
+        if (
+          terrain.voronoi.contains(cellIndex, peakPosition[0], peakPosition[1])
+        ) {
+          console.log(
+            `${cellIndex}, ${peakPosition[0]}, ${peakPosition[1]} done`
+          );
+          cells[cellIndex].terrainType = TerrainTypes.PEAK;
+        }
+
+        let distanceToPeak = MathHelper.calculate2DDistance(
+          { x: cells[cellIndex].point[0], y: cells[cellIndex].point[1] },
+          { x: peakPosition[0], y: peakPosition[1] }
+        );
+
+        if (distanceToPeak < cells[cellIndex].peakDistance) {
+          cells[cellIndex].peakDistance = distanceToPeak;
+        }
+      }
+    }
+  },
   generateVoronoiCells: function(terrain, params) {
     let delaunay = Delaunay.from(terrain.points);
-    let voronoi = delaunay.voronoi([0, 0, params.width, params.height]);
+    terrain.voronoi = delaunay.voronoi([0, 0, params.width, params.height]);
 
     for (var cellIndex = 0; cellIndex < terrain.points.length; cellIndex++) {
-      let polygonList = voronoi.cellPolygon(cellIndex);
-      let neighbors = [...voronoi.neighbors(cellIndex)];
+      let polygonList = terrain.voronoi.cellPolygon(cellIndex);
+      let neighbors = [...terrain.voronoi.neighbors(cellIndex)];
 
       let cell = {
         id: cellIndex,
         point: terrain.points[cellIndex],
+        peakDistance: 0,
         centerDistance: MathHelper.calculate2DDistance(
           MathHelper.convertArrayOfArraysOf2DPointsToArrayOfXY([
             terrain.points[cellIndex],
@@ -217,10 +268,9 @@ const MapGenerator = {
         polygons: polygonList,
         neighbors: [],
         properties: {},
+        elevation: 0,
       };
       cell.isEdge = MapGenerator.isEdge(cell.polygons, params);
-      cell.terrainType = MapGenerator.calculateTerrainType(cell, params);
-
       for (neighborIndex in neighbors) {
         cell.neighbors.push(neighbors[neighborIndex]);
       }
@@ -238,6 +288,8 @@ const MapGenerator = {
     for (var i = 0; i < params.terrainIterations; i++) {
       MapGenerator.lloydRelaxCells(terrain, params);
     }
+    MapGenerator.assignPeaks(terrain.cells, params, terrain);
+    MapGenerator.assignOcean(terrain.cells, params);
     MapGenerator.assignCoast(terrain.cells);
     MapGenerator.assignCities(terrain.cells);
   },
@@ -254,16 +306,18 @@ const MapGenerator = {
     // Relax points until territories are regular.
     MapGenerator.generateCells(terrain, params);
 
+    /*
     var i = 0;
     for (cell in terrain.cells) {
-      if (i > 990) console.log(terrain.cells[cell]);
+      if (i > params.npts - 3) console.log(terrain.cells[cell]);
       i++;
     }
-
+*/
     return terrain;
   },
   generateMap: function(svg, params) {
     params.rng = seedrandom(params.seed);
+
     params.mapCenter = { x: params.width / 2, y: params.height / 2 };
 
     let terrainData = MapGenerator.generateTerrain(params);

@@ -14,7 +14,11 @@ router.use(function timeLog(req, res, next) {
 // define the home page route
 router.get("/makeMap", async function(req, res) {
   let params = defaultParams;
-  params.seed = _.get(req.query, "seed", null);
+  params.seed = _.get(
+    req.query,
+    "seed",
+    _.get(defaultParams, "seed", "BRAEZOS")
+  );
   await Braezos.saveMap(
     `${__dirname}/../public/maps/${_.get(params, "mapName", "map.svg")}`,
     await Braezos.makeMapSVG(params)

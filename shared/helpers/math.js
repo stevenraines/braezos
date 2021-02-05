@@ -32,6 +32,15 @@ let MathHelper = {
 
     return xyArray;
   },
+  centroid: function(pts) {
+    var x = 0;
+    var y = 0;
+    for (var i = 0; i < pts.length; i++) {
+      x += pts[i][0];
+      y += pts[i][1];
+    }
+    return [x / pts.length, y / pts.length];
+  },
 };
 
 module.exports = MathHelper;
