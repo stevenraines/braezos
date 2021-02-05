@@ -5,10 +5,19 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "nodemon --exec 'vue-cli-service serve'"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "d3": "^6.5.0",
+    "d3-delaunay": "^5.3.0",
+    "d3-node": "^2.2.2",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "js-priority-queue": "^0.1.5",
+    "lodash": "^4.17.20",
+    "seedrandom": "^3.0.5",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
