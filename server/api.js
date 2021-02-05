@@ -3,7 +3,7 @@ const router = express.Router();
 const _ = require("lodash");
 
 const Braezos = require("../shared/Braezos");
-const defaultParams = require("./params.config");
+const defaultParams = require("../params.config");
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {

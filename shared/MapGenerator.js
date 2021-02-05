@@ -1,3 +1,13 @@
+/* 
+Map generation strategy:
+
+1. Generate Delauney/Voronoi diagrams for the size of the visible area
+2. Relax cells
+3. Set any cell touching the outer border to be water (ocean)
+4. Loop through each cell, determining distance from map center.
+
+*/
+
 const d3 = require("d3");
 const _ = require("lodash");
 _.assign(d3, require("d3-voronoi"));
@@ -5,6 +15,8 @@ const PriorityQueue = require("js-priority-queue");
 const Delaunay = require("d3-delaunay").Delaunay;
 const seedrandom = require("seedrandom");
 const Names = require("./names");
+const TerrainTypes = require("./enums/terrainTypes");
+const MathHelper = require("./helpers/math");
 
 var defaultExtent = {
   width: 1,
@@ -40,7 +52,7 @@ const MapGenerator = {
   },
   renderTerrainCells: function(svg, cells) {
     for (cell in cells) {
-      let fillColor = cells[cell].isEdge ? "#0077be" : "#567d46";
+      let fillColor = cells[cell].terrainType.color;
       let strokeColor = "#333333";
       var i = 0;
       svg
@@ -110,8 +122,10 @@ const MapGenerator = {
 
     MapGenerator.renderTerrainCells(svg, terrainData.cells);
 
+    /*
     if (terrainData.points.length < 100)
       MapGenerator.renderTerrainLabels(svg, terrainData.cells);
+    */
     // MapGenerator.renderTerrainLinks(svg, terrainData.edges);
   },
   /* recalculate the center of a cell based on verticies, then regenerate the cell shape.
@@ -139,23 +153,82 @@ const MapGenerator = {
     }
     return false;
   },
+  calculateTerrainType: function(cell, params) {
+    // if we are at the edge, set the TerrainType to OCEAN
+    let terrainType = cell.isEdge ? TerrainTypes.OCEAN : TerrainTypes.LAND;
+    // if the cell center is more than 80% of the way from the center, set it to OCEAN
+    let distPercent = cell.centerDistance / (params.width / 2);
+    var i = 0;
+    let varDist = (Math.random() - 0.5) * 0.25;
+    if (distPercent > 0.85 + varDist) {
+      terrainType = TerrainTypes.OCEAN;
+    }
+    return terrainType;
+  },
+  assignCoast: function(cells) {
+    for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      let cell = cells[cellIndex];
+      if (cell.terrainType != TerrainTypes.OCEAN) {
+        for (
+          let neighborIndex = 0;
+          neighborIndex < cell.neighbors.length;
+          neighborIndex++
+        ) {
+          if (
+            cells[cell.neighbors[neighborIndex]].terrainType ==
+            TerrainTypes.OCEAN
+          ) {
+            cells[cellIndex].terrainType = TerrainTypes.COAST;
+          }
+        }
+      }
+    }
+  },
+  assignCities: function(cells) {
+    for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      if (
+        cells[cellIndex].terrainType == TerrainTypes.LAND &&
+        cells[cellIndex].neighbors.length >= 9
+      ) {
+        cells[cellIndex].terrainType = TerrainTypes.CITY;
+      }
+    }
+  },
   generateVoronoiCells: function(terrain, params) {
     let delaunay = Delaunay.from(terrain.points);
     let voronoi = delaunay.voronoi([0, 0, params.width, params.height]);
-    var i = 0;
-    for (const polygons of voronoi.cellPolygons()) {
-      let pList = polygons.slice(0, polygons.length - 1);
-      terrain.cells[i] = {
-        id: i,
-        point: terrain.points[i],
-        polygons: pList,
-        isEdge: MapGenerator.isEdge(pList, params),
+
+    for (var cellIndex = 0; cellIndex < terrain.points.length; cellIndex++) {
+      let polygonList = voronoi.cellPolygon(cellIndex);
+      let neighbors = [...voronoi.neighbors(cellIndex)];
+
+      let cell = {
+        id: cellIndex,
+        point: terrain.points[cellIndex],
+        centerDistance: MathHelper.calculate2DDistance(
+          MathHelper.convertArrayOfArraysOf2DPointsToArrayOfXY([
+            terrain.points[cellIndex],
+          ])[0],
+          params.mapCenter
+        ),
+        area: MathHelper.calcPolygonArea(
+          MathHelper.convertArrayOfArraysOf2DPointsToArrayOfXY(polygonList)
+        ),
+        polygons: polygonList,
+        neighbors: [],
         properties: {},
       };
+      cell.isEdge = MapGenerator.isEdge(cell.polygons, params);
+      cell.terrainType = MapGenerator.calculateTerrainType(cell, params);
 
-      i++;
+      for (neighborIndex in neighbors) {
+        cell.neighbors.push(neighbors[neighborIndex]);
+      }
+
+      terrain.cells[cellIndex] = cell;
     }
   },
+
   /* generateTerrain
     produce the terrain for the map.
 
@@ -165,6 +238,8 @@ const MapGenerator = {
     for (var i = 0; i < params.terrainIterations; i++) {
       MapGenerator.lloydRelaxCells(terrain, params);
     }
+    MapGenerator.assignCoast(terrain.cells);
+    MapGenerator.assignCities(terrain.cells);
   },
   generateTerrain: function(params) {
     // generate the map data structure
@@ -178,12 +253,19 @@ const MapGenerator = {
 
     // Relax points until territories are regular.
     MapGenerator.generateCells(terrain, params);
+
+    var i = 0;
+    for (cell in terrain.cells) {
+      if (i > 990) console.log(terrain.cells[cell]);
+      i++;
+    }
+
     return terrain;
   },
   generateMap: function(svg, params) {
     params.rng = seedrandom(params.seed);
+    params.mapCenter = { x: params.width / 2, y: params.height / 2 };
 
-    console.log(params);
     let terrainData = MapGenerator.generateTerrain(params);
     //console.log(terrainData);
     MapGenerator.renderTerrain(svg, terrainData, params);

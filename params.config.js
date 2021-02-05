@@ -1,8 +1,8 @@
 module.exports = {
-  npts: 50, //75, //16384,
-  height: 720,
+  npts: 1500, //75, //16384,
+  height: 800,
   width: 800,
-  terrainIterations: 40,
+  terrainIterations: 3,
   extent: {
     width: 1,
     height: 1,
