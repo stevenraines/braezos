@@ -32,7 +32,7 @@ let SVGMethods = {
 
     //TODO: fix right / bottom side of map when zooming out
 
-    if (zoomAmountH <= parseInt(message.data.width))
+    if (zoomAmountH <= mapWidth)
       map.setAttributeNS(
         null,
         "viewBox",

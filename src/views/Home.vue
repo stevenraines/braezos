@@ -1,8 +1,14 @@
 <template>
-  <div>
-    <Map />
-    <LocationDetail />
-  </div>
+  <v-container fluid>
+    <v-row>
+      <v-col cols="8">
+        <Map />
+      </v-col>
+      <v-col cols="4">
+        <LocationDetail />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

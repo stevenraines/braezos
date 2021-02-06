@@ -31,7 +31,8 @@ const Names = {
     "Galesward",
   ],
 
-  getPlaceName: function (index) {
+  getPlaceName: function(index) {
+    return index;
     if (index > Names.placeNames.length - 1) return index;
     return Names.placeNames[index];
   },

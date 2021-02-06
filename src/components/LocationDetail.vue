@@ -1,5 +1,11 @@
 <template>
-  <div class="location-detail">hi</div>
+  <v-container class="section-border">
+    <v-row>
+      <v-col cols="12">
+        {{ currentLocation.cellIndex }}
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 <script>
 export default {
@@ -7,12 +13,10 @@ export default {
   data: function() {
     return {};
   },
+  computed: {
+    currentLocation: function() {
+      return this.$store.state.location;
+    },
+  },
 };
 </script>
-<style scoped>
-.location-detail {
-  height: 400px;
-  width: 300px;
-  border: 1px solid #000000;
-}
-</style>

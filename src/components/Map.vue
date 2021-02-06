@@ -1,25 +1,38 @@
 <template>
-  <div>
-    <div>
-      <object
-        id="svg-object"
-        type="image/svg+xml"
-        data="./maps/map.svg"
-        v-bind:width="width"
-        v-bind:height="height"
-      ></object>
-    </div>
-    <div>
-      <button v-on:click="resetSVG()">%</button>
-
-      <button v-on:click="zoomSVG(10)">+</button>
-      <button v-on:click="zoomSVG(-10)">-</button>
-      <button v-on:click="panSVGV(10)">Up</button>
-      <button v-on:click="panSVGV(-10)">Down</button>
-      <button v-on:click="panSVGH(10)">Left</button>
-      <button v-on:click="panSVGH(-10)">Right</button>
-    </div>
-  </div>
+  <v-container class="section-border">
+    <v-row>
+      <v-col cols="12">
+        <object
+          id="svg-object"
+          type="image/svg+xml"
+          data="./maps/map.svg"
+          v-bind:width="width"
+          v-bind:height="height"
+        ></object>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <table>
+          <tr>
+            <td><v-btn x-small v-on:click="zoomSVG(10)">+</v-btn></td>
+            <td><v-btn x-small v-on:click="panSVGV(10)">Up</v-btn></td>
+            <td><v-btn x-small v-on:click="zoomSVG(-10)">-</v-btn></td>
+          </tr>
+          <tr>
+            <td><v-btn x-small v-on:click="panSVGH(10)">Left</v-btn></td>
+            <td><v-btn x-small v-on:click="resetSVG()">%</v-btn></td>
+            <td><v-btn x-small v-on:click="panSVGH(-10)">Right</v-btn></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><v-btn x-small v-on:click="panSVGV(-10)">Down</v-btn></td>
+            <td></td>
+          </tr>
+        </table>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -27,14 +40,19 @@ export default {
   name: "Map",
   data: function() {
     return {
-      height: 800,
-      width: 800,
+      height: 600,
+      width: 600,
       mapSVG: null,
     };
   },
   components: {},
   created: function() {
     window.addEventListener("message", this.handlePostedMessage, false);
+  },
+  computed: {
+    currentLocation: function() {
+      return this.$store.getters.currentLocation;
+    },
   },
   methods: {
     handlePostedMessage: function(message) {
@@ -44,12 +62,19 @@ export default {
       }
 
       if (message.data.event == "click" && message.source == this.mapSVG) {
+        // load details about the territory
+
+        this.$store.commit("setCurrentLocation", {
+          cellIndex: message.data.cellIndex,
+        });
+
         this.mapSVG.postMessage(
           { event: "changeCellColor", elementId: message.data.elementId },
           "*"
         );
       }
     },
+
     resetSVG: function() {
       this.mapSVG.postMessage(
         {

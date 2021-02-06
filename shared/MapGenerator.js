@@ -57,7 +57,7 @@ const MapGenerator = {
           return `cell-${d.id.toString().padStart(5, "0")}`;
         })
         .attr("onclick", function(d) {
-          return `window.parent.postMessage({ event: 'click', elementId: this.id }, '*')`;
+          return `window.parent.postMessage({ event: 'click', cellIndex: ${d.id.toString()}, elementId: this.id }, '*')`;
         })
         .attr("d", (d) => {
           let path = `M ${d.polygons.join(" L ")} Z`.replace(",", " ");
@@ -72,7 +72,6 @@ const MapGenerator = {
   renderTerrainLabels: function(svg, cells) {
     // console.log("RENDER LABELS");
 
-    var i = 0;
     for (cell in cells) {
       if (cells[cell].isEdge) continue;
 
@@ -87,17 +86,16 @@ const MapGenerator = {
           return `label-${d.id}`;
         })
         .attr("x", (d) => {
-          return d ? d.point[0] : null;
+          return d ? d.point[0] - 8 : null;
         })
         .attr("y", (d) => {
-          return d ? d.point[1] : null;
+          return d ? d.point[1] + 3 : null;
         })
         //.attr("dy", ".35em")
         .attr("font-size", ".75em")
         .text(function(d) {
-          return Names.getPlaceName(i); // this will be the name, eventually
+          return Names.getPlaceName(d.id); // this will be the name, eventually
         });
-      i++;
     }
   },
   renderTerrain: function(svg, terrainData, params) {
@@ -120,9 +118,11 @@ const MapGenerator = {
 
     MapGenerator.renderTerrainCells(svg, terrainData.cells);
 
+    MapGenerator.renderTerrainLabels(svg, terrainData.cells);
+
     /*
     if (terrainData.points.length < 100)
-      MapGenerator.renderTerrainLabels(svg, terrainData.cells);
+     
     */
     // MapGenerator.renderTerrainLinks(svg, terrainData.edges);
   },
@@ -215,8 +215,6 @@ const MapGenerator = {
 
       params.peaks.push([Math.floor(pX), Math.floor(pY)]);
     }
-
-    console.log(params.peaks);
 
     for (var cellIndex = 0; cellIndex < cells.length; cellIndex++) {
       cells[cellIndex].peakDistance = cells[cellIndex].centerDistance;

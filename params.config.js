@@ -5,7 +5,7 @@ module.exports = {
   terrainIterations: 5,
   extent: {
     width: 1,
-    height: 1,
+    height: 1
   },
   seed: 0.10440970585212783,
   peaks: [],
@@ -15,7 +15,7 @@ module.exports = {
   fontsizes: {
     region: 40,
     city: 25,
-    town: 20,
+    town: 20
   },
-  mapName: "map.svg",
+  mapName: "map.svg"
 };
