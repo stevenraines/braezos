@@ -15,6 +15,7 @@
 // @ is an alias to /src
 import Map from "@/components/Map.vue";
 import LocationDetail from "@/components/LocationDetail.vue";
+
 export default {
   name: "Home",
   components: {

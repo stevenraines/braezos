@@ -11,13 +11,14 @@ let Braezos = {
     this.svg = this.d3n.createSVG(params.height, params.width); // create SVG w/ 'g' tag and width/height
   },
   generateMap: function(params) {
-    MapGenerator.generateMap(this.svg, params);
-    return this.d3n.svgString(); // output: <svg width=10 height=20 xmlns="http://www.w3.org/2000/svg"><g></g></svg>
+    let mapData = MapGenerator.generateMap(this.svg, params);
+    return { json: JSON.stringify(mapData), svg: this.d3n.svgString() }; // output: <svg width=10 height=20 xmlns="http://www.w3.org/2000/svg"><g></g></svg>
   },
-  saveMap: async function(outputURL, svg) {
-    fs.writeFileSync(outputURL, svg);
+  saveMap: async function(outputURLBase, data) {
+    fs.writeFileSync(`${outputURLBase}.svg`, data.svg);
+    fs.writeFileSync(`${outputURLBase}.json`, data.json);
   },
-  makeMapSVG: async function(params) {
+  makeMap: async function(params) {
     this.init(params);
     return this.generateMap(params);
   },

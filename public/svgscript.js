@@ -2,7 +2,8 @@ let SVGMethods = {
   zoomFactor: 10,
   changeCellColor: function(map, message) {
     let element = map.getElementById(message.data.elementId);
-    element.setAttributeNS(null, "fill", "orange");
+    if (!element) return;
+    element.setAttributeNS(null, "fill", message.data.color);
   },
   resetSVG: function(map, message) {
     map.setAttributeNS(

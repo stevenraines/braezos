@@ -36,6 +36,9 @@
 </template>
 
 <script>
+import TerrainTypes from "../../shared/enums/terrainTypes";
+import _ from "lodash";
+import { mapGetters } from "vuex";
 export default {
   name: "Map",
   data: function() {
@@ -46,32 +49,62 @@ export default {
     };
   },
   components: {},
+  computed: {
+    ...mapGetters(["normalState"]),
+  },
+  mounted: function() {},
   created: function() {
     window.addEventListener("message", this.handlePostedMessage, false);
   },
-  computed: {
-    currentLocation: function() {
-      return this.$store.getters.currentLocation;
-    },
-  },
+
   methods: {
-    handlePostedMessage: function(message) {
+    setLocationColor: function(location, color) {
+      let cellColor = color || "#cccccc";
+
+      if (!color && _.get(location, "terrainType")) {
+        cellColor = _.find(TerrainTypes, {
+          name: location.terrainType.name,
+        }).color;
+      }
+
+      this.mapSVG.postMessage(
+        {
+          event: "changeCellColor",
+          elementId: location.elementId,
+          color: cellColor,
+          id: location.id,
+        },
+        "*"
+      );
+    },
+    handlePostedMessage: async function(message) {
       if (message.data.event == "register" && message.data.elementId == "map") {
         this.mapSVG = message.source;
+        // let location = _.get(this.$store.state, "location");
+        let location = this.normalState.location;
+        if (location) {
+          this.setLocationColor(location, "orange");
+        }
         return;
       }
 
       if (message.data.event == "click" && message.source == this.mapSVG) {
         // load details about the territory
 
-        this.$store.commit("setCurrentLocation", {
-          cellIndex: message.data.cellIndex,
-        });
+        let priorLocation = this.normalState.location;
 
-        this.mapSVG.postMessage(
-          { event: "changeCellColor", elementId: message.data.elementId },
-          "*"
-        );
+        // if there is a prior location, change it back to it's previous color
+        if (_.get(priorLocation, "terrainType")) {
+          this.setLocationColor(priorLocation);
+        }
+
+        let newLocation = await (
+          await this.$http.get(`/api/location/${message.data.id}`)
+        ).data;
+
+        this.$store.commit("setCurrentLocation", newLocation);
+
+        this.setLocationColor(newLocation, "orange");
       }
     },
 
@@ -124,12 +157,6 @@ export default {
     },
   },
 };
-/*
-function clickCell(elementId, source) {
-  console.log(source);
-  source
-}
-*/
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

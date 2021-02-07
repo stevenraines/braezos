@@ -3,16 +3,50 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const defaultState = {
+  location: { id: "none" },
+};
+
+let store = new Vuex.Store({
   state: {
-    location: { cellIndex: "none" },
+    location: null,
+  },
+  getters: {
+    normalState(state) {
+      return JSON.parse(JSON.stringify(state));
+    },
   },
   mutations: {
     setCurrentLocation: (state, data) => {
       // mutate state
+
       state.location = data;
     },
+    resetStore(state, newState) {
+      this.replaceState(Object.assign(state, newState));
+      localStorage.setItem("store", JSON.stringify(this.state));
+    },
+
+    initialiseStore(state) {
+      // Check if the ID exists
+
+      if (localStorage.getItem("store")) {
+        // Replace the state object with the stored item
+        this.replaceState(
+          Object.assign(state, JSON.parse(localStorage.getItem("store")))
+        );
+      } else {
+        this.replaceState(Object.assign(state, defaultState));
+      }
+    },
   },
-  actions: {},
+
   modules: {},
 });
+
+store.subscribe((mutation, state) => {
+  // Store the state object as a JSON string
+  localStorage.setItem("store", JSON.stringify(state));
+});
+
+export default store;

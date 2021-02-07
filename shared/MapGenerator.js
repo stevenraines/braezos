@@ -25,6 +25,8 @@ var defaultExtent = {
 };
 
 const MapGenerator = {
+  terrainData: {},
+  params: {},
   renderTerrainLinks: function(svg, links) {
     svg
       .append("g")
@@ -54,15 +56,18 @@ const MapGenerator = {
         .enter()
         .append("path")
         .attr("id", function(d) {
-          return `cell-${d.id.toString().padStart(5, "0")}`;
+          return d.elementId;
         })
         .attr("onclick", function(d) {
-          return `window.parent.postMessage({ event: 'click', cellIndex: ${d.id.toString()}, elementId: this.id }, '*')`;
+          return `window.parent.postMessage({ event: 'click', terrainType: "${
+            d.terrainType.name
+          }", id: ${d.id.toString()},  elementId: this.id }, '*')`;
         })
         .attr("d", (d) => {
           let path = `M ${d.polygons.join(" L ")} Z`.replace(",", " ");
           return path;
         })
+
         .attr("fill", fillColor)
         .attr("stroke", strokeColor);
 
@@ -225,9 +230,6 @@ const MapGenerator = {
         if (
           terrain.voronoi.contains(cellIndex, peakPosition[0], peakPosition[1])
         ) {
-          console.log(
-            `${cellIndex}, ${peakPosition[0]}, ${peakPosition[1]} done`
-          );
           cells[cellIndex].terrainType = TerrainTypes.PEAK;
         }
 
@@ -252,6 +254,7 @@ const MapGenerator = {
 
       let cell = {
         id: cellIndex,
+        elementId: `cell-${cellIndex.toString().padStart(5, "0")}`,
         point: terrain.points[cellIndex],
         peakDistance: 0,
         centerDistance: MathHelper.calculate2DDistance(
@@ -291,36 +294,45 @@ const MapGenerator = {
     MapGenerator.assignCoast(terrain.cells);
     MapGenerator.assignCities(terrain.cells);
   },
-  generateTerrain: function(params) {
+  generateTerrain: function() {
     // generate the map data structure
-    let terrain = { params, cells: [] };
+    let terrain = { params: this.params, cells: [] };
 
     // generate random points based on the number of points identfied by the map,
     // then generate a Delaunay / Voronoi diagram.
     terrain.points = d3
-      .range(params.npts)
-      .map((d) => [params.rng() * params.width, params.rng() * params.height]);
+      .range(this.params.npts)
+      .map((d) => [
+        this.params.rng() * this.params.width,
+        this.params.rng() * this.params.height,
+      ]);
 
     // Relax points until territories are regular.
-    MapGenerator.generateCells(terrain, params);
+    MapGenerator.generateCells(terrain, this.params);
+    this.terrainData = terrain;
+  },
+  setStartLocation: function() {
+    // get starting location
+    let coastLocations = _.filter(this.terrainData.cells, (cell) => {
+      return cell.terrainType.name == TerrainTypes.COAST.name;
+    });
 
-    /*
-    var i = 0;
-    for (cell in terrain.cells) {
-      if (i > params.npts - 3) console.log(terrain.cells[cell]);
-      i++;
-    }
-*/
-    return terrain;
+    this.terrainData.startingCellIndex =
+      coastLocations[Math.floor(this.params.rng() * coastLocations.length)].id;
   },
   generateMap: function(svg, params) {
-    params.rng = seedrandom(params.seed);
+    this.svg = svg;
+    this.params = params;
+    this.params.rng = seedrandom(params.seed);
+    this.params.mapCenter = { x: params.width / 2, y: params.height / 2 };
 
-    params.mapCenter = { x: params.width / 2, y: params.height / 2 };
+    this.generateTerrain();
 
-    let terrainData = MapGenerator.generateTerrain(params);
-    //console.log(terrainData);
-    MapGenerator.renderTerrain(svg, terrainData, params);
+    // generate the SVG
+    this.renderTerrain(this.svg, this.terrainData, this.params);
+    this.setStartLocation();
+
+    return this.terrainData;
   },
 };
 
