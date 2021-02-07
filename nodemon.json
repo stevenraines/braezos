@@ -1,3 +1,3 @@
 {
-  "watch": ["server", "shared", "params.config.js"]
+  "watch": ["server", "shared", "data", "params.config.js"]
 }

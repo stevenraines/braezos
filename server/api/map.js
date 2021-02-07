@@ -1,11 +1,15 @@
 const Braezos = require("../../shared/Braezos");
 const defaultParams = require("../../params.config");
 const _ = require("lodash");
+const LocationManager = require("../../shared/LocationManager");
 
 const Map = {
   currentMap: null,
   load: async function() {
     Map.currentMap = require(`${__dirname}/../../public/maps/map.json`);
+  },
+  clearEncounters: async function() {
+    LocationManager.resetEncounters();
   },
   getMap: async function() {
     if (!Map.currentMap) {
@@ -32,11 +36,16 @@ const Map = {
     let map = await Map.getMap();
 
     if (req.params.cellIndex == "start") {
-      return res.status(200).send(map.cells[map.startingCellIndex]);
+      LocationManager.resetEncounters();
+      return res
+        .status(200)
+        .send(LocationManager.getLocationDetails(map, map.startingCellIndex));
     }
 
     if (req.params.cellIndex >= 0 && req.params.cellIndex < map.cells.length) {
-      return res.status(200).send(map.cells[req.params.cellIndex]);
+      return res
+        .status(200)
+        .send(LocationManager.getLocationDetails(map, req.params.cellIndex));
     }
 
     return res.status(404).send("no such place");

@@ -38,7 +38,7 @@ router.use(function timeLog(req, res, next) {
 // define the home page route
 router.get("/makeMap", MapAPI.create);
 router.get("/location/:cellIndex", MapAPI.getLocation);
-
+router.get("/encounter/clear", MapAPI.clearEncounters);
 // define the about route
 router.get("/about", function(req, res) {
   res.send("About birds");
