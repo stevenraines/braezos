@@ -1,6 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import axios from "axios";
+import VueAxios from "vue-axios";
+import EncounterStates from "../../shared/enums/encounterStates";
 
+Vue.use(VueAxios, axios);
 Vue.use(Vuex);
 
 const defaultState = {
@@ -22,9 +26,11 @@ let store = new Vuex.Store({
 
       state.location = data;
     },
-    resetStore(state, newState) {
-      this.replaceState(Object.assign(state, newState));
-      localStorage.setItem("store", JSON.stringify(this.state));
+
+    resetStore(state, defaultLocation) {
+      defaultState.location = defaultLocation;
+      this.replaceState(Object.assign(state, defaultState));
+      localStorage.setItem("store", JSON.stringify(state));
     },
 
     initialiseStore(state) {
@@ -40,7 +46,26 @@ let store = new Vuex.Store({
       }
     },
   },
+  actions: {
+    async movePlayer({ commit, getters }, data) {
+      // if we are leaving an encounter and the state is "Start", change it to visited
+      let location = getters.normalState.location;
 
+      if (location.encounter.state == EncounterStates.START) {
+        location.encounter.state = EncounterStates.VISITED;
+      }
+
+      let newLocation = await (
+        await axios.post(`/api/location/${data.toCell}`, location.encounter)
+      ).data;
+
+      commit("setCurrentLocation", newLocation);
+      return true;
+    },
+    async resetGame({ commit }) {
+      commit("resetStore", (await axios.post("/api/location/start")).data);
+    },
+  },
   modules: {},
 });
 

@@ -6,6 +6,11 @@ const Location = {
       text: "There is nothing special here.",
       actions: {},
     },
+    visited: {
+      title: "Nowhere in particular",
+      text: "This place looks familiar.",
+      actions: {},
+    },
   },
 };
 

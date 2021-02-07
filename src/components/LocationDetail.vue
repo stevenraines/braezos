@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     currentEvent() {
-      if (!_.get(this.location, "encounter")) return null;
+      if (!_.get(this.location, "encounter.events")) return null;
       let event = this.location.encounter.events[this.location.encounter.state];
       return event;
     },

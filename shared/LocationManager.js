@@ -1,4 +1,4 @@
-const LocationTemplates = require("../data/locations");
+const LocationTemplates = require("../data/encounter.js");
 const _ = require("lodash");
 const EncounterStates = require("../shared/enums/encounterStates");
 
@@ -10,11 +10,15 @@ const LocationManager = {
     }
   },
   resetEncounters: function() {
-    console.log("resetEncounters");
     this.encounters = null;
   },
   getLocationTemplateByName: function(name) {
     return _.find(LocationTemplates, { name: name });
+  },
+  updateEncounter: function(encounter) {
+    console.log(encounter);
+    this.encounters[encounter.id] = encounter;
+    console.log(this.encounters[encounter.id]);
   },
   getLocationDetails: function(map, id) {
     // if we do not have any encounters, make / load them.
@@ -27,16 +31,14 @@ const LocationManager = {
     let encounter = this.encounters[id];
     if (!encounter) {
       encounter = {
+        id: id,
         state: EncounterStates.START,
       };
 
       if (id == map.startingCellIndex) {
-        encounter = _.assign(
-          encounter,
-          this.getLocationTemplateByName("start")
-        );
+        encounter = _.merge(encounter, this.getLocationTemplateByName("start"));
       } else {
-        encounter = _.assign(
+        encounter = _.merge(
           encounter,
           this.getLocationTemplateByName("default")
         );
@@ -45,6 +47,7 @@ const LocationManager = {
     this.encounters[id] = encounter;
 
     location.encounter = encounter;
+
     return location;
   },
 };

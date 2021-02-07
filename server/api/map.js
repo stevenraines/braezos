@@ -13,7 +13,6 @@ const Map = {
   },
   getMap: async function() {
     if (!Map.currentMap) {
-      console.log("loading map!");
       await Map.load();
     }
     return Map.currentMap;
@@ -40,6 +39,10 @@ const Map = {
       return res
         .status(200)
         .send(LocationManager.getLocationDetails(map, map.startingCellIndex));
+    }
+
+    if (req.body) {
+      LocationManager.updateEncounter(req.body);
     }
 
     if (req.params.cellIndex >= 0 && req.params.cellIndex < map.cells.length) {

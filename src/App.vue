@@ -26,9 +26,7 @@ export default {
   }),
   methods: {
     newGame: async function() {
-      this.$store.commit("resetStore", {
-        location: (await this.$http.get("/api/location/start")).data,
-      });
+      await this.$store.dispatch("resetGame");
       this.homekey += 1;
     },
     newMap: async function() {

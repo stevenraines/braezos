@@ -1,5 +1,6 @@
 const EncounterStates = {
-  START: "start",
   DEFAULT: "default",
+  START: "start",
+  VISITED: "visited",
 };
 module.exports = EncounterStates;

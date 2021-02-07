@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const _ = require("lodash");
 const fs = require("fs");
 const MapAPI = require("./api/map");
@@ -37,7 +38,7 @@ router.use(function timeLog(req, res, next) {
 
 // define the home page route
 router.get("/makeMap", MapAPI.create);
-router.get("/location/:cellIndex", MapAPI.getLocation);
+router.post("/location/:cellIndex", MapAPI.getLocation);
 router.get("/encounter/clear", MapAPI.clearEncounters);
 // define the about route
 router.get("/about", function(req, res) {

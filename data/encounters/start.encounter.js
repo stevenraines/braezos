@@ -1,8 +1,7 @@
 const _ = require("lodash");
 
-const Location = _.merge(require("./default.location"), {
+module.exports = _.merge({}, require("./default.encounter"), {
   name: "start",
-
   events: {
     start: {
       title: "Adventure Awaits",
@@ -16,6 +15,3 @@ const Location = _.merge(require("./default.location"), {
     },
   },
 });
-
-console.log(Location);
-module.exports = Location;

@@ -39,6 +39,7 @@
 import TerrainTypes from "../../shared/enums/terrainTypes";
 import _ from "lodash";
 import { mapGetters } from "vuex";
+
 export default {
   name: "Map",
   data: function() {
@@ -89,25 +90,33 @@ export default {
       }
 
       if (message.data.event == "click" && message.source == this.mapSVG) {
-        // load details about the territory
-
-        let priorLocation = this.normalState.location;
-
-        // if there is a prior location, change it back to it's previous color
-        if (_.get(priorLocation, "terrainType")) {
-          this.setLocationColor(priorLocation);
-        }
-
-        let newLocation = await (
-          await this.$http.get(`/api/location/${message.data.id}`)
-        ).data;
-
-        this.$store.commit("setCurrentLocation", newLocation);
-
-        this.setLocationColor(newLocation, "orange");
+        await this.movePlayer(message);
       }
     },
 
+    movePlayer: async function(message) {
+      // store where we are:
+      let priorLocation = this.normalState.location;
+
+      // try and perform the move
+
+      if (
+        !(await this.$store.dispatch("movePlayer", {
+          toCell: message.data.id,
+        }))
+      ) {
+        return;
+      }
+
+      //if successful update the map appearance
+
+      // if there is a prior location, change it back to it's previous color
+      if (_.get(priorLocation, "terrainType")) {
+        this.setLocationColor(priorLocation);
+      }
+
+      this.setLocationColor(this.normalState.location, "orange");
+    },
     resetSVG: function() {
       this.mapSVG.postMessage(
         {
