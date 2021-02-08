@@ -2,6 +2,15 @@ const _ = require("lodash");
 
 module.exports = _.merge({}, require("./default.encounter"), {
   name: "start",
+  items: [
+    {
+      id: "1",
+      item: {
+        name: "dagger",
+      },
+      q: 1,
+    },
+  ],
   events: {
     start: {
       title: "Adventure Awaits",

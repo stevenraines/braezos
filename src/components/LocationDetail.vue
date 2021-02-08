@@ -2,9 +2,19 @@
   <v-container class="section-border">
     <v-row>
       <v-col cols="12">
-        <h1>{{ currentEvent.title }}</h1>
+        <h1>{{ event.title }}</h1>
         Type: {{ location.terrainType.name }} <br /><br />
-        {{ currentEvent.text }}
+        {{ event.text }}
+        {{ location.encounter.items }}
+        <div v-if="items">
+          You see:
+          <ul>
+            <li v-for="item in items" :key="item.id">
+              {{ item.item.name }}
+              <v-btn v-on:click="takeItem(item.id)">Take</v-btn>
+            </li>
+          </ul>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -18,8 +28,16 @@ export default {
   data: function() {
     return {};
   },
+  methods: {
+    takeItem: function(id) {
+      this.$store.dispatch("pickUpItem", id);
+    },
+  },
   computed: {
-    currentEvent() {
+    items() {
+      return this.location.encounter.items;
+    },
+    event() {
       if (!_.get(this.location, "encounter.events")) return null;
       let event = this.location.encounter.events[this.location.encounter.state];
       return event;

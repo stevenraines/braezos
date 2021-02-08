@@ -53,9 +53,11 @@ export default {
   computed: {
     ...mapGetters(["normalState"]),
   },
-  mounted: function() {},
-  created: function() {
-    window.addEventListener("message", this.handlePostedMessage, false);
+  mounted: function() {
+    window.addEventListener("message", this.handlePostedMessage);
+  },
+  beforeDestroy() {
+    window.removeEventListener("message", this.handlePostedMessage);
   },
 
   methods: {
@@ -97,7 +99,7 @@ export default {
     movePlayer: async function(message) {
       // store where we are:
       let priorLocation = this.normalState.location;
-
+      if (message.data.id == priorLocation.id) return;
       // try and perform the move
 
       if (

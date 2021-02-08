@@ -59,7 +59,7 @@ const MapGenerator = {
           return d.elementId;
         })
         .attr("onclick", function(d) {
-          return `window.parent.postMessage({ event: 'click', terrainType: "${
+          return `postParentMessage(event,{ event: 'click', terrainType: "${
             d.terrainType.name
           }", id: ${d.id.toString()},  elementId: this.id }, '*')`;
         })

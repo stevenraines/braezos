@@ -3,12 +3,21 @@ import Vuex from "vuex";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import EncounterStates from "../../shared/enums/encounterStates";
+import _ from "lodash";
 
 Vue.use(VueAxios, axios);
 Vue.use(Vuex);
+function cleanObservable(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 
 const defaultState = {
-  location: { id: "none" },
+  location: {
+    id: "none",
+    encounter: {
+      items: [],
+    },
+  },
 };
 
 let store = new Vuex.Store({
@@ -21,9 +30,16 @@ let store = new Vuex.Store({
     },
   },
   mutations: {
-    setCurrentLocation: (state, data) => {
-      // mutate state
+    removeItemFromEncounter(state, itemId) {
+      let itemList = cleanObservable(state.location.encounter.items);
+      let removedItems = _.remove(itemList, { id: itemId });
 
+      // move items to player inventory
+      console.log(removedItems);
+      state.location.encounter.items = itemList;
+    },
+
+    setCurrentLocation: (state, data) => {
       state.location = data;
     },
 
@@ -47,6 +63,10 @@ let store = new Vuex.Store({
     },
   },
   actions: {
+    async pickUpItem({ commit }, itemId) {
+      console.log("removeItemFromEncounter", itemId);
+      commit("removeItemFromEncounter", itemId);
+    },
     async movePlayer({ commit, getters }, data) {
       // if we are leaving an encounter and the state is "Start", change it to visited
       let location = getters.normalState.location;
@@ -55,6 +75,7 @@ let store = new Vuex.Store({
         location.encounter.state = EncounterStates.VISITED;
       }
 
+      console.log(location.encounter);
       let newLocation = await (
         await axios.post(`/api/location/${data.toCell}`, location.encounter)
       ).data;

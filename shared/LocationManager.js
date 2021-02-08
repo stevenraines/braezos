@@ -16,9 +16,7 @@ const LocationManager = {
     return _.find(LocationTemplates, { name: name });
   },
   updateEncounter: function(encounter) {
-    console.log(encounter);
     this.encounters[encounter.id] = encounter;
-    console.log(this.encounters[encounter.id]);
   },
   getLocationDetails: function(map, id) {
     // if we do not have any encounters, make / load them.

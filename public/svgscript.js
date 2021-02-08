@@ -1,5 +1,11 @@
+window.postParentMessage = function(event, data) {
+  event.stopPropagation();
+  window.parent.postMessage(data);
+};
+
 let SVGMethods = {
   zoomFactor: 10,
+
   changeCellColor: function(map, message) {
     let element = map.getElementById(message.data.elementId);
     if (!element) return;
