@@ -9,7 +9,7 @@ const D3Renderer = {
     this.height = height;
     this.width = width;
   },
-  renderMap: async function(place) {
+  renderMap: async function(player) {
     let mapSvg = d3
       .create('svg')
       .attr('id', 'map')
@@ -17,10 +17,11 @@ const D3Renderer = {
       .attr('width', this.width);
 
     // render the map cells. for overland this is voronoi. for interiors, grids.
-    this.renderCells(mapSvg, this.mapData, place);
+    this.renderCells(mapSvg, this.mapData, player.location);
+    this.renderPlayer(mapSvg, player);
 
     // set the pan of the map to focus on the place
-    this.scrollToPlace(mapSvg, place);
+    this.scrollToPlace(mapSvg, player.position);
     return this.serializeSVG(mapSvg.node());
   },
   serializeSVG: function(d3Node) {
@@ -28,7 +29,7 @@ const D3Renderer = {
     var source = serializer.serializeToString(d3Node);
     return source;
   },
-  scrollToPlace: function(svg, place, zoom) {
+  scrollToPlace: function(svg, position, zoom) {
     //get coordinates of place.
     if (!zoom) zoom = 1;
 
@@ -37,10 +38,21 @@ const D3Renderer = {
     let startX = 0;
     let startY = 0;
 
-    startX = place.point[0] - width / 2;
-    startY = place.point[1] - height / 2;
+    startX = position[0] - width / 2;
+    startY = position[1] - height / 2;
 
     svg.attr('viewBox', `${startX} ${startY} ${width} ${height}`);
+  },
+  renderPlayer(svg, playerData) {
+    console.log(playerData);
+    svg
+      .append('circle')
+      .attr('id', 'player')
+      .style('stroke', 'gray')
+      .style('fill', 'black')
+      .attr('r', 10)
+      .attr('cx', playerData.position[0])
+      .attr('cy', playerData.position[1]);
   },
   renderCells: function(svg, mapData, place) {
     let cells = mapData.cells;

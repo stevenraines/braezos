@@ -1,11 +1,7 @@
 <template>
-  <v-container class="section-border">
-    <v-row>
-      <v-col cols="12">
-        {{ player.location }}
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-card class="card">
+    {{ player.location }}
+  </v-card>
 </template>
 <script>
 import { mapState } from 'vuex';

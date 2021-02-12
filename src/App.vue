@@ -9,11 +9,11 @@
     <v-main>
       <Home :key="homekey" />
     </v-main>
-  </v-app>
-</template>
-
+  </v-app> </template
+>ß
 <script>
 import Home from './views/Home';
+import { EventBus } from './eventbus.js';
 
 export default {
   name: 'App',
@@ -25,7 +25,22 @@ export default {
   components: {
     Home,
   },
+  created: function() {
+    window.addEventListener('keyup', this.keyup);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener('keyup', this.keyup);
+  },
   methods: {
+    keyup: async function(event) {
+      if (
+        event.srcElement.tagName != 'TEXTAREA' &&
+        event.srcElement.tagName != 'INPUT'
+      ) {
+        EventBus.$emit('keyevent', event);
+      }
+    },
+
     newGame: async function() {
       await this.$store.dispatch('resetGame');
       this.homekey += 1;
