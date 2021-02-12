@@ -19,6 +19,7 @@
     "js-priority-queue": "^0.1.5",
     "lodash": "^4.17.20",
     "seedrandom": "^3.0.5",
+    "uuid": "^8.3.2",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.4",
     "vue-router": "^3.2.0",

@@ -1,6 +1,6 @@
-const LocationTemplates = require("../data/encounter.js");
-const _ = require("lodash");
-const EncounterStates = require("../shared/enums/encounterStates");
+const LocationTemplates = require('../data/encounter.js');
+const _ = require('lodash');
+const EncounterStates = require('../shared/enums/encounterStates');
 
 const LocationManager = {
   encounters: null,
@@ -34,11 +34,11 @@ const LocationManager = {
       };
 
       if (id == map.startingCellIndex) {
-        encounter = _.merge(encounter, this.getLocationTemplateByName("start"));
+        encounter = _.merge(encounter, this.getLocationTemplateByName('start'));
       } else {
         encounter = _.merge(
           encounter,
-          this.getLocationTemplateByName("default")
+          this.getLocationTemplateByName('default')
         );
       }
     }

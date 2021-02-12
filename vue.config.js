@@ -1,9 +1,9 @@
-const configureAPI = require("./server/configure");
+const configureAPI = require('./server/configure');
 
 module.exports = {
+  runtimeCompiler: true,
   devServer: {
-    before: configureAPI
+    before: configureAPI,
   },
-
-  transpileDependencies: ["vuetify"]
+  transpileDependencies: ['vuetify'],
 };

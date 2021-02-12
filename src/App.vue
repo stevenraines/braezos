@@ -13,28 +13,30 @@
 </template>
 
 <script>
-import Home from "./views/Home";
+import Home from './views/Home';
 
 export default {
-  name: "App",
+  name: 'App',
+  data: function() {
+    return {
+      homekey: 0,
+    };
+  },
   components: {
     Home,
   },
-
-  data: () => ({
-    homekey: 0,
-  }),
   methods: {
     newGame: async function() {
-      await this.$store.dispatch("resetGame");
+      await this.$store.dispatch('resetGame');
       this.homekey += 1;
     },
     newMap: async function() {
-      await this.$http.get("/api/makeMap");
+      await this.$http.get('/api/makeMap');
     },
   },
-  beforeCreate() {
-    this.$store.commit("initialiseStore");
+  async beforeCreate() {
+    console.log('CREATE');
+    await this.$store.dispatch('init');
   },
 };
 </script>

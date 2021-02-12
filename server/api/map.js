@@ -1,7 +1,7 @@
-const Braezos = require("../../shared/Braezos");
-const defaultParams = require("../../params.config");
-const _ = require("lodash");
-const LocationManager = require("../../shared/LocationManager");
+const Braezos = require('../../shared/Braezos');
+const defaultParams = require('../../params.config');
+const _ = require('lodash');
+const LocationManager = require('../../shared/LocationManager');
 
 const Map = {
   currentMap: null,
@@ -18,27 +18,27 @@ const Map = {
     return Map.currentMap;
   },
   create: async function(req, res) {
-    console.log("create map");
     let params = defaultParams;
     params.seed = _.get(
       req,
-      "query.seed",
-      _.get(defaultParams, "seed", "BRAEZOS")
+      'query.seed',
+      _.get(defaultParams, 'seed', 'BRAEZOS')
     );
     await Braezos.saveMap(
-      `${__dirname}/../../public/maps/${_.get(params, "mapName", "map")}`,
+      `${__dirname}/../../public/maps/${_.get(params, 'mapName', 'map')}`,
       await Braezos.makeMap(params)
     );
-    if (res) res.send("done");
+    if (res) res.send('done');
   },
-  getLocation: async function(req, res) {
+  /*
+  getPlace: async function(req, res) {
     let map = await Map.getMap();
 
     if (req.params.cellIndex == "start") {
       LocationManager.resetEncounters();
       return res
         .status(200)
-        .send(LocationManager.getLocationDetails(map, map.startingCellIndex));
+        .send(LocationManager.getPlaceDetails(map, map.startingCellIndex));
     }
 
     if (req.body) {
@@ -52,6 +52,13 @@ const Map = {
     }
 
     return res.status(404).send("no such place");
+  },
+  */
+  getPlaces: async function(req, res) {
+    let map = await Map.getMap();
+
+    LocationManager.resetEncounters();
+    return res.status(200).send(map);
   },
 };
 

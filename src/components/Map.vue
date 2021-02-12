@@ -2,13 +2,9 @@
   <v-container class="section-border">
     <v-row>
       <v-col cols="12">
-        <object
-          id="svg-object"
-          type="image/svg+xml"
-          data="./maps/map.svg"
-          v-bind:width="width"
-          v-bind:height="height"
-        ></object>
+        <div id="svg-object" key="renderedMap">
+          <component :is="dynamicComponent" />
+        </div>
       </v-col>
     </v-row>
     <v-row>
@@ -36,14 +32,16 @@
 </template>
 
 <script>
-import TerrainTypes from "../../shared/enums/terrainTypes";
-import _ from "lodash";
-import { mapGetters } from "vuex";
+import { mapState } from 'vuex';
+import { EventBus } from '../eventbus.js';
+import renderer from '../../shared/renderers/d3';
 
 export default {
-  name: "Map",
+  name: 'Map',
   data: function() {
     return {
+      map: null,
+      renderedMap: null,
       height: 600,
       width: 600,
       mapSVG: null,
@@ -51,119 +49,93 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters(["normalState"]),
-  },
-  mounted: function() {
-    window.addEventListener("message", this.handlePostedMessage);
-  },
-  beforeDestroy() {
-    window.removeEventListener("message", this.handlePostedMessage);
-  },
-
-  methods: {
-    setLocationColor: function(location, color) {
-      let cellColor = color || "#cccccc";
-
-      if (!color && _.get(location, "terrainType")) {
-        cellColor = _.find(TerrainTypes, {
-          name: location.terrainType.name,
-        }).color;
-      }
-
-      this.mapSVG.postMessage(
-        {
-          event: "changeCellColor",
-          elementId: location.elementId,
-          color: cellColor,
-          id: location.id,
+    ...mapState({
+      player: state => state.player,
+      places: state => state.places,
+    }),
+    dynamicComponent: function() {
+      return {
+        template: `<div>${this.renderedMap}</div>`,
+        methods: {
+          someAction() {
+            console.log('Action!');
+          },
         },
-        "*"
+      };
+    },
+  },
+  async created() {
+    EventBus.$on('click', this.handleGlobalEvent);
+
+    await this.renderMap();
+  },
+  async beforeUpdate() {},
+  methods: {
+    renderMap: async function() {
+      console.log('rendermap', this.$store.state);
+      if (!this.$store.state.player.location) return;
+
+      renderer.init(this.$store.state.places, this.height, this.width);
+
+      this.renderedMap = await renderer.renderMap(
+        this.$store.state.player.location
       );
     },
-    handlePostedMessage: async function(message) {
-      if (message.data.event == "register" && message.data.elementId == "map") {
-        this.mapSVG = message.source;
-        // let location = _.get(this.$store.state, "location");
-        let location = this.normalState.location;
-        if (location) {
-          this.setLocationColor(location, "orange");
-        }
-        return;
+
+    handleGlobalEvent: async function(message) {
+      if (message.event == 'click' && message.source == 'map') {
+        await this.$store.dispatch(
+          'player/movePlayer',
+          this.places.cells[message.id]
+        );
+        await this.renderMap();
       }
-
-      if (message.data.event == "click" && message.source == this.mapSVG) {
-        await this.movePlayer(message);
-      }
-    },
-
-    movePlayer: async function(message) {
-      // store where we are:
-      let priorLocation = this.normalState.location;
-      if (message.data.id == priorLocation.id) return;
-      // try and perform the move
-
-      if (
-        !(await this.$store.dispatch("movePlayer", {
-          toCell: message.data.id,
-        }))
-      ) {
-        return;
-      }
-
-      //if successful update the map appearance
-
-      // if there is a prior location, change it back to it's previous color
-      if (_.get(priorLocation, "terrainType")) {
-        this.setLocationColor(priorLocation);
-      }
-
-      this.setLocationColor(this.normalState.location, "orange");
     },
     resetSVG: function() {
       this.mapSVG.postMessage(
         {
-          event: "resetSVG",
-          elementId: "map",
+          event: 'resetSVG',
+          elementId: 'map',
           height: this.height,
           width: this.width,
         },
-        "*"
+        '*'
       );
     },
     panSVGV: function(amount) {
       this.mapSVG.postMessage(
         {
-          event: "panSVGV",
-          elementId: "map",
+          event: 'panSVGV',
+          elementId: 'map',
           amount: amount,
           height: this.height,
           width: this.width,
         },
-        "*"
+        '*'
       );
     },
     panSVGH: function(amount) {
       this.mapSVG.postMessage(
         {
-          event: "panSVGH",
-          elementId: "map",
+          event: 'panSVGH',
+          elementId: 'map',
           amount: amount,
           height: this.height,
           width: this.width,
         },
-        "*"
+        '*'
       );
     },
     zoomSVG: function(amount) {
       this.mapSVG.postMessage(
         {
-          event: "zoomSVG",
-          elementId: "map",
+          event: 'zoomSVG',
+          elementId: 'map',
           amount: amount,
           height: this.height,
           width: this.width,
         },
-        "*"
+        '*'
       );
     },
   },

@@ -1,28 +1,28 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const _ = require("lodash");
-const fs = require("fs");
-const MapAPI = require("./api/map");
-const defaultParams = require("../params.config");
+const _ = require('lodash');
+const fs = require('fs');
+const MapAPI = require('./api/map');
+const defaultParams = require('../params.config');
 
 async function initialize() {
   console.log(
-    `${__dirname}/../public/maps/${_.get(defaultParams, "mapName", "map")}.json`
+    `${__dirname}/../public/maps/${_.get(defaultParams, 'mapName', 'map')}.json`
   );
   if (
     !fs.existsSync(
       `${__dirname}/../public/maps/${_.get(
         defaultParams,
-        "mapName",
-        "map"
+        'mapName',
+        'map'
       )}.svg`
     ) ||
     !fs.existsSync(
       `${__dirname}/../public/maps/${_.get(
         defaultParams,
-        "mapName",
-        "map"
+        'mapName',
+        'map'
       )}.json`
     )
   ) {
@@ -32,20 +32,16 @@ async function initialize() {
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
-  console.log("Time: ", Date.now());
+  console.log('Time: ', Date.now());
   next();
 });
 
 // define the home page route
-router.get("/makeMap", MapAPI.create);
-router.post("/location/:cellIndex", MapAPI.getLocation);
-router.get("/encounter/clear", MapAPI.clearEncounters);
-// define the about route
-router.get("/about", function(req, res) {
-  res.send("About birds");
-});
-router.get("*", function(req, res) {
-  res.send("no valid endpoint");
+router.get('/makeMap', MapAPI.create);
+router.get('/places/', MapAPI.getPlaces);
+
+router.get('*', function(req, res) {
+  res.send('no valid endpoint');
 });
 initialize();
 module.exports = router;
