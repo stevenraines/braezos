@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const PlaceManager = {
+const PlaceStore = {
   namespaced: true,
   state: {
     cells: null,
@@ -34,4 +34,4 @@ const PlaceManager = {
   },
 };
 
-export default PlaceManager;
+export default PlaceStore;

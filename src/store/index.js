@@ -32,7 +32,7 @@ let store = new Vuex.Store({
   },
   actions: {
     async init({ state, dispatch }) {
-      if (localStorage.getItem('store')) {
+      if (localStorage.getItem('storeX')) {
         // Replace the state object with the stored item
         this.replaceState(
           Object.assign(state, JSON.parse(localStorage.getItem('store')))

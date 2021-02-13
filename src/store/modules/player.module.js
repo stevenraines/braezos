@@ -2,6 +2,16 @@ import { EventBus } from '../../eventbus.js';
 import helpers from '../../globalhelpers.js';
 const Delaunay = require('d3-delaunay').Delaunay;
 
+function normalizePosition(position, gridSize) {
+  let newX = Math.floor(position[0] / gridSize) * gridSize;
+  let newY = Math.floor(position[1] / gridSize) * gridSize;
+  position = [
+    newX < 0 ? -1 : (1 * gridSize) / 2 + newX,
+    newY < 0 ? -1 : (1 * gridSize) / 2 + newY,
+  ];
+
+  return position;
+}
 const PlayerManager = {
   namespaced: true,
   state: {
@@ -14,32 +24,35 @@ const PlayerManager = {
   },
   getters: {},
   mutations: {
-    setupPlayer(state, data) {
-      if (data) {
-        state.location = data.location;
-        state.position = data.location.point;
-        return;
-      }
-    },
-    updatePlayerLocation(state, location) {
+    updatePlayerLocation(state, data) {
       if (location) {
-        state.location = location;
-        state.position = location.point;
+        state.location = data.location;
+        state.position = data.position;
         return;
       }
     },
     updatePlayerPosition(state, newPosition) {
       state.position = newPosition;
-      // let oldPosition = state.position;
-      // update the position
-      // find what place the new player position is in
     },
   },
   actions: {
-    async init({ commit, rootState }) {
-      commit('setupPlayer', {
+    async init({ dispatch, rootState }) {
+      dispatch('setupPlayer', {
         location: rootState.places.cells[rootState.places.startingCellIndex],
       });
+    },
+    async setupPlayer({ commit, rootState }, data) {
+      if (data) {
+        let newPosition = normalizePosition(
+          data.location.point,
+          rootState.places.params.moveSize
+        );
+
+        await commit('updatePlayerLocation', {
+          location: location,
+          position: newPosition,
+        });
+      }
     },
     async movePlayerSmall({ state, commit, rootState }, positionVector) {
       let newPosition = helpers.cleanObservable(state.position);
@@ -48,7 +61,12 @@ const PlayerManager = {
       newPosition[1] = newPosition[1] + positionVector[1];
 
       let delaunay = Delaunay.from(rootState.places.points);
-      let voronoi = delaunay.voronoi([0, 0, 800, 800]);
+      let voronoi = delaunay.voronoi([
+        0,
+        0,
+        rootState.places.params.width,
+        rootState.places.params.height,
+      ]);
 
       for (let cell in rootState.places.cells) {
         if (
@@ -63,18 +81,33 @@ const PlayerManager = {
             return;
           }
 
-          await commit('updatePlayerLocation', newLocation);
           break;
         }
       }
 
-      await commit('updatePlayerPosition', newPosition);
+      newPosition = normalizePosition(
+        newPosition,
+        rootState.places.params.moveSize
+      );
+
+      await commit('updatePlayerLocation', {
+        location: newLocation,
+        position: newPosition,
+      });
+
       EventBus.$emit('playerMoved', state.location);
     },
-    async movePlayer({ state, commit }, newLocation) {
+    async movePlayer({ state, commit, rootState }, newLocation) {
       if (state.location && newLocation.id == state.location.id) return;
+      let newPosition = normalizePosition(
+        newLocation.point,
+        rootState.places.params.moveSize
+      );
 
-      await commit('updatePlayerLocation', newLocation);
+      await commit('updatePlayerLocation', {
+        location: newLocation,
+        position: newPosition,
+      });
 
       EventBus.$emit('playerMoved', newLocation);
     },

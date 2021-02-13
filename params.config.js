@@ -1,7 +1,9 @@
 module.exports = {
   npts: 50, //75, //16384,
-  height: 800,
-  width: 800,
+  height: 1600,
+  width: 1600,
+  moveSize: 20,
+  renderGrid: true,
   terrainIterations: 5,
   extent: {
     width: 1,
@@ -17,5 +19,5 @@ module.exports = {
     city: 25,
     town: 20,
   },
-  mapName: "map",
+  mapName: 'map',
 };

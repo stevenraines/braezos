@@ -9,28 +9,29 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import { EventBus } from '../eventbus.js';
 import renderer from '../../shared/renderers/d3';
-
+//import PlaceController from '../controllers/placeController';
+//import PlayerController from '../controllers/playerController';
 export default {
   name: 'Map',
   data: function() {
     return {
+      PlaceController: this.$root.$data.PlaceController,
+      PlayerController: this.$root.$data.PlayerController,
+      placeData: {},
+      playerData: {},
       map: null,
-      moveUnit: 10,
       renderedMap: null,
       height: 600,
       width: 600,
       mapSVG: null,
     };
   },
+
   components: {},
+  mounted() {},
   computed: {
-    ...mapState({
-      player: state => state.player,
-      places: state => state.places,
-    }),
     dynamicComponent: function() {
       return {
         template: `<div>${this.renderedMap}</div>`,
@@ -47,37 +48,36 @@ export default {
   async beforeUpdate() {},
   methods: {
     renderMap: async function() {
-      if (!this.$store.state.player.location) return;
-
-      renderer.init(this.$store.state.places, this.height, this.width);
-      this.renderedMap = await renderer.renderMap(this.$store.state.player);
+      if (!this.PlayerController.player.location) return;
+      renderer.init(this.PlaceController.places, this.height, this.width);
+      this.renderedMap = await renderer.renderMap(this.PlayerController.player);
     },
     handleKeyEvent: async function(message) {
       switch (message.code) {
         case 'ArrowUp':
           await this.$store.dispatch('player/movePlayerSmall', [
             0,
-            -this.moveUnit,
+            -this.PlaceController.places.params.moveSize,
           ]);
           await this.renderMap();
           break;
         case 'ArrowDown':
           await this.$store.dispatch('player/movePlayerSmall', [
             0,
-            this.moveUnit,
+            this.PlaceController.places.params.moveSize,
           ]);
           await this.renderMap();
           break;
         case 'ArrowLeft':
           await this.$store.dispatch('player/movePlayerSmall', [
-            -this.moveUnit,
+            -this.PlaceController.places.params.moveSize,
             0,
           ]);
           await this.renderMap();
           break;
         case 'ArrowRight':
           await this.$store.dispatch('player/movePlayerSmall', [
-            this.moveUnit,
+            this.PlaceController.places.params.moveSize,
             0,
           ]);
           await this.renderMap();
@@ -88,7 +88,7 @@ export default {
       if (message.event == 'click' && message.source == 'map') {
         await this.$store.dispatch(
           'player/movePlayer',
-          this.places.cells[message.id]
+          this.PlaceController.places.cells[message.id]
         );
         await this.renderMap();
       }

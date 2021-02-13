@@ -4,20 +4,68 @@ const D3Renderer = {
   mapData: null,
   height: null,
   width: null,
+  zoom: 1,
   init: function(mapData, height, width) {
     this.mapData = mapData;
     this.height = height;
     this.width = width;
+  },
+  renderGrid: async function(svg, width, height, gridSize) {
+    if (gridSize < 5) gridSize = 5;
+    let gridColor = '#0000cc';
+    let dataX = [];
+    let dataY = [];
+    for (var x = 0; x < width / gridSize; x++) {
+      dataX.push([x * gridSize, 0, x * gridSize, height]);
+    }
+    for (var y = 0; y < height / gridSize; y++) {
+      dataY.push([0, y * gridSize, width, y * gridSize]);
+    }
+
+    svg
+      .append('g')
+      .selectAll('path')
+      .data(dataX)
+      .enter()
+      .append('path')
+      .attr('stroke', gridColor)
+      .attr('d', d => {
+        let path = `M ${d[0]} ${d[1]} L ${d[2]} ${d[3]}`;
+
+        return path;
+      });
+
+    svg
+      .append('g')
+      .selectAll('path')
+      .data(dataY)
+      .enter()
+      .append('path')
+      .attr('stroke', gridColor)
+      .attr('d', d => {
+        let path = `M ${d[0]} ${d[1]} L ${d[2]} ${d[3]}`;
+
+        return path;
+      });
   },
   renderMap: async function(player) {
     let mapSvg = d3
       .create('svg')
       .attr('id', 'map')
       .attr('height', this.height)
-      .attr('width', this.width);
-
+      .attr('width', this.width)
+      .attr('stroke', '#000000');
     // render the map cells. for overland this is voronoi. for interiors, grids.
+
     this.renderCells(mapSvg, this.mapData, player.location);
+
+    this.renderGrid(
+      mapSvg,
+      this.mapData.params.width,
+      this.mapData.params.height,
+      this.mapData.params.moveSize
+    );
+
     this.renderPlayer(mapSvg, player);
 
     // set the pan of the map to focus on the place
@@ -29,22 +77,22 @@ const D3Renderer = {
     var source = serializer.serializeToString(d3Node);
     return source;
   },
-  scrollToPlace: function(svg, position, zoom) {
+  scrollToPlace: function(svg, position) {
     //get coordinates of place.
-    if (!zoom) zoom = 1;
 
-    let width = this.width * zoom;
-    let height = this.height * zoom;
+    let width = this.width * this.zoom;
+    let height = this.height * this.zoom;
     let startX = 0;
     let startY = 0;
 
     startX = position[0] - width / 2;
     startY = position[1] - height / 2;
 
-    svg.attr('viewBox', `${startX} ${startY} ${width} ${height}`);
+    let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
+    console.log(viewBoxSize);
+    svg.attr('viewBox', viewBoxSize);
   },
   renderPlayer(svg, playerData) {
-    console.log(playerData);
     svg
       .append('circle')
       .attr('id', 'player')

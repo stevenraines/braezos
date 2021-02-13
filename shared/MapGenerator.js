@@ -8,16 +8,16 @@ Map generation strategy:
 
 */
 
-const d3 = require("d3");
-const _ = require("lodash");
-_.assign(d3, require("d3-voronoi"));
-const PriorityQueue = require("js-priority-queue");
-const Delaunay = require("d3-delaunay").Delaunay;
-const seedrandom = require("seedrandom");
-const Names = require("./names");
-const TerrainTypes = require("./enums/terrainTypes");
-const MathHelper = require("./helpers/math");
-const { param } = require("../server/api");
+const d3 = require('d3');
+const _ = require('lodash');
+_.assign(d3, require('d3-voronoi'));
+const PriorityQueue = require('js-priority-queue');
+const Delaunay = require('d3-delaunay').Delaunay;
+const seedrandom = require('seedrandom');
+const Names = require('./names');
+const TerrainTypes = require('./enums/terrainTypes');
+const MathHelper = require('./helpers/math');
+const { param } = require('../server/api');
 
 var defaultExtent = {
   width: 1,
@@ -29,47 +29,47 @@ const MapGenerator = {
   params: {},
   renderTerrainLinks: function(svg, links) {
     svg
-      .append("g")
-      .selectAll("circle")
+      .append('g')
+      .selectAll('circle')
       .data(links)
       .enter()
-      .append("circle")
-      .attr("r", 5)
-      .attr("cx", (d) => {
+      .append('circle')
+      .attr('r', 5)
+      .attr('cx', d => {
         return d ? d[0][0] : null;
       })
-      .attr("cy", (d) => {
+      .attr('cy', d => {
         return d ? d[0][1] : null;
       })
-      .attr("fill", "green")
-      .attr("stroke", "green");
+      .attr('fill', 'green')
+      .attr('stroke', 'green');
   },
   renderTerrainCells: function(svg, cells) {
     for (cell in cells) {
       let fillColor = cells[cell].terrainType.color;
-      let strokeColor = "#333333";
+      let strokeColor = '#333333';
       var i = 0;
       svg
-        .append("g")
-        .selectAll("path")
+        .append('g')
+        .selectAll('path')
         .data([cells[cell]])
         .enter()
-        .append("path")
-        .attr("id", function(d) {
+        .append('path')
+        .attr('id', function(d) {
           return d.elementId;
         })
-        .attr("onclick", function(d) {
+        .attr('onclick', function(d) {
           return `postParentMessage(event,{ event: 'click', terrainType: "${
             d.terrainType.name
           }", id: ${d.id.toString()},  elementId: this.id }, '*')`;
         })
-        .attr("d", (d) => {
-          let path = `M ${d.polygons.join(" L ")} Z`.replace(",", " ");
+        .attr('d', d => {
+          let path = `M ${d.polygons.join(' L ')} Z`.replace(',', ' ');
           return path;
         })
 
-        .attr("fill", fillColor)
-        .attr("stroke", strokeColor);
+        .attr('fill', fillColor)
+        .attr('stroke', strokeColor);
 
       i++;
     }
@@ -81,45 +81,45 @@ const MapGenerator = {
       if (cells[cell].isEdge) continue;
 
       svg
-        .append("g")
-        .selectAll("text")
+        .append('g')
+        .selectAll('text')
         .data([cells[cell]])
         .enter()
 
-        .append("text")
-        .attr("id", (d) => {
+        .append('text')
+        .attr('id', d => {
           return `label-${d.id}`;
         })
-        .attr("x", (d) => {
+        .attr('x', d => {
           return d ? d.point[0] - 8 : null;
         })
-        .attr("y", (d) => {
+        .attr('y', d => {
           return d ? d.point[1] + 3 : null;
         })
         //.attr("dy", ".35em")
-        .attr("font-size", ".75em")
+        .attr('font-size', '.75em')
         .text(function(d) {
           return Names.getPlaceName(d.id); // this will be the name, eventually
         });
     }
   },
   renderTerrain: function(svg, terrainData, params) {
-    var width = svg.attr("width");
-    svg.attr("height", params.height);
+    var width = svg.attr('width');
+    svg.attr('height', params.height);
     //svg.attr("height", (width * params.extent.height) / params.extent.width);
-    svg.attr("id", "map");
-    svg.attr("seed", params.seed);
-    svg.attr("viewBox", `0 0 ${params.width} ${params.height}`);
+    svg.attr('id', 'map');
+    svg.attr('seed', params.seed);
+    svg.attr('viewBox', `0 0 ${params.width} ${params.height}`);
     svg.attr(
-      "onload",
+      'onload',
       `window.parent.postMessage({ event: 'register', elementId: this.id }, '*')`
     );
     svg.selectAll().remove();
 
     svg
-      .append("script")
-      .attr("href", "../svgscript.js")
-      .attr("type", "text/javascript");
+      .append('script')
+      .attr('href', '../svgscript.js')
+      .attr('type', 'text/javascript');
 
     MapGenerator.renderTerrainCells(svg, terrainData.cells);
 
@@ -161,7 +161,7 @@ const MapGenerator = {
     let terrainType =
       cell.isEdge && cell.terrainType != TerrainTypes.PEAK
         ? TerrainTypes.OCEAN
-        : _.get(cell, "terrainType", TerrainTypes.LAND);
+        : _.get(cell, 'terrainType', TerrainTypes.LAND);
     var i = 0;
     let distPercent = cell.peakDistance / (params.width / 2);
     let varDist = (params.rng() - 0.25) * 0.25;
@@ -254,7 +254,7 @@ const MapGenerator = {
 
       let cell = {
         id: cellIndex,
-        elementId: `cell-${cellIndex.toString().padStart(5, "0")}`,
+        elementId: `cell-${cellIndex.toString().padStart(5, '0')}`,
         point: terrain.points[cellIndex],
         peakDistance: 0,
         centerDistance: MathHelper.calculate2DDistance(
@@ -302,7 +302,7 @@ const MapGenerator = {
     // then generate a Delaunay / Voronoi diagram.
     terrain.points = d3
       .range(this.params.npts)
-      .map((d) => [
+      .map(d => [
         this.params.rng() * this.params.width,
         this.params.rng() * this.params.height,
       ]);
@@ -313,7 +313,7 @@ const MapGenerator = {
   },
   setStartLocation: function() {
     // get starting location
-    let coastLocations = _.filter(this.terrainData.cells, (cell) => {
+    let coastLocations = _.filter(this.terrainData.cells, cell => {
       return cell.terrainType.name == TerrainTypes.COAST.name;
     });
 
