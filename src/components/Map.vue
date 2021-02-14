@@ -50,7 +50,7 @@ export default {
         return;
 
       renderer.init(
-        this.$root.$data.controllers.PlaceController.terrain,
+        this.$root.$data.controllers.PlaceController.visibleTerrain,
         this.$root.$data.controllers.EnvironmentController.params,
         this.height,
         this.width

@@ -1,6 +1,9 @@
 <template>
   <v-card class="card">
-    {{ player.location }}
+    {{ player.position }}
+    {{ playerWorldCell }}
+    <hr />
+    {{ player }}
   </v-card>
 </template>
 <script>
@@ -18,6 +21,11 @@ export default {
     },
   },
   computed: {
+    playerWorldCell() {
+      return this.$root.$data.controllers.PlaceController.getWorldCellPosition(
+        this.player.position
+      );
+    },
     items() {
       return this.location.encounter.items;
     },

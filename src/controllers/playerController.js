@@ -52,6 +52,29 @@ export default class extends BaseController {
     }
   }
 
+  async getPlayerViewableCells() {
+    let playerWorldCell = this.controllers.PlaceController.getWorldCellPosition(
+      this.store.player.position
+    );
+    console.log(playerWorldCell);
+  }
+
+  viewArea() {
+    let playerPos = this.store.player.position;
+    let playerViewDistance =
+      this.controllers.store.player.viewDistance *
+      this.controllers.EnvironmentController.params.moveSize;
+
+    let minX = playerPos[0] - playerViewDistance;
+    let minY = playerPos[1] - playerViewDistance;
+    let maxX = playerPos[0] + playerViewDistance;
+    let maxY = playerPos[1] + playerViewDistance;
+
+    return [minX, minY, maxX, maxY];
+
+    //console.log(territory);
+  }
+
   async movePlayerToTerritory(id) {
     let location = this.controllers.PlaceController.territory(id);
     this.movePlayerToTerritoryByLocation(location);

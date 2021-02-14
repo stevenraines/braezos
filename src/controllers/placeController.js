@@ -1,6 +1,6 @@
 //const BaseController = require('./baseController');
 import BaseController from './baseController';
-import _ from 'lodash';
+//import _ from 'lodash';
 import TerrainGenerator from '../classes/terrainGenerator';
 
 export default class extends BaseController {
@@ -28,11 +28,14 @@ export default class extends BaseController {
     return this.store.state.places.terrain.territories;
   }
 
-  territoriesInView() {
-    let territories = _.filter(this.store.state.places.terrain.territories, {
-      id: this.store.state.player.location.id,
-    });
-    console.log(territories);
+  get visibleTerrain() {
+    let terrain = this.store.state.places.terrain;
+    for (let territoryIndex in terrain.territories) {
+      terrain.territories[territoryIndex] = this.$generatePlace(
+        terrain.territories[territoryIndex]
+      );
+    }
+    return terrain;
   }
 
   territory(territoryIndex) {
@@ -47,6 +50,18 @@ export default class extends BaseController {
       position[0],
       position[1]
     );
+  }
+
+  getWorldCellPosition(position) {
+    let npos = this.normalizePosition(position);
+    return [
+      Math.floor(
+        npos[0] / this.controllers.EnvironmentController.params.moveSize
+      ),
+      Math.floor(
+        npos[1] / this.controllers.EnvironmentController.params.moveSize
+      ),
+    ];
   }
 
   getTerritoryByPosition(position) {
@@ -77,12 +92,31 @@ export default class extends BaseController {
     return position;
   }
   $generatePlace(territory) {
-    console.log(territory);
-    this.$getTerritoryBoundingBox(territory);
     territory.special = 'special stuff';
+
+    if (territory.id == this.controllers.PlayerController.player.location.id) {
+      this.$getTerritoryBoundingBox(territory);
+    }
     return territory;
   }
   $getTerritoryBoundingBox(territory) {
-    console.log(territory);
+    let minX = 99999;
+    let minY = 99999;
+    let maxX = 0;
+    let maxY = 0;
+    //let gridSize = this.controllers.EnvironmentController.params.moveSize;
+
+    for (let polygonIndex in territory.polygons) {
+      let polygon = this.normalizePosition(territory.polygons[polygonIndex]);
+
+      if (polygon[0] < minX) minX = polygon[0];
+      if (polygon[1] < minY) minY = polygon[1];
+      if (polygon[0] > maxX) maxX = polygon[0];
+      if (polygon[1] > maxY) maxY = polygon[1];
+    }
+
+    territory.bounds = [minX, minY, maxX, maxY];
+
+    //console.log(territory);
   }
 }
