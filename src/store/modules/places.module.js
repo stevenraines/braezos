@@ -17,10 +17,8 @@ const PlaceStore = {
   mutations: {
     updatePlaces(state, places) {
       state.cells = places.cells;
-      state.params = places.params;
       state.points = places.points;
       state.startingCellIndex = places.startingCellIndex;
-      state.voronoi = places.voronoi;
     },
     updateEncounters(state, encounters) {
       state.encounters = encounters;
@@ -29,6 +27,7 @@ const PlaceStore = {
   actions: {
     async init({ commit }) {
       let places = await axios.get('/api/places');
+
       commit('updatePlaces', places.data);
     },
   },

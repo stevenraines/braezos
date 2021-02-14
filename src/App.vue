@@ -50,8 +50,10 @@ export default {
     },
   },
   async beforeCreate() {
-    console.log('CREATE');
-    await this.$store.dispatch('init');
+    await this.$root.$data.controllers.PlaceController.setup();
+    await this.$root.$data.controllers.PlayerController.setup();
+    await this.$root.$data.controllers.EnvironmentController.setup();
+    EventBus.$emit('setupComplete', { success: true });
   },
 };
 </script>

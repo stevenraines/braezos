@@ -1,12 +1,14 @@
 const d3 = require('d3');
 
 const D3Renderer = {
+  params: null,
   mapData: null,
   height: null,
   width: null,
   zoom: 1,
-  init: function(mapData, height, width) {
+  init: function(mapData, params, height, width) {
     this.mapData = mapData;
+    this.params = params;
     this.height = height;
     this.width = width;
   },
@@ -61,9 +63,9 @@ const D3Renderer = {
 
     this.renderGrid(
       mapSvg,
-      this.mapData.params.width,
-      this.mapData.params.height,
-      this.mapData.params.moveSize
+      this.params.width,
+      this.params.height,
+      this.params.moveSize
     );
 
     this.renderPlayer(mapSvg, player);
@@ -89,7 +91,7 @@ const D3Renderer = {
     startY = position[1] - height / 2;
 
     let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
-    console.log(viewBoxSize);
+
     svg.attr('viewBox', viewBoxSize);
   },
   renderPlayer(svg, playerData) {

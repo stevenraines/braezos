@@ -30,30 +30,6 @@ const Map = {
     );
     if (res) res.send('done');
   },
-  /*
-  getPlace: async function(req, res) {
-    let map = await Map.getMap();
-
-    if (req.params.cellIndex == "start") {
-      LocationManager.resetEncounters();
-      return res
-        .status(200)
-        .send(LocationManager.getPlaceDetails(map, map.startingCellIndex));
-    }
-
-    if (req.body) {
-      LocationManager.updateEncounter(req.body);
-    }
-
-    if (req.params.cellIndex >= 0 && req.params.cellIndex < map.cells.length) {
-      return res
-        .status(200)
-        .send(LocationManager.getLocationDetails(map, req.params.cellIndex));
-    }
-
-    return res.status(404).send("no such place");
-  },
-  */
   getPlaces: async function(req, res) {
     let map = await Map.getMap();
 

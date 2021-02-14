@@ -1,7 +1,7 @@
-const D3Node = require("d3-node");
-const fs = require("fs");
-const _ = require("lodash");
-const MapGenerator = require("./MapGenerator");
+const D3Node = require('d3-node');
+const fs = require('fs');
+const _ = require('lodash');
+const MapGenerator = require('./MapGenerator');
 let Braezos = {
   d3n: null,
   svg: null,
@@ -12,6 +12,9 @@ let Braezos = {
   },
   generateMap: function(params) {
     let mapData = MapGenerator.generateMap(this.svg, params);
+
+    delete mapData.params;
+    delete mapData.voronoi;
     return { json: JSON.stringify(mapData), svg: this.d3n.svgString() }; // output: <svg width=10 height=20 xmlns="http://www.w3.org/2000/svg"><g></g></svg>
   },
   saveMap: async function(outputURLBase, data) {

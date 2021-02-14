@@ -8,7 +8,8 @@ import VueAxios from 'vue-axios';
 import { EventBus } from './eventbus.js';
 import PlaceController from './controllers/placeController';
 import PlayerController from './controllers/playerController';
-
+import EnvironmentController from './controllers/environmentController';
+import params from '../params.config';
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
@@ -19,11 +20,23 @@ new Vue({
   render: h => h(App),
   data: function() {
     return {
-      PlaceController: new PlaceController(this.$store),
-      PlayerController: new PlayerController(this.$store),
+      controllers: {
+        PlaceController: null,
+        PlayerController: null,
+        EnvironmentController: null,
+      },
     };
   },
-  created() {},
+  async created() {
+    this.controllers.PlaceController = new PlaceController(this.$root);
+    this.controllers.PlayerController = new PlayerController(this.$root);
+    this.controllers.EnvironmentController = new EnvironmentController(
+      this.$root,
+      params
+    );
+
+    await this.$store.dispatch('init');
+  },
 }).$mount('#app');
 
 window.postMessage = function(event, msg) {

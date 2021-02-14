@@ -75,8 +75,6 @@ const MapGenerator = {
     }
   },
   renderTerrainLabels: function(svg, cells) {
-    // console.log("RENDER LABELS");
-
     for (cell in cells) {
       if (cells[cell].isEdge) continue;
 

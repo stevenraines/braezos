@@ -9,24 +9,24 @@ let SVGMethods = {
   changeCellColor: function(map, message) {
     let element = map.getElementById(message.data.elementId);
     if (!element) return;
-    element.setAttributeNS(null, "fill", message.data.color);
+    element.setAttributeNS(null, 'fill', message.data.color);
   },
   resetSVG: function(map, message) {
     map.setAttributeNS(
       null,
-      "viewBox",
-      `0 0 ${map.getAttributeNS(null, "width")} ${map.getAttributeNS(
+      'viewBox',
+      `0 0 ${map.getAttributeNS(null, 'width')} ${map.getAttributeNS(
         null,
-        "height"
+        'height'
       )}`
     );
   },
   zoomSVG: function(map, message) {
-    let vB = map.getAttributeNS(null, "viewBox").split(" ");
+    let vB = map.getAttributeNS(null, 'viewBox').split(' ');
 
     let amount = parseInt(message.data.amount);
-    let mapHeight = map.getAttributeNS(null, "height");
-    let mapWidth = map.getAttributeNS(null, "width");
+    let mapHeight = map.getAttributeNS(null, 'height');
+    let mapWidth = map.getAttributeNS(null, 'width');
 
     let scrollAmountH = parseInt(vB[0]) + amount * (SVGMethods.zoomFactor / 2);
     let scrollAmountV = parseInt(vB[1]) + amount * (SVGMethods.zoomFactor / 2);
@@ -42,18 +42,14 @@ let SVGMethods = {
     if (zoomAmountH <= mapWidth)
       map.setAttributeNS(
         null,
-        "viewBox",
+        'viewBox',
         `${scrollAmountH} ${scrollAmountV} ${zoomAmountH} ${zoomAmountV} `
       );
-
-    console.log(
-      `${scrollAmountH} ${scrollAmountV} ${zoomAmountH} ${zoomAmountV} `
-    );
   },
   panSVGV: function(map, message) {
-    let vB = map.getAttributeNS(null, "viewBox").split(" ");
-    let mapHeight = map.getAttributeNS(null, "height");
-    let zoomV = parseInt(vB[3]) - map.getAttributeNS(null, "height") / 2;
+    let vB = map.getAttributeNS(null, 'viewBox').split(' ');
+    let mapHeight = map.getAttributeNS(null, 'height');
+    let zoomV = parseInt(vB[3]) - map.getAttributeNS(null, 'height') / 2;
     let moveDir = parseInt(message.data.amount) * 10;
     let newTop = parseInt(vB[1]) - moveDir;
 
@@ -65,14 +61,14 @@ let SVGMethods = {
 
     map.setAttributeNS(
       null,
-      "viewBox",
+      'viewBox',
       `${vB[0]} ${newTop} ${vB[2]} ${vB[3]} `
     );
   },
   panSVGH: function(map, message) {
-    let vB = map.getAttributeNS(null, "viewBox").split(" ");
-    let mapWidth = map.getAttributeNS(null, "width");
-    let zoomH = parseInt(vB[2]) - map.getAttributeNS(null, "width") / 2;
+    let vB = map.getAttributeNS(null, 'viewBox').split(' ');
+    let mapWidth = map.getAttributeNS(null, 'width');
+    let zoomH = parseInt(vB[2]) - map.getAttributeNS(null, 'width') / 2;
     let moveDir = parseInt(message.data.amount) * 10;
     let newLeft = parseInt(vB[0]) - moveDir;
 
@@ -84,32 +80,32 @@ let SVGMethods = {
 
     map.setAttributeNS(
       null,
-      "viewBox",
+      'viewBox',
       `${newLeft} ${vB[1]} ${vB[2]} ${vB[3]} `
     );
   },
 };
 
 window.addEventListener(
-  "message",
-  (message) => {
+  'message',
+  message => {
     // register map
-    let map = document.getElementById("map");
+    let map = document.getElementById('map');
 
     switch (message.data.event) {
-      case "resetSVG":
+      case 'resetSVG':
         SVGMethods.resetSVG(map, message);
         break;
-      case "zoomSVG":
+      case 'zoomSVG':
         SVGMethods.zoomSVG(map, message);
         break;
-      case "panSVGV":
+      case 'panSVGV':
         SVGMethods.panSVGV(map, message);
         break;
-      case "panSVGH":
+      case 'panSVGH':
         SVGMethods.panSVGH(map, message);
         break;
-      case "changeCellColor":
+      case 'changeCellColor':
         SVGMethods.changeCellColor(map, message);
         break;
     }

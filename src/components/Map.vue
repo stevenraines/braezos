@@ -11,14 +11,12 @@
 <script>
 import { EventBus } from '../eventbus.js';
 import renderer from '../../shared/renderers/d3';
-//import PlaceController from '../controllers/placeController';
-//import PlayerController from '../controllers/playerController';
+import MOVE_VECTORS from '../../shared/enums/moveVectors';
+
 export default {
   name: 'Map',
   data: function() {
     return {
-      PlaceController: this.$root.$data.PlaceController,
-      PlayerController: this.$root.$data.PlayerController,
       placeData: {},
       playerData: {},
       map: null,
@@ -48,47 +46,42 @@ export default {
   async beforeUpdate() {},
   methods: {
     renderMap: async function() {
-      if (!this.PlayerController.player.location) return;
-      renderer.init(this.PlaceController.places, this.height, this.width);
-      this.renderedMap = await renderer.renderMap(this.PlayerController.player);
+      if (!this.$root.$data.controllers.PlayerController.player.location)
+        return;
+      renderer.init(
+        this.$root.$data.controllers.PlaceController.places,
+        this.$root.$data.controllers.EnvironmentController.params,
+        this.height,
+        this.width
+      );
+      this.renderedMap = await renderer.renderMap(
+        this.$root.$data.controllers.PlayerController.player
+      );
     },
     handleKeyEvent: async function(message) {
+      let vector = [0, 0];
       switch (message.code) {
         case 'ArrowUp':
-          await this.$store.dispatch('player/movePlayerSmall', [
-            0,
-            -this.PlaceController.places.params.moveSize,
-          ]);
-          await this.renderMap();
+          vector = MOVE_VECTORS.N;
           break;
         case 'ArrowDown':
-          await this.$store.dispatch('player/movePlayerSmall', [
-            0,
-            this.PlaceController.places.params.moveSize,
-          ]);
-          await this.renderMap();
-          break;
-        case 'ArrowLeft':
-          await this.$store.dispatch('player/movePlayerSmall', [
-            -this.PlaceController.places.params.moveSize,
-            0,
-          ]);
-          await this.renderMap();
+          vector = MOVE_VECTORS.S;
           break;
         case 'ArrowRight':
-          await this.$store.dispatch('player/movePlayerSmall', [
-            this.PlaceController.places.params.moveSize,
-            0,
-          ]);
-          await this.renderMap();
+          vector = MOVE_VECTORS.E;
+          break;
+        case 'ArrowLeft':
+          vector = MOVE_VECTORS.W;
           break;
       }
+
+      await this.$root.$data.controllers.PlayerController.movePlayer(vector);
+      await this.renderMap();
     },
     handleGlobalEvent: async function(message) {
       if (message.event == 'click' && message.source == 'map') {
-        await this.$store.dispatch(
-          'player/movePlayer',
-          this.PlaceController.places.cells[message.id]
+        await this.$root.$data.controllers.PlayerController.movePlayerToPlaceId(
+          message.id
         );
         await this.renderMap();
       }
