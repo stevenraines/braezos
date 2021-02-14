@@ -15,10 +15,8 @@ let store = new Vuex.Store({
   state: {},
   getters: {},
   mutations: {
-    resetStore(state, defaultLocation) {
-      console.log('resetStore');
-      defaultState.location = defaultLocation;
-      this.replaceState(Object.assign(state, defaultState));
+    resetStore(state) {
+      this.replaceState(defaultState);
       localStorage.setItem('store', JSON.stringify(state));
     },
   },
@@ -29,6 +27,9 @@ let store = new Vuex.Store({
           Object.assign(state, JSON.parse(localStorage.getItem('store')))
         );
       }
+    },
+    async resetGame({ commit }) {
+      commit('resetStore');
     },
   },
   modules: {

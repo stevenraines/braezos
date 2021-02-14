@@ -10,8 +10,8 @@
 
 <script>
 import { EventBus } from '../eventbus.js';
-import renderer from '../../shared/renderers/d3';
-import MOVE_VECTORS from '../../shared/enums/moveVectors';
+import renderer from '../renderers/d3';
+import MOVE_VECTORS from '../enums/moveVectors';
 
 export default {
   name: 'Map',
@@ -48,12 +48,14 @@ export default {
     renderMap: async function() {
       if (!this.$root.$data.controllers.PlayerController.player.location)
         return;
+
       renderer.init(
-        this.$root.$data.controllers.PlaceController.places,
+        this.$root.$data.controllers.PlaceController.terrain,
         this.$root.$data.controllers.EnvironmentController.params,
         this.height,
         this.width
       );
+
       this.renderedMap = await renderer.renderMap(
         this.$root.$data.controllers.PlayerController.player
       );
@@ -80,7 +82,7 @@ export default {
     },
     handleGlobalEvent: async function(message) {
       if (message.event == 'click' && message.source == 'map') {
-        await this.$root.$data.controllers.PlayerController.movePlayerToPlaceId(
+        await this.$root.$data.controllers.PlayerController.movePlayerToTerritory(
           message.id
         );
         await this.renderMap();

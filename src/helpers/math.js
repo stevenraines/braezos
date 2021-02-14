@@ -1,5 +1,3 @@
-const { pointers } = require("d3");
-
 let MathHelper = {
   calculate2DDistance: function(point1, point2) {
     let xs = point2.x - point1.x,

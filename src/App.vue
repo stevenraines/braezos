@@ -4,13 +4,12 @@
       <div class="d-flex align-center"></div>
       <v-spacer></v-spacer>
       <v-btn v-on:click="newGame()">New Game</v-btn>
-      <v-btn v-on:click="newMap()">New Map</v-btn>
     </v-app-bar>
     <v-main>
       <Home :key="homekey" />
     </v-main>
-  </v-app> </template
->ß
+  </v-app>
+</template>
 <script>
 import Home from './views/Home';
 import { EventBus } from './eventbus.js';
@@ -40,13 +39,9 @@ export default {
         EventBus.$emit('keyevent', event);
       }
     },
-
     newGame: async function() {
       await this.$store.dispatch('resetGame');
-      this.homekey += 1;
-    },
-    newMap: async function() {
-      await this.$http.get('/api/makeMap');
+      window.location.reload();
     },
   },
   async beforeCreate() {
@@ -54,6 +49,7 @@ export default {
     await this.$root.$data.controllers.PlayerController.setup();
     await this.$root.$data.controllers.EnvironmentController.setup();
     EventBus.$emit('setupComplete', { success: true });
+    this.homekey += 1;
   },
 };
 </script>

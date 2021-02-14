@@ -5,11 +5,10 @@ export default class extends BaseController {
   }
 
   async setup() {
-    if (!this.store.state.player) {
-      let place = this.controllers.PlaceController.place(
-        this.store.state.places.startingCellIndex
+    if (!this.store.state.player.location) {
+      this.movePlayerToTerritory(
+        this.store.state.places.terrain.startingTerrainIndex
       );
-      this.movePlayerToLocation(place);
     }
   }
 
@@ -41,7 +40,7 @@ export default class extends BaseController {
       newPosition
     );
 
-    let newLocation = this.controllers.PlaceController.getPlaceByPosition(
+    let newLocation = this.controllers.PlaceController.getTerritoryByPosition(
       newPosition
     );
 
@@ -53,12 +52,12 @@ export default class extends BaseController {
     }
   }
 
-  async movePlayerToPlaceId(id) {
-    let location = this.controllers.PlaceController.place(id);
-    this.movePlayerToLocation(location);
+  async movePlayerToTerritory(id) {
+    let location = this.controllers.PlaceController.territory(id);
+    this.movePlayerToTerritoryByLocation(location);
   }
 
-  async movePlayerToLocation(location) {
+  async movePlayerToTerritoryByLocation(location) {
     await this.store.dispatch('player/movePlayer', {
       location: location,
       position: this.controllers.PlaceController.normalizePosition(

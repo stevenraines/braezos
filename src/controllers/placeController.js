@@ -1,33 +1,63 @@
 //const BaseController = require('./baseController');
 import BaseController from './baseController';
-import { Delaunay } from 'd3-delaunay';
+import _ from 'lodash';
+import TerrainGenerator from '../classes/terrainGenerator';
+
 export default class extends BaseController {
   constructor(root) {
     super(root);
+    this.terrainGenerator = null;
     this.delaunay = null;
     this.voronoi = null;
   }
-  async setup() {
-    await this.store.dispatch('places/init');
-    this.$initVornoi();
+  async setup(seed) {
+    this.terrainGenerator = new TerrainGenerator(
+      this.controllers.EnvironmentController.params.terrain
+    );
+    let terrain = this.terrainGenerator.generateTerrain(
+      this.controllers.EnvironmentController.params.terrain.seed || seed
+    );
+
+    this.store.commit('places/updateTerrain', terrain);
   }
 
-  get places() {
-    return this.store.state.places;
+  get terrain() {
+    return this.store.state.places.terrain;
+  }
+  get territories() {
+    return this.store.state.places.terrain.territories;
   }
 
-  place(id) {
-    return this.$generatePlace(this.places.cells[id]);
+  territoriesInView() {
+    let territories = _.filter(this.store.state.places.terrain.territories, {
+      id: this.store.state.player.location.id,
+    });
+    console.log(territories);
   }
 
-  isPositionInPlace(placeId, position) {
-    return this.voronoi.contains(placeId, position[0], position[1]);
+  territory(territoryIndex) {
+    return this.$generatePlace(
+      this.store.state.places.terrain.territories[territoryIndex]
+    );
   }
 
-  getPlaceByPosition(position) {
-    for (let cell in this.places.cells) {
-      if (this.isPositionInPlace(this.places.cells[cell].id, position)) {
-        return this.places.cells[cell];
+  isPositionInTerritory(territoryIndex, position) {
+    return this.terrainGenerator.voronoi.contains(
+      territoryIndex,
+      position[0],
+      position[1]
+    );
+  }
+
+  getTerritoryByPosition(position) {
+    for (let territoryIndex in this.terrain.territories) {
+      if (
+        this.isPositionInTerritory(
+          this.terrain.territories[territoryIndex].id,
+          position
+        )
+      ) {
+        return this.terrain.territories[territoryIndex];
       }
     }
 
@@ -46,19 +76,13 @@ export default class extends BaseController {
 
     return position;
   }
-  $generatePlace(placeData) {
-    placeData.special = 'special stuff';
-    return placeData;
+  $generatePlace(territory) {
+    console.log(territory);
+    this.$getTerritoryBoundingBox(territory);
+    territory.special = 'special stuff';
+    return territory;
   }
-  $initVornoi() {
-    if (!this.delaunay) this.delaunay = Delaunay.from(this.places.points);
-
-    if (!this.voronoi)
-      this.voronoi = this.delaunay.voronoi([
-        0,
-        0,
-        this.controllers.EnvironmentController.params.width,
-        this.controllers.EnvironmentController.params.height,
-      ]);
+  $getTerritoryBoundingBox(territory) {
+    console.log(territory);
   }
 }

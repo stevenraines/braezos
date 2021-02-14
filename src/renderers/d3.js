@@ -54,17 +54,15 @@ const D3Renderer = {
     let mapSvg = d3
       .create('svg')
       .attr('id', 'map')
-      .attr('height', this.height)
-      .attr('width', this.width)
       .attr('stroke', '#000000');
     // render the map cells. for overland this is voronoi. for interiors, grids.
 
-    this.renderCells(mapSvg, this.mapData, player.location);
+    this.renderTerritories(mapSvg, this.mapData, player.location);
 
     this.renderGrid(
       mapSvg,
-      this.params.width,
-      this.params.height,
+      this.params.terrain.width,
+      this.params.terrain.height,
       this.params.moveSize
     );
 
@@ -104,18 +102,18 @@ const D3Renderer = {
       .attr('cx', playerData.position[0])
       .attr('cy', playerData.position[1]);
   },
-  renderCells: function(svg, mapData, place) {
-    let cells = mapData.cells;
-    for (var cell in cells) {
-      let fillColor = cells[cell].terrainType.color;
+  renderTerritories: function(svg, terrain, place) {
+    let territories = terrain.territories;
+    for (var territoryIndex in territories) {
+      let fillColor = territories[territoryIndex].terrainType.color;
 
-      if (place.id == cells[cell].id) fillColor = 'orange';
+      if (place.id == territories[territoryIndex].id) fillColor = 'orange';
       let strokeColor = '#333333';
 
       svg
         .append('g')
         .selectAll('path')
-        .data([cells[cell]])
+        .data([territories[territoryIndex]])
         .enter()
         .append('path')
         .attr('id', function(d) {
