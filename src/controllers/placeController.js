@@ -66,6 +66,7 @@ export default class extends BaseController {
 
     let that = this;
     let halfGridSize = this.controllers.EnvironmentController.params.halfCell;
+
     this.loopThroughBox(viewArea, function(x, y) {
       let playerDistanceToCell = MathHelper.calculate2DDistance(
         { x: x, y: y },

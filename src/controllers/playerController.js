@@ -56,14 +56,14 @@ export default class extends BaseController {
     let playerWorldCell = this.controllers.PlaceController.getWorldCellPosition(
       this.store.player.position
     );
-    console.log(playerWorldCell);
+    return playerWorldCell;
   }
 
   get viewArea() {
     let playerPos = this.store.state.player.position;
     let playerViewDistance =
       this.store.state.player.viewDistance *
-      this.controllers.EnvironmentController.params.moveSize;
+      this.controllers.EnvironmentController.params.cellSize;
 
     let minX = playerPos[0] - playerViewDistance;
     let minY = playerPos[1] - playerViewDistance;
