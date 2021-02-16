@@ -6,6 +6,7 @@ import VueAxios from 'vue-axios';
 import PlacesModule from './modules/places.module';
 import PlayerModule from './modules/player.module';
 import EnvironmentModule from './modules/environment.module';
+import ItemsModule from './modules/items.module';
 Vue.use(VueAxios, axios);
 Vue.use(Vuex);
 
@@ -36,6 +37,7 @@ let store = new Vuex.Store({
     player: PlayerModule,
     places: PlacesModule,
     environment: EnvironmentModule,
+    items: ItemsModule,
   },
 });
 

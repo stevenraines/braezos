@@ -9,6 +9,7 @@ import { EventBus } from './eventbus.js';
 import PlaceController from './controllers/placeController';
 import PlayerController from './controllers/playerController';
 import EnvironmentController from './controllers/environmentController';
+import ItemsController from './controllers/itemsController';
 import params from '../params.config';
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
@@ -34,6 +35,7 @@ new Vue({
       this.$root,
       params
     );
+    this.controllers.ItemsController = new ItemsController(this.$root);
 
     await this.$store.dispatch('init');
   },

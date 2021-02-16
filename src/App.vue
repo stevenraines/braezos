@@ -46,8 +46,10 @@ export default {
   },
   async beforeCreate() {
     await this.$root.$data.controllers.PlaceController.setup();
+    await this.$root.$data.controllers.ItemsController.setup();
     await this.$root.$data.controllers.PlayerController.setup();
     await this.$root.$data.controllers.EnvironmentController.setup();
+
     EventBus.$emit('setupComplete', { success: true });
     this.homekey += 1;
   },
