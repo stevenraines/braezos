@@ -11,6 +11,7 @@ export default class extends BaseController {
 
   getItemsInCell(cell) {
     let itemsInCell = _.filter(this.store.state.items.items, function(o) {
+      if (!o) return false;
       return o.cell[0] == cell[0] && o.cell[1] == cell[1];
     });
     return itemsInCell;

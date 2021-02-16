@@ -49,11 +49,17 @@ export default {
       if (!this.$root.$data.controllers.PlayerController.player.location)
         return;
 
+      let visibleTerrain = this.$root.$data.controllers.PlaceController
+        .visibleTerrain;
+
       renderer.init(
-        this.$root.$data.controllers.PlaceController.visibleTerrain,
+        visibleTerrain,
         this.$root.$data.controllers.EnvironmentController.params,
         this.height,
-        this.width
+        this.width,
+        this.$root.$data.controllers.ItemsController.getItemsInCells(
+          visibleTerrain.cells
+        )
       );
 
       this.renderedMap = await renderer.renderMap(
@@ -93,8 +99,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 
-<style>
-svg text.character {
-  font-weight: normal;
-}
-</style>
+<style></style>

@@ -1,4 +1,5 @@
 const d3 = require('d3');
+const _ = require('lodash');
 
 const D3Renderer = {
   params: null,
@@ -6,11 +7,12 @@ const D3Renderer = {
   height: null,
   width: null,
   zoom: 1,
-  init: function(mapData, params, height, width) {
+  init: function(mapData, params, height, width, items) {
     this.mapData = mapData;
     this.params = params;
     this.height = height;
     this.width = width;
+    this.items = items;
   },
   renderGrid: async function(svg, width, height, gridSize) {
     if (gridSize < 5) gridSize = 5;
@@ -110,6 +112,7 @@ const D3Renderer = {
       .attr('x', position[0])
       .attr('y', position[1])
       .attr('dy', '.35em')
+
       .attr('text-anchor', 'middle')
       .attr('opacity', opacity || 1)
       .attr('class', cssClass || '')
@@ -165,36 +168,58 @@ const D3Renderer = {
       .attr('stroke-width', 2)
       .attr('stroke', 'black');
   },
+  getWorldCellPositionForRender: function(cell) {
+    return [
+      cell[0] * this.params.cellSize + this.params.halfCell,
+      cell[1] * this.params.cellSize + this.params.halfCell,
+    ];
+  },
   renderCells: function(svg, terrain) {
-    let territories = terrain.territories;
+    let cells = terrain.cells;
+    if (!cells || cells.length == 0) return;
 
-    for (var territoryIndex in territories) {
-      let cells = territories[territoryIndex].cells;
-
-      if (!cells || cells.length == 0) continue;
-
-      for (var cellIndex in cells) {
-        this.renderCell(svg, cells[cellIndex]);
-      }
+    for (var cellIndex in cells) {
+      this.renderCell(svg, cells[cellIndex]);
     }
+  },
+
+  renderCellItems(svg, cell) {
+    // leave if no items
+    if (cell.items.length == 0) return;
+
+    // draw a pile if more than one item
+    if (cell.items.length > 1) {
+      this.renderAscii(svg, 'P', this.getWorldCellPositionForRender(cell.cell));
+      return;
+    }
+
+    let item = cell.items[0];
+    this.renderAscii(
+      svg,
+      item.name[0],
+      this.getWorldCellPositionForRender(cell.cell)
+    );
   },
   renderCell(svg, cell) {
     // render structures
     // render actors
     // render items
+    let itemCell = _.filter(this.items, { cell: cell });
+    if (itemCell.length == 1) {
+      this.renderCellItems(svg, itemCell[0]);
+    }
+
     // render resources
 
     // render standard floor.
-    this.renderAscii(svg, '.', [
-      cell[0] * this.params.cellSize - this.params.halfCell,
-      cell[1] * this.params.cellSize - this.params.halfCell,
-    ]);
+
+    this.renderAscii(svg, '', this.getWorldCellPositionForRender(cell));
   },
   renderPlayer(svg, playerData) {
     this.renderAscii(
       svg,
       '@',
-      playerData.position,
+      this.getWorldCellPositionForRender(playerData.playerWorldCell),
       'black',
       'black',
       'character'

@@ -48,6 +48,7 @@ export default class extends BaseController {
     let viewArea = this.controllers.PlayerController.viewArea;
 
     let terrain = {
+      cells: [],
       mapCenter: this.store.state.places.terrain.mapCenter,
       territories: Array(this.store.state.places.terrain.territories.length),
       startingTerrainIndex: this.store.state.places.terrain
@@ -84,9 +85,9 @@ export default class extends BaseController {
       )
         return;
 
-      let cellTerritory = that.getTerritoryByPosition([x, y]);
+      //  let cellTerritory = that.getTerritoryByPosition([x, y]);
 
-      terrain.territories[cellTerritory.id].cells.push(
+      terrain.cells.push(
         that.getWorldCellPosition([x + halfGridSize, y + halfGridSize])
       );
     });

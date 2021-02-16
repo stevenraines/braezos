@@ -1,8 +1,11 @@
 import BaseController from './baseController';
-import MOVE_VECTORS from '../enums/moveVectors';
+//import MOVE_VECTORS from '../enums/moveVectors';
 export default class extends BaseController {
   get player() {
-    return this.store.state.player;
+    let player = this.store.state.player;
+    player.playerWorldCell = this.playerWorldCell;
+
+    return player;
   }
 
   async setup() {
@@ -12,10 +15,12 @@ export default class extends BaseController {
       );
     }
 
+    /* EXAMPLE OF ADDING AN ITEM */
+    /*
     let item1 = {
       id: 1,
       name: 'Dagger',
-      cell: this.getPlayerAdjacentCell(MOVE_VECTORS.E),
+      cell: this.getPlayerAdjacentCell(MOVE_VECTORS.W),
     };
     let item2 = {
       id: 2,
@@ -25,12 +30,7 @@ export default class extends BaseController {
 
     this.controllers.ItemsController.addItem(item1);
     this.controllers.ItemsController.addItem(item2);
-    console.log(
-      this.controllers.ItemsController.getItemsInCells([
-        this.getPlayerAdjacentCell(MOVE_VECTORS.E),
-        this.getPlayerAdjacentCell(MOVE_VECTORS.W),
-      ])
-    );
+    */
   }
 
   get currentLocation() {
@@ -72,20 +72,18 @@ export default class extends BaseController {
       });
     }
   }
-
-  getPlayerAdjacentCell(moveVector) {
-    return [
-      this.playerWorldCell[0] + moveVector[0],
-      this.playerWorldCell[1] + moveVector[1],
-    ];
-  }
-
   get playerWorldCell() {
     let playerWorldCell = this.controllers.PlaceController.getWorldCellPosition(
       this.store.state.player.position
     );
 
     return playerWorldCell;
+  }
+  getPlayerAdjacentCell(moveVector) {
+    return [
+      this.playerWorldCell[0] + moveVector[0],
+      this.playerWorldCell[1] + moveVector[1],
+    ];
   }
 
   get viewArea() {
