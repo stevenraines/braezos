@@ -65,9 +65,9 @@ const D3Renderer = {
       this.params.terrain.height,
       this.params.moveSize
     );
-    this.renderBoundingBox(mapSvg, this.mapData, player.location);
-    this.renderViewArea(mapSvg, null);
+    //this.renderBoundingBox(mapSvg, this.mapData, player.location);
     this.renderPlayer(mapSvg, player);
+    this.renderCells(mapSvg, this.mapData);
 
     // set the pan of the map to focus on the place
     this.scrollToPlace(mapSvg, player.position);
@@ -94,38 +94,30 @@ const D3Renderer = {
     svg.attr('viewBox', viewBoxSize);
   },
 
-  renderAscii(svg, character, position) {
+  renderAscii(
+    svg,
+    character,
+    position,
+    strokeColor,
+    fillColor,
+    cssClass,
+    opacity
+  ) {
     let g = svg.append('g');
-    g.append('text')
+    let text = g.append('text');
+
+    text
       .attr('x', position[0])
       .attr('y', position[1])
       .attr('dy', '.35em')
       .attr('text-anchor', 'middle')
-      .attr('opacity', 1)
+      .attr('opacity', opacity || 1)
+      .attr('class', cssClass || '')
+      .attr('stroke', strokeColor || '')
+      .attr('fill', fillColor || strokeColor || '')
       .text(character);
   },
 
-  renderPlayer(svg, playerData) {
-    this.renderAscii(svg, '@', playerData.position);
-    /*
-    g.append('rect')
-      .attr('x', playerData.position[0] - this.params.moveSize / 2)
-      .attr('y', playerData.position[1] - this.params.moveSize / 2)
-      .attr('width', this.params.moveSize)
-      .attr('height', this.params.moveSize)
-      .attr('color', 'blue')
-      .attr('opacity', 0.1);
-*/
-    /*
-    svg
-      .append('circle')
-      .attr('id', 'player')
-      .style('stroke', 'gray')
-      .style('fill', 'black')
-      .attr('r', 10)
-      .attr('cx', playerData.position[0])
-      .attr('cy', playerData.position[1]);*/
-  },
   renderTerritories: function(svg, terrain, place) {
     let territories = terrain.territories;
     for (var territoryIndex in territories) {
@@ -154,21 +146,9 @@ const D3Renderer = {
         })
         .attr('fill', fillColor)
         .attr('stroke', strokeColor);
-    }
-  },
-  renderViewArea: function(svg, viewArea) {
-    if (!viewArea) return;
-    svg
-      .append('rect')
-      .attr('x', viewArea[0])
-      .attr('y', viewArea[1])
-      .attr('width', viewArea[2] - viewArea[0])
-      .attr('height', viewArea[3] - viewArea[1])
 
-      .attr('fill-opacity', 0.0)
-      .attr('stroke-opacity', 1)
-      .attr('stroke-width', 2)
-      .attr('stroke', 'blue');
+      this.renderAscii(svg, territoryIndex, territories[territoryIndex].point);
+    }
   },
   renderBoundingBox: function(svg, terrain, location) {
     let territory = terrain.territories[location.id];
@@ -184,6 +164,42 @@ const D3Renderer = {
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 2)
       .attr('stroke', 'black');
+  },
+  renderCells: function(svg, terrain) {
+    let territories = terrain.territories;
+
+    for (var territoryIndex in territories) {
+      let cells = territories[territoryIndex].cells;
+
+      if (!cells || cells.length == 0) continue;
+
+      for (var cellIndex in cells) {
+        this.renderCell(svg, cells[cellIndex]);
+      }
+    }
+  },
+  renderCell(svg, cell) {
+    // render actors
+
+    // render items
+
+    // render resources
+
+    let halfCell = this.params.moveSize / 2;
+    this.renderAscii(svg, '.', [
+      cell[0] * this.params.moveSize - halfCell,
+      cell[1] * this.params.moveSize - halfCell,
+    ]);
+  },
+  renderPlayer(svg, playerData) {
+    this.renderAscii(
+      svg,
+      '@',
+      playerData.position,
+      'black',
+      'black',
+      'character'
+    );
   },
 };
 

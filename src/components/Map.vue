@@ -85,7 +85,6 @@ export default {
         await this.$root.$data.controllers.PlayerController.movePlayerToTerritory(
           message.id
         );
-        await this.renderMap();
       }
     },
   },
@@ -93,4 +92,9 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+
+<style>
+svg text.character {
+  font-weight: normal;
+}
+</style>

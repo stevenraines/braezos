@@ -27,14 +27,53 @@ export default class extends BaseController {
   get territories() {
     return this.store.state.places.terrain.territories;
   }
+  loopThroughBox(range, fn) {
+    for (
+      let x = range[0];
+      x <= range[2];
+      x += this.controllers.EnvironmentController.params.moveSize
+    ) {
+      for (
+        let y = range[1];
+        y <= range[3];
+        y += this.controllers.EnvironmentController.params.moveSize
+      ) {
+        fn(x, y);
+      }
+    }
+  }
 
   get visibleTerrain() {
-    let terrain = this.store.state.places.terrain;
-    for (let territoryIndex in terrain.territories) {
-      terrain.territories[territoryIndex] = this.$generatePlace(
-        terrain.territories[territoryIndex]
-      );
+    let viewArea = this.controllers.PlayerController.viewArea;
+
+    let terrain = {
+      mapCenter: this.store.state.places.terrain.mapCenter,
+      territories: Array(this.store.state.places.terrain.territories.length),
+      startingTerrainIndex: this.store.state.places.terrain
+        .startingTerrainIndex,
+      peaks: this.store.state.places.terrain.peaks,
+    };
+
+    for (let territoryIndex in this.store.state.places.terrain.territories) {
+      if (terrain.territories[territoryIndex] == null) {
+        terrain.territories[territoryIndex] = this.$generatePlace(
+          this.store.state.places.terrain.territories[territoryIndex]
+        );
+        terrain.territories[territoryIndex].cells = [];
+      }
     }
+
+    let that = this;
+    let halfGridSize =
+      this.controllers.EnvironmentController.params.moveSize / 2;
+    this.loopThroughBox(viewArea, function(x, y) {
+      let cellTerritory = that.getTerritoryByPosition([x, y]);
+
+      terrain.territories[cellTerritory.id].cells.push(
+        that.getWorldCellPosition([x + halfGridSize, y + halfGridSize])
+      );
+    });
+
     return terrain;
   }
 
@@ -94,9 +133,13 @@ export default class extends BaseController {
   $generatePlace(territory) {
     territory.special = 'special stuff';
 
-    if (territory.id == this.controllers.PlayerController.player.location.id) {
+    if (
+      this.controllers.PlayerController.player.location &&
+      territory.id == this.controllers.PlayerController.player.location.id
+    ) {
       this.$getTerritoryBoundingBox(territory);
     }
+
     return territory;
   }
   $getTerritoryBoundingBox(territory) {
@@ -116,7 +159,5 @@ export default class extends BaseController {
     }
 
     territory.bounds = [minX, minY, maxX, maxY];
-
-    //console.log(territory);
   }
 }

@@ -59,10 +59,10 @@ export default class extends BaseController {
     console.log(playerWorldCell);
   }
 
-  viewArea() {
-    let playerPos = this.store.player.position;
+  get viewArea() {
+    let playerPos = this.store.state.player.position;
     let playerViewDistance =
-      this.controllers.store.player.viewDistance *
+      this.store.state.player.viewDistance *
       this.controllers.EnvironmentController.params.moveSize;
 
     let minX = playerPos[0] - playerViewDistance;
@@ -70,13 +70,21 @@ export default class extends BaseController {
     let maxX = playerPos[0] + playerViewDistance;
     let maxY = playerPos[1] + playerViewDistance;
 
-    return [minX, minY, maxX, maxY];
+    let minPos = this.controllers.PlaceController.normalizePosition([
+      minX,
+      minY,
+    ]);
+    let maxPos = this.controllers.PlaceController.normalizePosition([
+      maxX,
+      maxY,
+    ]);
 
-    //console.log(territory);
+    return [minPos[0], minPos[1], maxPos[0], maxPos[1]];
   }
 
   async movePlayerToTerritory(id) {
     let location = this.controllers.PlaceController.territory(id);
+
     this.movePlayerToTerritoryByLocation(location);
   }
 

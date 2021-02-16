@@ -3,7 +3,6 @@
     {{ player.position }}
     {{ playerWorldCell }}
     <hr />
-    {{ player }}
   </v-card>
 </template>
 <script>
