@@ -4,7 +4,7 @@ const PlayerManager = {
   namespaced: true,
   state: {
     location: null,
-    viewDistance: 5,
+    viewDistance: 10,
     position: {
       x: 0,
       y: 0,

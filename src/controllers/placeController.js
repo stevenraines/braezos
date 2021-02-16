@@ -2,6 +2,7 @@
 import BaseController from './baseController';
 //import _ from 'lodash';
 import TerrainGenerator from '../classes/terrainGenerator';
+import MathHelper from '../helpers/math';
 
 export default class extends BaseController {
   constructor(root) {
@@ -31,12 +32,12 @@ export default class extends BaseController {
     for (
       let x = range[0];
       x <= range[2];
-      x += this.controllers.EnvironmentController.params.moveSize
+      x += this.controllers.EnvironmentController.params.cellSize
     ) {
       for (
         let y = range[1];
         y <= range[3];
-        y += this.controllers.EnvironmentController.params.moveSize
+        y += this.controllers.EnvironmentController.params.cellSize
       ) {
         fn(x, y);
       }
@@ -64,9 +65,24 @@ export default class extends BaseController {
     }
 
     let that = this;
-    let halfGridSize =
-      this.controllers.EnvironmentController.params.moveSize / 2;
+    let halfGridSize = this.controllers.EnvironmentController.params.halfCell;
     this.loopThroughBox(viewArea, function(x, y) {
+      let playerDistanceToCell = MathHelper.calculate2DDistance(
+        { x: x, y: y },
+        {
+          x: that.controllers.PlayerController.player.position[0],
+          y: that.controllers.PlayerController.player.position[1],
+        }
+      );
+
+      if (
+        playerDistanceToCell >
+        that.controllers.PlayerController.player.viewDistance *
+          that.controllers.EnvironmentController.params.cellSize +
+          halfGridSize
+      )
+        return;
+
       let cellTerritory = that.getTerritoryByPosition([x, y]);
 
       terrain.territories[cellTerritory.id].cells.push(
@@ -95,10 +111,10 @@ export default class extends BaseController {
     let npos = this.normalizePosition(position);
     return [
       Math.floor(
-        npos[0] / this.controllers.EnvironmentController.params.moveSize
+        npos[0] / this.controllers.EnvironmentController.params.cellSize
       ),
       Math.floor(
-        npos[1] / this.controllers.EnvironmentController.params.moveSize
+        npos[1] / this.controllers.EnvironmentController.params.cellSize
       ),
     ];
   }
@@ -119,7 +135,7 @@ export default class extends BaseController {
   }
 
   normalizePosition(position) {
-    const gridSize = this.controllers.EnvironmentController.params.moveSize;
+    const gridSize = this.controllers.EnvironmentController.params.cellSize;
 
     let newX = Math.floor(position[0] / gridSize) * gridSize;
     let newY = Math.floor(position[1] / gridSize) * gridSize;
@@ -147,7 +163,6 @@ export default class extends BaseController {
     let minY = 99999;
     let maxX = 0;
     let maxY = 0;
-    //let gridSize = this.controllers.EnvironmentController.params.moveSize;
 
     for (let polygonIndex in territory.polygons) {
       let polygon = this.normalizePosition(territory.polygons[polygonIndex]);

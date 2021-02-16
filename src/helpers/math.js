@@ -5,7 +5,10 @@ let MathHelper = {
 
     xs *= xs;
     ys *= ys;
-    return Math.sqrt(xs + ys);
+
+    let dist = Math.sqrt(xs + ys);
+
+    return dist;
   },
   calcPolygonArea: function(vertices) {
     var total = 0;

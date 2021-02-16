@@ -63,7 +63,7 @@ const D3Renderer = {
       mapSvg,
       this.params.terrain.width,
       this.params.terrain.height,
-      this.params.moveSize
+      this.params.cellSize
     );
     //this.renderBoundingBox(mapSvg, this.mapData, player.location);
     this.renderPlayer(mapSvg, player);
@@ -179,16 +179,15 @@ const D3Renderer = {
     }
   },
   renderCell(svg, cell) {
+    // render structures
     // render actors
-
     // render items
-
     // render resources
 
-    let halfCell = this.params.moveSize / 2;
+    // render standard floor.
     this.renderAscii(svg, '.', [
-      cell[0] * this.params.moveSize - halfCell,
-      cell[1] * this.params.moveSize - halfCell,
+      cell[0] * this.params.cellSize - this.params.halfCell,
+      cell[1] * this.params.cellSize - this.params.halfCell,
     ]);
   },
   renderPlayer(svg, playerData) {
