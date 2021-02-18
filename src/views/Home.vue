@@ -1,8 +1,8 @@
 <template>
   <v-container fluid fill-height>
     <v-row fill-height>
-      <v-col class="colX">
-        <Map />
+      <v-col widthclass="colX">
+        <Level />
       </v-col>
       <v-col class="sideColumn">
         <LocationDetail class="locationDetail"></LocationDetail>
@@ -14,13 +14,14 @@
 
 <script>
 // @ is an alias to /src
-import Map from '@/components/Map.vue';
+import Level from '@/components/Level.vue';
+
 import LocationDetail from '@/components/LocationDetail.vue';
 import Console from '@/components/Console.vue';
 export default {
   name: 'Home',
   components: {
-    Map,
+    Level,
     LocationDetail,
     Console,
   },

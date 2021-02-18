@@ -1,4 +1,5 @@
 import BaseController from './baseController';
+import Chunk from '../classes/chunk.class';
 import params from '../../params.config';
 export default class extends BaseController {
   constructor(root) {
@@ -12,5 +13,10 @@ export default class extends BaseController {
   }
   get params() {
     return params;
+  }
+  getLevel(levelIndex) {
+    let chunk = new Chunk(this.params);
+    let level = chunk.getLevel(levelIndex);
+    return level;
   }
 }
