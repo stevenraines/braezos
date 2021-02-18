@@ -2,6 +2,7 @@ import Cell from './cell.class';
 import * as d3 from 'd3';
 
 import TerrainGenerator from './terrainGenerator';
+import Renderer from './renderer.class';
 const Level = class {
   constructor(levelIndex, chunk) {
     this.levelIndex = levelIndex;
@@ -41,7 +42,8 @@ const Level = class {
           cell.territoryIndex
         ].terrainType;
 
-        this.cells.push(cell);
+        this.cells.push(cell.data);
+        cell = null;
       }
     }
   }
@@ -84,6 +86,7 @@ const Level = class {
     levelSvg.append('g');
 
     let onscreenCells = this.cellsOnScreen(playerPosition, renderArea);
+    let renderer = new Renderer();
 
     for (let cellIndex = 0; cellIndex < this.cells.length; cellIndex++) {
       let cell = this.cells[cellIndex];
@@ -94,7 +97,7 @@ const Level = class {
         cell.point.y >= onscreenCells.startY &&
         cell.point.y <= onscreenCells.endY
       ) {
-        this.cells[cellIndex].renderCell(levelSvg);
+        renderer.renderCell(levelSvg, this.cells[cellIndex]);
       }
     }
 

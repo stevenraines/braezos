@@ -9,6 +9,15 @@ const Cell = class {
     this.worldPosition = this.$getWorldPosition();
   }
 
+  get data() {
+    return {
+      point: this.point,
+      cellSize: this.cellSize,
+      territoryIndex: this.territoryIndex,
+      terrainType: this.terrainType,
+      worldPosition: this.worldPosition,
+    };
+  }
   get position() {
     return this.point;
   }
