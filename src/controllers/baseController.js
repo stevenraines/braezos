@@ -6,10 +6,10 @@ const BaseController = class {
     return this.$root;
   }
   get controllers() {
-    return this.root.$data.controllers;
+    return this.$root.$data.controllers;
   }
   get store() {
-    return this.root.$store;
+    return this.$root.$store;
   }
 };
 

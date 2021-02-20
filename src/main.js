@@ -10,7 +10,9 @@ import PlaceController from './controllers/placeController';
 import PlayerController from './controllers/playerController';
 import EnvironmentController from './controllers/environmentController';
 import ItemsController from './controllers/itemsController';
+import InputController from './controllers/inputController';
 import params from '../params.config';
+
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
@@ -25,6 +27,7 @@ new Vue({
         PlaceController: null,
         PlayerController: null,
         EnvironmentController: null,
+        InputController: null,
       },
     };
   },
@@ -36,7 +39,7 @@ new Vue({
       params
     );
     this.controllers.ItemsController = new ItemsController(this.$root);
-
+    this.controllers.InputController = new InputController();
     await this.$store.dispatch('init');
   },
 }).$mount('#app');

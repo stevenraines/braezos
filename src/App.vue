@@ -31,22 +31,21 @@ export default {
     await this.$root.$data.controllers.ItemsController.setup();
     await this.$root.$data.controllers.PlayerController.setup();
   },
-  created: function() {
+  created() {
     window.addEventListener('keyup', this.keyup);
     EventBus.$emit('setupComplete', { success: true });
     this.homekey += 1;
   },
-  beforeDestroy: function() {
+  mounted() {},
+  beforeDestroy() {
     window.removeEventListener('keyup', this.keyup);
   },
   methods: {
     keyup: async function(event) {
-      if (
-        event.srcElement.tagName != 'TEXTAREA' &&
-        event.srcElement.tagName != 'INPUT'
-      ) {
-        EventBus.$emit('keyevent', event);
-      }
+      EventBus.$emit('keyevent', {
+        controllers: this.$root.$data.controllers,
+        event: event,
+      });
     },
     newGame: async function() {
       await this.$store.dispatch('resetGame');

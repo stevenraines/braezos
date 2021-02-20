@@ -22,19 +22,6 @@ const Cell = class {
     return this.point;
   }
 
-  renderCell(svg) {
-    svg
-      .append('rect')
-      .attr('x', this.worldPosition.x)
-      .attr('y', this.worldPosition.y)
-      .attr('width', this.cellSize)
-      .attr('height', this.cellSize)
-      .attr('fill', this.terrainType.color)
-      .attr('stroke-opacity', 1)
-      .attr('stroke-width', 0.1)
-      .attr('stroke', 'blue');
-  }
-
   $getWorldPosition() {
     let halfCell = this.cellSize / 2;
     return {

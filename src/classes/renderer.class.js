@@ -6,8 +6,8 @@ const Renderer = class {
   renderCell(svg, cell) {
     svg
       .append('rect')
-      .attr('x', cell.worldPosition.x)
-      .attr('y', cell.worldPosition.y)
+      .attr('x', cell.worldPosition.x - cell.cellSize / 2)
+      .attr('y', cell.worldPosition.y - cell.cellSize / 2)
       .attr('width', cell.cellSize)
       .attr('height', cell.cellSize)
       .attr('fill', cell.terrainType.color)
@@ -44,8 +44,8 @@ const Renderer = class {
   }
   getWorldPositionFromWorldCellPosition(position) {
     return {
-      x: position.x * this.cellSize + this.cellSize,
-      y: position.y * this.cellSize + this.cellSize,
+      x: position.x * this.cellSize + this.cellSize / 2,
+      y: position.y * this.cellSize + this.cellSize / 2,
     };
   }
 };

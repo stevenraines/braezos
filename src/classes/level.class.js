@@ -1,5 +1,6 @@
 import Cell from './cell.class';
 import * as d3 from 'd3';
+import _ from 'lodash';
 
 import TerrainGenerator from './terrainGenerator';
 import Renderer from './renderer.class';
@@ -120,7 +121,9 @@ const Level = class {
     }
 
     for (let cellIndex = 0; cellIndex < cellsToRender.length; cellIndex++) {
-      renderer.renderCell(levelSvg, this.cells[cellsToRender[cellIndex]]);
+      let cell = this.cells[cellsToRender[cellIndex]];
+
+      renderer.renderCell(levelSvg, cell);
     }
 
     renderer.renderPlayer(levelSvg, playerPosition);
@@ -143,11 +146,45 @@ const Level = class {
     let startX = position.x * this.cellSize - width / 2;
     let startY = position.y * this.cellSize - height / 2;
 
-    if (!startX) startX = 0;
-    if (!startY) startY = 0;
+    if (startX + width > this.renderWidth)
+      startX = this.renderWidth - width + this.cellSize / 2;
+    if (startY + height > this.renderWidth)
+      startY = this.renderHeight - height + this.cellSize / 2;
+
+    if (!startX || startX < 0) startX = 0;
+    if (!startY || startY < 0) startY = 0;
+
     let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
 
+    this.viewBox = {
+      startX: startX,
+      startY: startY,
+
+      width: width,
+      height: height,
+    };
+
     svg.attr('viewBox', viewBoxSize);
+  }
+
+  getCellByWorldPosition(worldPosition) {
+    let cellPosition = this.getCellPositionByWorldPosition(worldPosition);
+    let cells = _.filter(this.cells, function(cell) {
+      if (!cell.point) return false;
+      return cell.point.x == cellPosition.x && cell.point.y == cellPosition.y;
+    });
+
+    if (cells.length == 1) return cells[0];
+    return null;
+  }
+
+  getCellPositionByWorldPosition(worldPosition) {
+    let cellCoordinates = {
+      x: Math.floor(worldPosition.x / this.cellSize),
+      y: Math.floor(worldPosition.y / this.cellSize),
+    };
+
+    return cellCoordinates;
   }
 };
 
