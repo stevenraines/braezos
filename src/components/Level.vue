@@ -1,9 +1,7 @@
 <template>
   <v-flex d-flex child-flex>
     <v-card class="cc card">
-      <div key="renderedLevel">
-        <component :is="mapRenderer" />
-      </div>
+      <img :src="this.renderedMapImg" />
     </v-card>
   </v-flex>
 </template>
@@ -19,20 +17,13 @@ export default {
     return {
       level: null,
       levelIndex: 0,
-      renderedLevel: null,
+
+      renderedMapImg: null,
     };
   },
 
   components: {},
 
-  computed: {
-    mapRenderer: function() {
-      return {
-        template: `<div class="dyn">${this.renderedLevel}</div>`,
-        methods: {},
-      };
-    },
-  },
   beforeCreate() {},
   created() {},
   mounted() {
@@ -48,13 +39,15 @@ export default {
         this.levelIndex
       );
 
-      let playerWorldCellPoint = new Point(
-        this.$root.$data.controllers.PlayerController.player.playerWorldCell
+      let player = this.$root.$data.controllers.PlayerController.player;
+      let playerWorldCellPoint = new Point(player.playerWorldCell);
+      this.renderedMapImg = this.level.renderLevelAsImgSrc(
+        playerWorldCellPoint,
+        {
+          width: 400,
+          height: 400,
+        }
       );
-      this.renderedLevel = this.level.renderLevel(playerWorldCellPoint, {
-        width: 400,
-        height: 400,
-      });
     },
 
     handleKeyEvent: async function(message) {

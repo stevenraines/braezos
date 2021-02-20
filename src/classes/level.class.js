@@ -63,20 +63,39 @@ const Level = class {
   }
 
   cellsOnScreen(position, renderArea) {
-    let startX = position.x * this.cellSize - renderArea.width / 2;
-    let startY = position.y * this.cellSize - renderArea.height / 2;
+    let renderAreaWidthInCells = renderArea.width / this.cellSize;
+    let renderAreaHeightInCells = renderArea.height / this.cellSize;
+
+    let startX = position.x - renderAreaWidthInCells / 2;
+    let startY = position.y - renderAreaHeightInCells / 2;
 
     if (startX < 0) startX = 0;
     if (startY < 0) startY = 0;
 
-    return {
-      startX: startX / this.cellSize,
-      startY: startY / this.cellSize,
-      endX: startX + this.renderArea.width / this.cellSize,
-      endY: startY + this.renderArea.height / this.cellSize,
+    let data = {
+      startX: startX,
+      startY: startY,
+      endX: startX + renderAreaWidthInCells,
+      endY: startY + renderAreaHeightInCells,
     };
+
+    if (data.endX >= this.cellWidth) {
+      data.endX = this.cellWidth - 1;
+      data.startX = this.cellWidth - 1 - renderAreaWidthInCells;
+    }
+
+    if (data.endY >= this.cellHeight) {
+      data.endY = this.cellHeight - 1;
+      data.startY = this.cellHeight - 1 - renderAreaHeightInCells;
+    }
+
+    return data;
   }
 
+  renderLevelAsImgSrc(playerPosition, renderArea) {
+    let svg = btoa(this.renderLevel(playerPosition, renderArea));
+    return `data:image/svg+xml;base64,${svg}`;
+  }
   renderLevel(playerPosition, renderArea) {
     let levelSvg = d3
       .create('svg')
@@ -86,20 +105,25 @@ const Level = class {
     levelSvg.append('g');
 
     let onscreenCells = this.cellsOnScreen(playerPosition, renderArea);
-    let renderer = new Renderer();
+    let renderer = new Renderer(this.cellSize);
+    let cellsToRender = [];
 
-    for (let cellIndex = 0; cellIndex < this.cells.length; cellIndex++) {
-      let cell = this.cells[cellIndex];
-
-      if (
-        cell.point.x >= onscreenCells.startX &&
-        cell.point.x <= onscreenCells.endX &&
-        cell.point.y >= onscreenCells.startY &&
-        cell.point.y <= onscreenCells.endY
+    for (let yPos = onscreenCells.startY; yPos <= onscreenCells.endY; yPos++) {
+      for (
+        let xPos = onscreenCells.startX;
+        xPos <= onscreenCells.endX;
+        xPos++
       ) {
-        renderer.renderCell(levelSvg, this.cells[cellIndex]);
+        let cellIndex = yPos * this.cellWidth + xPos;
+        cellsToRender.push(cellIndex);
       }
     }
+
+    for (let cellIndex = 0; cellIndex < cellsToRender.length; cellIndex++) {
+      renderer.renderCell(levelSvg, this.cells[cellsToRender[cellIndex]]);
+    }
+
+    renderer.renderPlayer(levelSvg, playerPosition);
 
     if (renderArea) this.renderArea = renderArea;
     this.scrollToPlace(levelSvg, playerPosition);
@@ -119,6 +143,8 @@ const Level = class {
     let startX = position.x * this.cellSize - width / 2;
     let startY = position.y * this.cellSize - height / 2;
 
+    if (!startX) startX = 0;
+    if (!startY) startY = 0;
     let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
 
     svg.attr('viewBox', viewBoxSize);

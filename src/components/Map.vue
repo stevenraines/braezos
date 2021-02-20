@@ -21,6 +21,7 @@ export default {
       playerData: {},
       map: null,
       renderedMap: null,
+
       height: 600,
       width: 600,
       mapSVG: null,
