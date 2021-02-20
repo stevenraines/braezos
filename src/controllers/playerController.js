@@ -9,30 +9,31 @@ export default class extends BaseController {
   async setup() {}
 
   async movePlayer(vector) {
-    if (Array.isArray(vector)) {
-      vector = {
-        x: vector[0],
-        y: vector[1],
-        d: vector[2] || 0,
-      };
-    }
+    let cell = this.getPlayerAdjacentCell(vector);
 
+    if (!cell || !this.isCellTraverable(cell)) return;
+    await this.store.dispatch('player/movePlayer', {
+      location: null,
+      position: cell.point,
+    });
+  }
+
+  getPlayerAdjacentCell(vector) {
     let newPosition = {
       x: vector.x + this.store.state.player.position.x,
       y: vector.y + this.store.state.player.position.y,
       d: vector.z + this.store.state.player.position.d,
     };
 
-    await this.store.dispatch('player/movePlayer', {
-      location: null,
-      position: newPosition,
-    });
+    let cell = this.controllers.EnvironmentController.level.getCellByPosition(
+      newPosition
+    );
+
+    return cell;
   }
 
-  getPlayerAdjacentCell(moveVector) {
-    return [
-      this.playerWorldCell.x + moveVector.x,
-      this.playerWorldCell.y + moveVector.y,
-    ];
+  isCellTraverable(cell) {
+    if (cell.terrainType.name == 'ocean') return false;
+    return true;
   }
 }

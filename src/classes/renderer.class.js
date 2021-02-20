@@ -3,11 +3,23 @@ const Renderer = class {
     this.cellSize = cellSize;
   }
 
-  renderCell(svg, cell) {
+  renderBackground(svg, width, height) {
     svg
       .append('rect')
-      .attr('x', cell.worldPosition.x - cell.cellSize / 2)
-      .attr('y', cell.worldPosition.y - cell.cellSize / 2)
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', width)
+      .attr('height', height)
+      .attr('fill', '#000000');
+  }
+
+  renderCell(svg, cell, player) {
+    if (!cell.visibleFrom(player.position, player.viewDistance)) return;
+
+    svg
+      .append('rect')
+      .attr('x', cell.worldPosition.x - cell.cellSize)
+      .attr('y', cell.worldPosition.y - cell.cellSize)
       .attr('width', cell.cellSize)
       .attr('height', cell.cellSize)
       .attr('fill', cell.terrainType.color)
@@ -15,20 +27,20 @@ const Renderer = class {
       .attr('stroke-width', 0.1)
       .attr('stroke', 'blue');
   }
-  renderPlayer(svg, playerPosition) {
-    this.renderAscii(svg, '@', playerPosition);
+  renderPlayer(svg, player) {
+    this.renderAscii(svg, '@', player);
   }
 
   renderAscii(
     svg,
     character,
-    position,
+    player,
     strokeColor,
     fillColor,
     cssClass,
     opacity
   ) {
-    let worldPosition = this.getWorldPositionFromWorldCellPosition(position);
+    let worldPosition = this.getCenterCellPositionForRender(player.position);
     let g = svg.append('g');
     let text = g.append('text');
     text
@@ -42,7 +54,8 @@ const Renderer = class {
       .attr('fill', fillColor || strokeColor || '')
       .text(character);
   }
-  getWorldPositionFromWorldCellPosition(position) {
+  // gets the middle
+  getCenterCellPositionForRender(position) {
     return {
       x: position.x * this.cellSize + this.cellSize / 2,
       y: position.y * this.cellSize + this.cellSize / 2,

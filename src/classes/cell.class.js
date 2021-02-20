@@ -1,5 +1,4 @@
 import Point from './point.class';
-import MathHelper from '../helpers/math';
 
 const Cell = class {
   constructor(coordinates, level) {
@@ -26,19 +25,20 @@ const Cell = class {
   // returns if the cell is visible from the selected position?
   visibleFrom(position, sightDistance) {
     // is it close enough?
-    let distance = MathHelper.calculate2DDistance(this.point, position);
 
-    if (distance > sightDistance) return false;
+    let distance = this.point.distanceFromInCells(position) + 0.5;
+
+    if (distance >= sightDistance + 1) return false; // add one so we don't include the cell the player is on.
     // is anything blocking it?
 
     return true;
   }
 
   $getWorldPosition() {
-    let halfCell = this.cellSize / 2;
+    //let halfCell = this.cellSize / 2;
     return {
-      x: this.point.x * this.cellSize + halfCell,
-      y: this.point.y * this.cellSize + halfCell,
+      x: this.point.x * this.cellSize + this.cellSize,
+      y: this.point.y * this.cellSize + this.cellSize,
       d: this.point.d,
     };
   }

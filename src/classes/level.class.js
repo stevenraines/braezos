@@ -19,14 +19,26 @@ const Level = class {
     this.startingCell = null;
     this.terrainGenerator = new TerrainGenerator(this.terrainParams);
 
-    this.renderArea = {
+    this.setRenderArea({
       width: this.renderWidth,
       height: this.renderHeight,
-    };
+    });
+
     // generate terrain, if above ground
     if (this.levelIndex == 0) this.$generateTerrain(chunk);
 
     this.$generateCells(chunk);
+  }
+
+  setRenderArea(renderArea) {
+    if (renderArea.width % this.cellSize == 0) {
+      renderArea.width += this.cellSize;
+    }
+    if (renderArea.height % this.cellSize == 0) {
+      renderArea.height += this.cellSize;
+    }
+
+    this.renderArea = renderArea;
   }
 
   $generateTerrain(chunk) {
@@ -52,7 +64,6 @@ const Level = class {
         }
 
         this.cells.push(cell);
-        cell = null;
       }
     }
   }
@@ -73,6 +84,7 @@ const Level = class {
 
   cellsOnScreen(position, renderArea) {
     let renderAreaWidthInCells = renderArea.width / this.cellSize;
+
     let renderAreaHeightInCells = renderArea.height / this.cellSize;
 
     let startX = position.x - renderAreaWidthInCells / 2;
@@ -101,20 +113,20 @@ const Level = class {
     return data;
   }
 
-  renderLevelAsImgSrc(playerPosition, renderArea) {
-    let svg = btoa(this.renderLevel(playerPosition, renderArea));
+  renderLevelAsImgSrc(player, renderArea) {
+    let svg = btoa(this.renderLevel(player, renderArea));
     return `data:image/svg+xml;base64,${svg}`;
   }
-  renderLevel(playerPosition, renderArea) {
-    let levelSvg = d3
-      .create('svg')
-      .attr('id', 'map')
-      .attr('stroke', '#000000');
+  renderLevel(player, renderArea) {
+    let renderer = new Renderer(this.cellSize);
+    let levelSvg = d3.create('svg').attr('id', 'map');
+
+    renderer.renderBackground(levelSvg, this.renderWidth, this.renderHeight);
 
     levelSvg.append('g');
 
-    let onscreenCells = this.cellsOnScreen(playerPosition, renderArea);
-    let renderer = new Renderer(this.cellSize);
+    let onscreenCells = this.cellsOnScreen(player.position, renderArea);
+
     let cellsToRender = [];
 
     for (let yPos = onscreenCells.startY; yPos <= onscreenCells.endY; yPos++) {
@@ -131,16 +143,16 @@ const Level = class {
     for (let cellIndex = 0; cellIndex < cellsToRender.length; cellIndex++) {
       let cell = this.cells[cellsToRender[cellIndex]];
 
-      renderer.renderCell(levelSvg, cell);
+      renderer.renderCell(levelSvg, cell, player);
     }
 
     // render the player's icoon on screen
-    renderer.renderPlayer(levelSvg, playerPosition);
+    renderer.renderPlayer(levelSvg, player);
 
     // render what the player can see.
 
-    if (renderArea) this.renderArea = renderArea;
-    this.scrollToPlace(levelSvg, playerPosition);
+    if (renderArea) this.setRenderArea(renderArea);
+    this.scrollToPlace(levelSvg, player.position);
 
     return this.serializeSVG(levelSvg.node());
   }
@@ -154,8 +166,8 @@ const Level = class {
     let width = this.renderArea.width; // drawDistanceCells * 2 * this.cellSize;
     let height = this.renderArea.height; //drawDistanceCells * 2 * this.cellSize;
 
-    let startX = position.x * this.cellSize - width / 2;
-    let startY = position.y * this.cellSize - height / 2;
+    let startX = position.x * this.cellSize - width / 2 + this.cellSize / 2;
+    let startY = position.y * this.cellSize - height / 2 + this.cellSize / 2;
 
     if (startX + width > this.renderWidth)
       startX = this.renderWidth - width + this.cellSize / 2;
@@ -166,16 +178,25 @@ const Level = class {
     if (!startY || startY < 0) startY = 0;
 
     let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
-
+    console.log(viewBoxSize);
     this.viewBox = {
       startX: startX,
       startY: startY,
-
       width: width,
       height: height,
     };
 
     svg.attr('viewBox', viewBoxSize);
+  }
+
+  getCellByPosition(cellPosition) {
+    let cells = _.filter(this.cells, function(cell) {
+      if (!cell.point) return false;
+      return cell.point.x == cellPosition.x && cell.point.y == cellPosition.y;
+    });
+
+    if (cells.length == 1) return cells[0];
+    return null;
   }
 
   getCellByWorldPosition(worldPosition) {

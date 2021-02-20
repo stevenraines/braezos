@@ -61,19 +61,22 @@ export default {
         selectedMapCoordinate
       );
 
-      let visibleByPlayer = selectedCell.visibleFrom(
-        this.$root.$data.controllers.PlayerController.player.position,
-        this.$root.$data.controllers.PlayerController.player.viewDistance
-      );
+      console.log('selected Cell', selectedCell);
     },
     renderLevel: async function() {
       if (!this.$root.$data.controllers.EnvironmentController.level) return;
       let player = this.$root.$data.controllers.PlayerController.player;
+
+      let mapDistance = (player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
+      let mapSize =
+        mapDistance *
+        this.$root.$data.controllers.EnvironmentController.level.cellSize;
+
       this.renderedMapImg = this.$root.$data.controllers.EnvironmentController.level.renderLevelAsImgSrc(
-        player.position,
+        player,
         {
-          width: 400,
-          height: 400,
+          width: mapSize,
+          height: mapSize,
         }
       );
     },
@@ -87,6 +90,6 @@ export default {
 .level {
   padding: 0px;
   max-height: 75vh;
-  max-width: 50vw;
+  max-width: 75vw;
 }
 </style>
