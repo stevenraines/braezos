@@ -5,7 +5,6 @@
         <Level />
       </v-col>
       <v-col class="sideColumn">
-        <LocationDetail class="locationDetail"></LocationDetail>
         <Console class="console"></Console>
       </v-col>
     </v-row>
@@ -16,13 +15,12 @@
 // @ is an alias to /src
 import Level from '@/components/Level.vue';
 
-import LocationDetail from '@/components/LocationDetail.vue';
 import Console from '@/components/Console.vue';
 export default {
   name: 'Home',
   components: {
     Level,
-    LocationDetail,
+
     Console,
   },
 };

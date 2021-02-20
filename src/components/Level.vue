@@ -10,13 +10,11 @@
 
 <script>
 import { EventBus } from '../eventbus.js';
-import Point from '../classes/point.class';
 
 export default {
   name: 'Level',
   data: function() {
     return {
-      level: null,
       levelIndex: 0,
 
       renderedMapImg: null,
@@ -26,38 +24,53 @@ export default {
   components: {},
 
   beforeCreate() {},
-  created() {},
-  mounted() {
+  created() {
     EventBus.$on('RenderLevel', this.renderLevel);
     EventBus.$on('click', this.handleGlobalEvent);
     EventBus.$on('setupComplete', this.setupComplete);
+  },
+  mounted() {
     this.renderLevel();
   },
   methods: {
-    setupComplete: function() {},
+    setupComplete: function() {
+      this.renderLevel();
+    },
     handleLevelClick(event) {
-      let scaleX = this.level.renderArea.width / event.target.width;
-      let scaleY = this.level.renderArea.height / event.target.height;
+      let scaleX =
+        this.$root.$data.controllers.EnvironmentController.level.renderArea
+          .width / event.target.width;
+      let scaleY =
+        this.$root.$data.controllers.EnvironmentController.level.renderArea
+          .height / event.target.height;
 
       let selectedMapCoordinate = {
-        x: Math.floor(event.offsetX * scaleX + this.level.viewBox.startX),
-        y: Math.floor(event.offsetY * scaleY + this.level.viewBox.startY),
+        x: Math.floor(
+          event.offsetX * scaleX +
+            this.$root.$data.controllers.EnvironmentController.level.viewBox
+              .startX
+        ),
+        y: Math.floor(
+          event.offsetY * scaleY +
+            this.$root.$data.controllers.EnvironmentController.level.viewBox
+              .startY
+        ),
       };
 
-      let selectedCell = this.level.getCellByWorldPosition(
+      let selectedCell = this.$root.$data.controllers.EnvironmentController.level.getCellByWorldPosition(
         selectedMapCoordinate
       );
-      console.log('clicked on cell', selectedCell);
+
+      let visibleByPlayer = selectedCell.visibleFrom(
+        this.$root.$data.controllers.PlayerController.player.position,
+        this.$root.$data.controllers.PlayerController.player.viewDistance
+      );
     },
     renderLevel: async function() {
-      this.level = this.$root.$data.controllers.EnvironmentController.getLevel(
-        this.levelIndex
-      );
-
+      if (!this.$root.$data.controllers.EnvironmentController.level) return;
       let player = this.$root.$data.controllers.PlayerController.player;
-      let playerWorldCellPoint = new Point(player.playerWorldCell);
-      this.renderedMapImg = this.level.renderLevelAsImgSrc(
-        playerWorldCellPoint,
+      this.renderedMapImg = this.$root.$data.controllers.EnvironmentController.level.renderLevelAsImgSrc(
+        player.position,
         {
           width: 400,
           height: 400,

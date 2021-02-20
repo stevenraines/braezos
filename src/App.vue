@@ -12,7 +12,6 @@
 </template>
 <script>
 import Home from './views/Home';
-
 import { EventBus } from './eventbus.js';
 
 export default {
@@ -25,18 +24,10 @@ export default {
   components: {
     Home,
   },
-  async beforeCreate() {
-    await this.$root.$data.controllers.EnvironmentController.setup();
-    await this.$root.$data.controllers.PlaceController.setup();
-    await this.$root.$data.controllers.ItemsController.setup();
-    await this.$root.$data.controllers.PlayerController.setup();
-  },
-  created() {
+  async beforeCreate() {},
+  async created() {
     window.addEventListener('keyup', this.keyup);
-    EventBus.$emit('setupComplete', { success: true });
-    this.homekey += 1;
   },
-  mounted() {},
   beforeDestroy() {
     window.removeEventListener('keyup', this.keyup);
   },

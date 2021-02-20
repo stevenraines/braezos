@@ -16,6 +16,7 @@ const Level = class {
     this.cells = [];
     this.terrainPoints = 100;
     this.terrain = {};
+    this.startingCell = null;
     this.terrainGenerator = new TerrainGenerator(this.terrainParams);
 
     this.renderArea = {
@@ -43,7 +44,14 @@ const Level = class {
           cell.territoryIndex
         ].terrainType;
 
-        this.cells.push(cell.data);
+        if (
+          !this.startingCell &&
+          this.terrain.startingTerrainIndex == cell.territoryIndex
+        ) {
+          this.startingCell = cell;
+        }
+
+        this.cells.push(cell);
         cell = null;
       }
     }
@@ -126,7 +134,10 @@ const Level = class {
       renderer.renderCell(levelSvg, cell);
     }
 
+    // render the player's icoon on screen
     renderer.renderPlayer(levelSvg, playerPosition);
+
+    // render what the player can see.
 
     if (renderArea) this.renderArea = renderArea;
     this.scrollToPlace(levelSvg, playerPosition);
@@ -183,7 +194,6 @@ const Level = class {
       x: Math.floor(worldPosition.x / this.cellSize),
       y: Math.floor(worldPosition.y / this.cellSize),
     };
-
     return cellCoordinates;
   }
 };

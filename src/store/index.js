@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
-import PlacesModule from './modules/places.module';
 import PlayerModule from './modules/player.module';
 import EnvironmentModule from './modules/environment.module';
 import ItemsModule from './modules/items.module';
@@ -35,14 +34,14 @@ let store = new Vuex.Store({
   },
   modules: {
     player: PlayerModule,
-    places: PlacesModule,
+
     environment: EnvironmentModule,
     items: ItemsModule,
   },
 });
 
 store.subscribe(() => {
-  localStorage.setItem('store', JSON.stringify(store.state));
+  // localStorage.setItem('store', JSON.stringify(store.state));
 });
 
 export default store;

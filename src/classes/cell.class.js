@@ -1,4 +1,5 @@
 import Point from './point.class';
+import MathHelper from '../helpers/math';
 
 const Cell = class {
   constructor(coordinates, level) {
@@ -20,6 +21,17 @@ const Cell = class {
   }
   get position() {
     return this.point;
+  }
+
+  // returns if the cell is visible from the selected position?
+  visibleFrom(position, sightDistance) {
+    // is it close enough?
+    let distance = MathHelper.calculate2DDistance(this.point, position);
+
+    if (distance > sightDistance) return false;
+    // is anything blocking it?
+
+    return true;
   }
 
   $getWorldPosition() {

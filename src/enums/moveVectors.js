@@ -1,12 +1,12 @@
 const MoveVectors = {
-  NW: [-1, -1],
-  N: [0, -1],
-  NE: [1, -1],
-  W: [-1, 0],
-  NONE: [0, 0],
-  E: [1, 0],
-  SW: [-1, 1],
-  S: [0, 1],
-  SE: [1, 1],
+  NW: { x: -1, y: -1, d: 0 },
+  N: { x: 0, y: -1, d: 0 },
+  NE: { x: 1, y: -1, d: 0 },
+  W: { x: -1, y: 0, d: 0 },
+  NONE: { x: 0, y: 0, d: 0 },
+  E: { x: 1, y: 0, d: 0 },
+  SW: { x: -1, y: 1, d: 0 },
+  S: { x: 0, y: 1, d: 0 },
+  SE: { x: 1, y: 1, d: 0 },
 };
 module.exports = MoveVectors;

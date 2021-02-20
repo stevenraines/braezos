@@ -6,7 +6,7 @@ import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import { EventBus } from './eventbus.js';
-import PlaceController from './controllers/placeController';
+
 import PlayerController from './controllers/playerController';
 import EnvironmentController from './controllers/environmentController';
 import ItemsController from './controllers/itemsController';
@@ -32,7 +32,6 @@ new Vue({
     };
   },
   async created() {
-    this.controllers.PlaceController = new PlaceController(this.$root);
     this.controllers.PlayerController = new PlayerController(this.$root);
     this.controllers.EnvironmentController = new EnvironmentController(
       this.$root,
@@ -40,7 +39,14 @@ new Vue({
     );
     this.controllers.ItemsController = new ItemsController(this.$root);
     this.controllers.InputController = new InputController();
+
     await this.$store.dispatch('init');
+
+    await this.controllers.PlayerController.setup();
+    await this.controllers.EnvironmentController.setup();
+    await this.controllers.ItemsController.setup();
+
+    EventBus.$emit('setupComplete', { success: true });
   },
 }).$mount('#app');
 
