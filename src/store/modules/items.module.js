@@ -8,7 +8,7 @@ const ItemsStore = {
   getters: {},
   mutations: {
     addItem(state, item) {
-      state.items[item.id] = item;
+      state.items.push(item);
     },
   },
 };

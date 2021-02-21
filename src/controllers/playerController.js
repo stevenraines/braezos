@@ -11,10 +11,10 @@ export default class extends BaseController {
   async movePlayer(vector) {
     let cell = this.getPlayerAdjacentCell(vector);
 
-    if (!cell || !this.isCellTraverable(cell)) return;
+    if (!cell || !cell.isCellTraverable(this.player)) return;
     await this.store.dispatch('player/movePlayer', {
       location: null,
-      position: cell.point,
+      position: cell.position,
     });
   }
 
@@ -30,10 +30,5 @@ export default class extends BaseController {
     );
 
     return cell;
-  }
-
-  isCellTraverable(cell) {
-    if (cell.terrainType.name == 'ocean') return false;
-    return true;
   }
 }

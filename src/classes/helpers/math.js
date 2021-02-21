@@ -1,5 +1,5 @@
-let MathHelper = {
-  calculate2DDistance: function(point1, point2) {
+const MathHelper = class {
+  static calculate2DDistance(point1, point2) {
     let xs = point2.x - point1.x,
       ys = point2.y - point1.y;
 
@@ -9,8 +9,9 @@ let MathHelper = {
     let dist = Math.sqrt(xs + ys);
 
     return dist;
-  },
-  calcPolygonArea: function(vertices) {
+  }
+
+  static calcPolygonArea(vertices) {
     var total = 0;
 
     for (var i = 0, l = vertices.length; i < l; i++) {
@@ -24,16 +25,18 @@ let MathHelper = {
     }
 
     return Math.abs(total);
-  },
-  convertArrayOfArraysOf2DPointsToArrayOfXY: function(arrPoints) {
+  }
+
+  static convertArrayOfArraysOf2DPointsToArrayOfXY(arrPoints) {
     let xyArray = [];
     for (var i = 0; i < arrPoints.length; i++) {
       xyArray.push({ x: arrPoints[i][0], y: arrPoints[i][1] });
     }
 
     return xyArray;
-  },
-  centroid: function(pts) {
+  }
+
+  static centroid(pts) {
     var x = 0;
     var y = 0;
     for (var i = 0; i < pts.length; i++) {
@@ -41,7 +44,7 @@ let MathHelper = {
       y += pts[i][1];
     }
     return [x / pts.length, y / pts.length];
-  },
+  }
 };
 
-module.exports = MathHelper;
+export default MathHelper;

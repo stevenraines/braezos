@@ -1,12 +1,14 @@
-import Cell from './cell.class';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
-import TerrainGenerator from './terrainGenerator';
-import Renderer from './renderer.class';
+import Renderer from '../renderer.class';
+import Cell from './cell.class';
+import TerrainGenerator from '../terrainGenerator.class';
+
 const Level = class {
   constructor(levelIndex, chunk) {
     this.levelIndex = levelIndex;
+    this.controllers = chunk.controllers;
     this.cellSize = chunk.cellSize;
     this.cellWidth = chunk.cellWidth;
     this.cellHeight = chunk.cellHeight;
@@ -49,7 +51,7 @@ const Level = class {
   $generateCells(chunk) {
     for (let yPos = 0; yPos < chunk.cellHeight; yPos++) {
       for (let xPos = 0; xPos < chunk.cellWidth; xPos++) {
-        let cell = new Cell([xPos, yPos, this.levelIndex], this);
+        let cell = new Cell({ x: xPos, y: yPos, d: this.levelIndex }, this);
 
         cell.territoryIndex = this.$getCellTerritoryIndex(cell.worldPosition);
         cell.terrainType = this.terrain.territories[
@@ -140,11 +142,17 @@ const Level = class {
       }
     }
 
+    let cellList = [];
     for (let cellIndex = 0; cellIndex < cellsToRender.length; cellIndex++) {
       let cell = this.cells[cellsToRender[cellIndex]];
-
+      cellList.push(cell);
       renderer.renderCell(levelSvg, cell, player);
     }
+
+    renderer.renderCellItems(
+      levelSvg,
+      this.controllers.ItemsController.getItemsInCells(cellList)
+    );
 
     // render the player's icoon on screen
     renderer.renderPlayer(levelSvg, player);
@@ -178,7 +186,7 @@ const Level = class {
     if (!startY || startY < 0) startY = 0;
 
     let viewBoxSize = `${startX} ${startY} ${width} ${height}`;
-    console.log(viewBoxSize);
+
     this.viewBox = {
       startX: startX,
       startY: startY,
@@ -191,8 +199,10 @@ const Level = class {
 
   getCellByPosition(cellPosition) {
     let cells = _.filter(this.cells, function(cell) {
-      if (!cell.point) return false;
-      return cell.point.x == cellPosition.x && cell.point.y == cellPosition.y;
+      if (!cell.position) return false;
+      return (
+        cell.position.x == cellPosition.x && cell.position.y == cellPosition.y
+      );
     });
 
     if (cells.length == 1) return cells[0];
@@ -202,8 +212,10 @@ const Level = class {
   getCellByWorldPosition(worldPosition) {
     let cellPosition = this.getCellPositionByWorldPosition(worldPosition);
     let cells = _.filter(this.cells, function(cell) {
-      if (!cell.point) return false;
-      return cell.point.x == cellPosition.x && cell.point.y == cellPosition.y;
+      if (!cell.position) return false;
+      return (
+        cell.position.x == cellPosition.x && cell.position.y == cellPosition.y
+      );
     });
 
     if (cells.length == 1) return cells[0];

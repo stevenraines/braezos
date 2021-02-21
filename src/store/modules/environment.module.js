@@ -5,6 +5,7 @@ const EnvironmentStore = {
   },
   mutations: {
     setParams(state, data) {
+      console.log(state);
       state.params = data;
     },
   },

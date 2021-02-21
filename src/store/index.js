@@ -34,14 +34,13 @@ let store = new Vuex.Store({
   },
   modules: {
     player: PlayerModule,
-
     environment: EnvironmentModule,
     items: ItemsModule,
   },
 });
 
 store.subscribe(() => {
-  localStorage.setItem('store', JSON.stringify(store.state));
+  //  localStorage.setItem('store', JSON.stringify(store.state));
 });
 
 export default store;

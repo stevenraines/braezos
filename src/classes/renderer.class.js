@@ -27,20 +27,30 @@ const Renderer = class {
       .attr('stroke-width', 0.1)
       .attr('stroke', 'blue');
   }
+  renderCellItems(svg, items) {
+    if (items.length > 0) {
+      svg.append('g');
+
+      for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+        this.renderAscii(svg, 'I', items[itemIndex].position);
+      }
+    }
+  }
+
   renderPlayer(svg, player) {
-    this.renderAscii(svg, '@', player);
+    this.renderAscii(svg, '@', player.position);
   }
 
   renderAscii(
     svg,
     character,
-    player,
+    position,
     strokeColor,
     fillColor,
     cssClass,
     opacity
   ) {
-    let worldPosition = this.getCenterCellPositionForRender(player.position);
+    let worldPosition = this.getCenterCellPositionForRender(position);
     let g = svg.append('g');
     let text = g.append('text');
     text

@@ -10,25 +10,29 @@ export default class extends BaseController {
   }
 
   getItemsInCell(cell) {
-    let itemsInCell = _.filter(this.store.state.items.items, function(o) {
-      if (!o) return false;
-      return o.cell[0] == cell[0] && o.cell[1] == cell[1];
-    });
+    let itemsInCell = _.filter(
+      JSON.parse(JSON.stringify(this.store.state.items.items)),
+      function(o) {
+        if (!o) return false;
+
+        return (
+          o.position.x == cell.position.x &&
+          o.position.y == cell.position.y &&
+          o.position.d == cell.position.d
+        );
+      }
+    );
     return itemsInCell;
   }
 
   getItemsInCells(cells) {
-    let cellList = [];
+    let itemList = [];
 
-    for (let cell in cells) {
-      let items = this.getItemsInCell(cells[cell]);
-      if (items.length > 0)
-        cellList.push({
-          cell: cells[cell],
-          items: items,
-        });
+    for (let cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      let cell = cells[cellIndex];
+      itemList = itemList.concat(this.getItemsInCell(cell));
     }
 
-    return cellList;
+    return itemList;
   }
 }

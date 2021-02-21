@@ -1,35 +1,46 @@
 import BaseController from './baseController';
 
-import Chunk from '../classes/chunk.class';
+import Chunk from '../classes/places/chunk.class';
 import params from '../../params.config';
+import Player from '../classes/things/actors/player.class';
+import Item from '../classes/things/item.class';
 export default class extends BaseController {
   constructor(root) {
     super(root);
 
+    this.player = null;
     this.level = null;
 
     params.cellSize = params.moveSize;
     params.halfCell = params.cellSize / 2;
   }
+
   async setup() {
-    let playerPosition = this.controllers.PlayerController.player.position;
-
-    this.level = this.getLevelByIndex(playerPosition.d);
-
-    if (playerPosition.x == null) {
-      this.store.commit(
-        'player/updatePlayerPosition',
-        this.level.startingCell.point
-      );
+    this.player = new Player();
+    this.level = this.getLevelByIndex(this.player.position.d);
+    if (this.player.position.x == null) {
+      this.player.setPosition(this.level.startingCell.position);
     }
 
     this.store.commit('environment/setParams', params);
+
+    // add default items next to the player
+    let item = new Item(
+      {
+        name: 'Dagger',
+        position: this.level.startingCell.position,
+      },
+      this
+    );
+
+    this.controllers.ItemsController.addItem(item);
   }
+
   get params() {
     return params;
   }
   getLevelByIndex(levelIndex) {
-    let chunk = new Chunk(this.params);
+    let chunk = new Chunk(this.params, this.controllers);
     return chunk.getLevel(levelIndex);
   }
 }

@@ -44,7 +44,8 @@ const InputController = class {
         vector = MOVE_VECTORS.W;
         break;
     }
-    await controllers.PlayerController.movePlayer(vector);
+
+    await controllers.EnvironmentController.player.move(vector);
     return {
       renderLevel: !(vector == MOVE_VECTORS.NONE),
     };

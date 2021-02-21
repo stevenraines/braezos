@@ -16,7 +16,7 @@ import params from '../params.config';
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
-new Vue({
+window.GameEngine = new Vue({
   router,
   store,
   vuetify,

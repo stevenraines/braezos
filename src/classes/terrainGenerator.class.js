@@ -5,12 +5,10 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-
-//_.assign(d3, require('d3-voronoi'));
 import { Delaunay } from 'd3-delaunay';
 import seedrandom from 'seedrandom';
 import TerrainTypes from '../enums/terrainTypes';
-import MathHelper from '../helpers/math';
+import MathHelper from '../classes/helpers/math';
 
 const TerrainGenerator = class {
   constructor(params) {
@@ -81,7 +79,7 @@ const TerrainGenerator = class {
         uuid: uuid,
         seed: seedrandom(uuid),
         elementId: `cell-${territoryIndex.toString().padStart(5, '0')}`,
-        point: this.terrain.points[territoryIndex],
+        position: this.terrain.points[territoryIndex],
         peakDistance: 0,
         centerDistance: MathHelper.calculate2DDistance(
           MathHelper.convertArrayOfArraysOf2DPointsToArrayOfXY([
@@ -227,8 +225,8 @@ const TerrainGenerator = class {
 
         let distanceToPeak = MathHelper.calculate2DDistance(
           {
-            x: this.terrain.territories[territoryIndex].point[0],
-            y: this.terrain.territories[territoryIndex].point[1],
+            x: this.terrain.territories[territoryIndex].position[0],
+            y: this.terrain.territories[territoryIndex].position[1],
           },
           { x: peakPosition[0], y: peakPosition[1] }
         );

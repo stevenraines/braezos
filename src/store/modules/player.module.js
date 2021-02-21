@@ -3,7 +3,7 @@ import { EventBus } from '../../eventbus.js';
 const PlayerManager = {
   namespaced: true,
   state: {
-    viewDistance: 10,
+    viewDistance: 8,
     position: {
       x: null,
       y: null,
@@ -15,6 +15,12 @@ const PlayerManager = {
   mutations: {
     updatePlayerPosition(state, newPosition) {
       state.position = newPosition;
+    },
+    saveState(state, data) {
+      delete data.storeName;
+      for (const [key, value] of Object.entries(data)) {
+        state[key] = value;
+      }
     },
   },
   actions: {
