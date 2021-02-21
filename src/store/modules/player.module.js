@@ -3,6 +3,7 @@ import { EventBus } from '../../eventbus.js';
 const PlayerManager = {
   namespaced: true,
   state: {
+    singleton: true,
     viewDistance: 8,
     position: {
       x: null,

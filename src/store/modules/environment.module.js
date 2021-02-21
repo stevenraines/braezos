@@ -1,11 +1,11 @@
 const EnvironmentStore = {
   namespaced: true,
   state: {
+    singleton: true,
     params: null,
   },
   mutations: {
     setParams(state, data) {
-      console.log(state);
       state.params = data;
     },
   },

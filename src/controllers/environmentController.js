@@ -4,6 +4,7 @@ import Chunk from '../classes/places/chunk.class';
 import params from '../../params.config';
 import Player from '../classes/things/actors/player.class';
 import Item from '../classes/things/item.class';
+
 export default class extends BaseController {
   constructor(root) {
     super(root);
@@ -25,15 +26,10 @@ export default class extends BaseController {
     this.store.commit('environment/setParams', params);
 
     // add default items next to the player
-    let item = new Item(
-      {
-        name: 'Dagger',
-        position: this.level.startingCell.position,
-      },
-      this
-    );
-
-    this.controllers.ItemsController.addItem(item);
+    new Item({
+      name: 'Dagger',
+      position: this.level.startingCell.position,
+    });
   }
 
   get params() {

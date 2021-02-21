@@ -31,6 +31,11 @@ window.GameEngine = new Vue({
       },
     };
   },
+  methods: {
+    log(msg) {
+      console.log(msg);
+    },
+  },
   async created() {
     this.controllers.PlayerController = new PlayerController(this.$root);
     this.controllers.EnvironmentController = new EnvironmentController(

@@ -1,4 +1,5 @@
 // base class for all entities in the system. Contains ONLY system related info
+
 import { v4 as uuidv4 } from 'uuid';
 
 const Base = class {
@@ -25,18 +26,31 @@ const Base = class {
   }
 
   loadState() {
-    const state = this.state[this.storeName];
-    for (const [key, value] of Object.entries(state)) {
-      this[key] = value;
+    if (!this.state[this.storeName].singleton) {
+      console.log('This is a collection class');
+      return false;
     }
+
+    const state = this.state[this.storeName];
+
+    this.getKeyData(state, this);
   }
 
   saveState() {
-    let data = {};
-    for (const [key, value] of Object.entries(this)) {
+    if (!this.state[this.storeName].singleton) {
+      console.log('This is a collection class');
+      return false;
+    }
+
+    this.store.commit(`${this.storeName}/saveState`, this.getKeyData(this));
+  }
+
+  getKeyData(obj, data) {
+    if (!data) data = {};
+    for (const [key, value] of Object.entries(obj)) {
       data[key] = value;
     }
-    this.store.commit(`${this.storeName}/saveState`, data);
+    return data;
   }
 };
 

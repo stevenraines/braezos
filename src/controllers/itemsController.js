@@ -5,13 +5,10 @@ export default class extends BaseController {
     super(root);
   }
   setup() {}
-  addItem(item) {
-    this.store.commit('items/addItem', item);
-  }
 
   getItemsInCell(cell) {
     let itemsInCell = _.filter(
-      JSON.parse(JSON.stringify(this.store.state.items.items)),
+      JSON.parse(JSON.stringify(this.store.state.items.collection)),
       function(o) {
         if (!o) return false;
 
