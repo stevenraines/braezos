@@ -2,11 +2,17 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
-const Base = class {
+const Base = class Base {
   constructor(config, storeName) {
+    this.className = this.constructor
+      .toString()
+      .split('(' || /s+/)[0]
+      .split(' ' || /s+/)[1];
+
+    this.storeName = storeName ? storeName : this.className.toLowerCase();
+
     this.config = config || {};
     this.id = uuidv4();
-    this.storeName = storeName;
   }
 
   get engine() {
@@ -26,8 +32,12 @@ const Base = class {
   }
 
   loadState() {
+    if (!this.storeName)
+      return this.engine.log(`${this.className} is not a persistant class.`);
+
+    this.engine.log(this.state[this.storeName]);
     if (!this.state[this.storeName].singleton) {
-      console.log('This is a collection class');
+      this.engine.log('This is a collection class');
       return false;
     }
 
@@ -37,8 +47,10 @@ const Base = class {
   }
 
   saveState() {
+    if (!this.storeName)
+      return this.engine.log(`${this.className} is not a persistant class.`);
     if (!this.state[this.storeName].singleton) {
-      console.log('This is a collection class');
+      this.engine.log('This is a collection class');
       return false;
     }
 
@@ -51,6 +63,14 @@ const Base = class {
       data[key] = value;
     }
     return data;
+  }
+
+  static get className() {
+    var classname = this.toString()
+      .split('(' || /s+/)[0]
+      .split(' ' || /s+/)[1];
+
+    return classname;
   }
 };
 

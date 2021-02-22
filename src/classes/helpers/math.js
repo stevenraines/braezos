@@ -1,4 +1,4 @@
-const MathHelper = class {
+const MathHelper = class MathHelper {
   static calculate2DDistance(point1, point2) {
     let xs = point2.x - point1.x,
       ys = point2.y - point1.y;

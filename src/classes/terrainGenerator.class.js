@@ -10,7 +10,7 @@ import seedrandom from 'seedrandom';
 import TerrainTypes from '../enums/terrainTypes';
 import MathHelper from '../classes/helpers/math';
 
-const TerrainGenerator = class {
+const TerrainGenerator = class TerrainGenerator {
   constructor(params) {
     this.params = params;
     this.rng = seedrandom();

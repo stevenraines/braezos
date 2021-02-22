@@ -38,41 +38,37 @@ export default {
     },
     handleLevelClick(event) {
       let scaleX =
-        this.$root.$data.controllers.EnvironmentController.level.renderArea
-          .width / event.target.width;
+        window.GameEngine.Environment.level.renderArea.width /
+        event.target.width;
       let scaleY =
-        this.$root.$data.controllers.EnvironmentController.level.renderArea
-          .height / event.target.height;
+        window.GameEngine.Environment.level.renderArea.height /
+        event.target.height;
 
       let selectedMapCoordinate = {
         x: Math.floor(
           event.offsetX * scaleX +
-            this.$root.$data.controllers.EnvironmentController.level.viewBox
-              .startX
+            window.GameEngine.Environment.level.viewBox.startX
         ),
         y: Math.floor(
           event.offsetY * scaleY +
-            this.$root.$data.controllers.EnvironmentController.level.viewBox
-              .startY
+            window.GameEngine.Environment.level.viewBox.startY
         ),
       };
 
-      let selectedCell = this.$root.$data.controllers.EnvironmentController.level.getCellByWorldPosition(
+      let selectedCell = window.GameEngine.Environment.level.getCellByWorldPosition(
         selectedMapCoordinate
       );
 
       console.log('selected Cell', selectedCell);
     },
     renderLevel: async function() {
-      if (!this.$root.$data.controllers.EnvironmentController.level) return;
-      let player = this.$root.$data.controllers.PlayerController.player;
+      if (!window.GameEngine.Environment.level) return;
+      let player = window.GameEngine.Player;
 
       let mapDistance = (player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
-      let mapSize =
-        mapDistance *
-        this.$root.$data.controllers.EnvironmentController.level.cellSize;
+      let mapSize = mapDistance * window.GameEngine.Environment.level.cellSize;
 
-      this.renderedMapImg = this.$root.$data.controllers.EnvironmentController.level.renderLevelAsImgSrc(
+      this.renderedMapImg = window.GameEngine.Environment.level.renderLevelAsImgSrc(
         player,
         {
           width: mapSize,

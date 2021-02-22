@@ -5,7 +5,7 @@ import VueAxios from 'vue-axios';
 
 import PlayerModule from './modules/player.module';
 import EnvironmentModule from './modules/environment.module';
-import ItemsModule from './modules/items.module';
+import ItemsModule from './modules/item.module';
 Vue.use(VueAxios, axios);
 Vue.use(Vuex);
 
@@ -35,7 +35,7 @@ let store = new Vuex.Store({
   modules: {
     player: PlayerModule,
     environment: EnvironmentModule,
-    items: ItemsModule,
+    item: ItemsModule,
   },
 });
 

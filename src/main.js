@@ -7,57 +7,56 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import { EventBus } from './eventbus.js';
 
-import PlayerController from './controllers/playerController';
-import EnvironmentController from './controllers/environmentController';
-import ItemsController from './controllers/itemsController';
-import InputController from './controllers/inputController';
+import Environment from './classes/environment.class';
+import Player from './classes/things/actors/player.class';
+import Input from './classes/input.class';
 import params from '../params.config';
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
-window.GameEngine = new Vue({
+new Vue({
   router,
   store,
   vuetify,
   render: h => h(App),
   data: function() {
     return {
-      controllers: {
-        PlaceController: null,
-        PlayerController: null,
-        EnvironmentController: null,
-        InputController: null,
-      },
+      Player: null,
+      Environment: null,
+      Input: null,
     };
   },
-  methods: {
-    log(msg) {
-      console.log(msg);
-    },
-  },
-  async created() {
-    this.controllers.PlayerController = new PlayerController(this.$root);
-    this.controllers.EnvironmentController = new EnvironmentController(
-      this.$root,
-      params
-    );
-    this.controllers.ItemsController = new ItemsController(this.$root);
-    this.controllers.InputController = new InputController();
 
+  async created() {
+    // assign a blobal object that classes can use.
+    window.GameEngine = this;
+
+    // instantiate core classes
+    this.Player = new Player();
+    this.Input = new Input();
+    this.Environment = new Environment(params);
+
+    // load any existing state
     await this.$store.dispatch('init');
 
-    await this.controllers.PlayerController.setup();
-    await this.controllers.EnvironmentController.setup();
-    await this.controllers.ItemsController.setup();
-
+    // broadcast set-up complete message to components
     EventBus.$emit('setupComplete', { success: true });
+  },
+  methods: {
+    log(message, type) {
+      EventBus.$emit('log', { type: type, message: message });
+      console.log(message);
+    },
+    cleanObservable: function(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    },
   },
 }).$mount('#app');
 
 window.postMessage = function(event, msg) {
   if (event && msg.event) {
-    console.log(msg.event, msg);
+    window.GameEngine.log({ msg: msg, event: event });
     EventBus.$emit(msg.event, msg);
 
     if (event.stopPropagation) event.stopPropagation();

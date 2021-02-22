@@ -1,8 +1,9 @@
 import Actor from '../actor.class';
 
-export default class extends Actor {
+export default class Player extends Actor {
   constructor(config) {
-    super(config, 'player');
+    super(config);
+
     this.loadState();
   }
 }

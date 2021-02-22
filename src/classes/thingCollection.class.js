@@ -2,7 +2,7 @@
 import Thing from './thing.class';
 import _ from 'lodash';
 
-const ThingCollection = class extends Thing {
+const ThingCollection = class ThingCollection extends Thing {
   constructor(config, storeName) {
     super(config, storeName);
   }
@@ -41,6 +41,39 @@ const ThingCollection = class extends Thing {
       window.GameEngine.$store.state[storeName].collection,
       conditions
     );
+  }
+
+  static getThingsInCell(cell, thingCollectionName) {
+    let thingsInCell = _.filter(
+      JSON.parse(
+        JSON.stringify(
+          window.GameEngine.$store.state[thingCollectionName].collection
+        )
+      ),
+      function(o) {
+        if (!o) return false;
+
+        return (
+          o.position.x == cell.position.x &&
+          o.position.y == cell.position.y &&
+          o.position.d == cell.position.d
+        );
+      }
+    );
+    return thingsInCell;
+  }
+
+  static getThingsInCells(cells, thingCollectionName) {
+    let thingsList = [];
+
+    for (let cellIndex = 0; cellIndex < cells.length; cellIndex++) {
+      let cell = cells[cellIndex];
+      thingsList = thingsList.concat(
+        this.getThingsInCell(cell, thingCollectionName)
+      );
+    }
+
+    return thingsList;
   }
 };
 

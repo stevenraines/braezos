@@ -1,9 +1,9 @@
 import Base from './base.class';
 import Point from './helpers/point.class';
 
-export default class extends Base {
-  constructor(config, storeName) {
-    super(config, storeName);
+export default class Thing extends Base {
+  constructor(config) {
+    super(config);
     this.position = this.config.position
       ? new Point(this.config.position)
       : null; // the position of the thing in the world. Null if possessed by another.
@@ -18,7 +18,7 @@ export default class extends Base {
       d: vector.z + this.position.d,
     });
 
-    let cell = this.engine.controllers.EnvironmentController.level.getCellByPosition(
+    let cell = this.engine.Environment.level.getCellByPosition(
       adjacentPosition
     );
 

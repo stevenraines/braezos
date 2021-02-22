@@ -8,6 +8,12 @@ const EnvironmentStore = {
     setParams(state, data) {
       state.params = data;
     },
+    saveState(state, data) {
+      delete data.storeName;
+      for (const [key, value] of Object.entries(data)) {
+        state[key] = value;
+      }
+    },
   },
 };
 

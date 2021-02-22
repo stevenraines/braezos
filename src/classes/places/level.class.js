@@ -1,20 +1,21 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
-
+import Base from '../base.class';
 import Renderer from '../renderer.class';
 import Cell from './cell.class';
 import TerrainGenerator from '../terrainGenerator.class';
+import Item from '../things/item.class';
 
-const Level = class {
+const Level = class Level extends Base {
   constructor(levelIndex, chunk) {
+    super();
     this.levelIndex = levelIndex;
-    this.controllers = chunk.controllers;
     this.cellSize = chunk.cellSize;
     this.cellWidth = chunk.cellWidth;
     this.cellHeight = chunk.cellHeight;
     this.renderWidth = this.cellWidth * this.cellSize;
     this.renderHeight = this.cellHeight * this.cellSize;
-    this.terrainParams = chunk.params.terrain;
+    this.terrainParams = chunk.config.terrain;
     this.cells = [];
     this.terrainPoints = 100;
     this.terrain = {};
@@ -151,7 +152,7 @@ const Level = class {
 
     renderer.renderCellItems(
       levelSvg,
-      this.controllers.ItemsController.getItemsInCells(cellList)
+      Item.getThingsInCells(cellList, Item.className.toLowerCase())
     );
 
     // render the player's icoon on screen

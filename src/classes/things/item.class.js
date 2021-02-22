@@ -1,8 +1,8 @@
 import ThingCollection from '../thingCollection.class';
 
-export default class extends ThingCollection {
+export default class Item extends ThingCollection {
   constructor(config) {
-    super(config, 'items');
+    super(config);
     this.owner = config.owner ? config.owner : null;
     this.add();
   }

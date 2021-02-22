@@ -1,6 +1,6 @@
 import Point from '../helpers/point.class';
 
-const Cell = class {
+const Cell = class Cell {
   constructor(coordinates, level) {
     this.position = new Point(coordinates);
     this.cellSize = level.cellSize;

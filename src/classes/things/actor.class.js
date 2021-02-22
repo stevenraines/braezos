@@ -1,8 +1,8 @@
 import Thing from '../thing.class';
 
-export default class extends Thing {
-  constructor(config, storeName) {
-    super(config, storeName || 'actors');
+export default class Actor extends Thing {
+  constructor(config) {
+    super(config);
   }
 
   async move(vector) {

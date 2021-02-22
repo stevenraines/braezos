@@ -1,15 +1,16 @@
+import Base from './base.class';
 import { EventBus } from '../eventbus.js';
-import MOVE_VECTORS from '../enums/moveVectors';
 import _ from 'lodash';
+import MOVE_VECTORS from '../enums/moveVectors';
 
-const InputController = class {
+const Input = class Input extends Base {
   constructor() {
+    super();
     EventBus.$on('keyevent', this.handleKeyEvent);
   }
 
   async handleKeyEvent(message) {
     let event = message.event;
-    let controllers = message.controllers;
     let status = {
       renderLevel: false,
     };
@@ -18,17 +19,13 @@ const InputController = class {
       event.srcElement.tagName != 'TEXTAREA' &&
       event.srcElement.tagName != 'INPUT'
     ) {
-      // check for move commands
-      status = _.merge(
-        status,
-        await InputController.handlePlayerMove(controllers, event)
-      );
+      status = _.merge(status, await Input.handlePlayerMove(event));
     }
 
     if (status.renderLevel) EventBus.$emit('RenderLevel');
   }
 
-  static async handlePlayerMove(controllers, event) {
+  static async handlePlayerMove(event) {
     let vector = MOVE_VECTORS.NONE;
     switch (event.code) {
       case 'ArrowUp':
@@ -45,11 +42,10 @@ const InputController = class {
         break;
     }
 
-    await controllers.EnvironmentController.player.move(vector);
+    await window.GameEngine.Player.move(vector);
     return {
       renderLevel: !(vector == MOVE_VECTORS.NONE),
     };
   }
 };
-
-export default InputController;
+export default Input;

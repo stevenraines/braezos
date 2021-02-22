@@ -1,6 +1,6 @@
 import MathHelper from './math';
 
-const Point = class {
+const Point = class Point {
   constructor(coordinates) {
     this.x = 0; // world-length position (X axis)
     this.y = 0; // world-height position (Y axis)

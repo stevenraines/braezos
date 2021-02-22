@@ -1,4 +1,4 @@
-const Renderer = class {
+const Renderer = class Renderer {
   constructor(cellSize) {
     this.cellSize = cellSize;
   }
