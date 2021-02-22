@@ -1,35 +1,33 @@
 <template>
   <v-container fluid fill-height>
+    {{ currentTab }}
+    <v-tabs v-model="currentTab" value="Cell">
+      <v-tab id="Cell">World</v-tab>
+      <v-tab id="Inventory">Inventory</v-tab>
+      <v-tab id="Character">Character</v-tab>
+    </v-tabs>
     <v-row fill-height>
-      <v-col widthclass="colX">
-        <v-tabs v-model="currentTab" value="Cell">
-          <v-tab id="Cell">Cell</v-tab>
-          <v-tab id="Inventory">Inventory</v-tab>
-          <v-tab id="Character">Character</v-tab>
-        </v-tabs>
-        <div v-show="currentTab == 0" :key="player.updateTime">
-          <hr />
-
-          <Inventory
-            @pickupItem="pickupItem"
-            @dropItem="dropItem"
-            v-bind:items="player.currentCell.inventory"
-            :key="player.currentCell.inventory.length"
-          ></Inventory>
+      <v-col>
+        {{ player.currentCell.terrainType.name }}
+        <hr />
+        <Inventory
+          v-show="currentTab == 0"
+          @pickupItem="pickupItem"
+          @dropItem="dropItem"
+          v-bind:items="player.currentCell.inventory"
+        ></Inventory>
+        <Inventory
+          v-show="currentTab == 1"
+          @pickupItem="pickupItem"
+          @dropItem="dropItem"
+          v-bind:items="player.inventory"
+        ></Inventory>
+        <div :key="player.updateTime" v-show="currentTab == 2">
+          {{ player }}
         </div>
-        <div v-show="currentTab == 1">
-          <Inventory
-            @pickupItem="pickupItem"
-            @dropItem="dropItem"
-            v-bind:items="player.inventory"
-            :key="player.itemCount"
-          ></Inventory>
-        </div>
-        <div v-show="currentTab == 2">HP:{{ player.hp }}</div>
       </v-col>
       <v-col class="sideColumn">
         <Level />
-
         <Console class="console"></Console>
       </v-col>
     </v-row>
