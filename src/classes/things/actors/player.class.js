@@ -6,4 +6,9 @@ export default class Player extends Actor {
 
     this.loadState();
   }
+
+  setPosition(cell) {
+    this.currentCell = cell;
+    super.setPosition(cell.position);
+  }
 }

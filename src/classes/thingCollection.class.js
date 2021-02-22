@@ -14,13 +14,23 @@ const ThingCollection = class ThingCollection extends Thing {
     return false;
   }
 
-  add() {
+  load(id) {
+    let existingThings = this.constructor.filter({ id: id }, this.storeName);
+
+    if (existingThings.length != 1) return;
+
+    let existingThing = existingThings[0];
+
+    for (const [key, value] of Object.entries(existingThing)) {
+      this[key] = value;
+    }
+  }
+
+  save() {
     if (!this.exists()) {
       this.store.commit(`${this.storeName}/add`, this);
     } else {
-      this.engine.log(
-        `Entity ${this.id} exists in collection ${this.storeName}`
-      );
+      this.store.commit(`${this.storeName}/update`, this);
     }
   }
   remove() {
@@ -32,9 +42,6 @@ const ThingCollection = class ThingCollection extends Thing {
       );
     }
   }
-  update() {
-    this.store.commit(`${this.storeName}/update`, this);
-  }
 
   static filter(conditions, storeName) {
     return _.filter(
@@ -44,6 +51,8 @@ const ThingCollection = class ThingCollection extends Thing {
   }
 
   static getThingsInCell(cell, thingCollectionName) {
+    if (!thingCollectionName) thingCollectionName = this.storeName;
+
     let thingsInCell = _.filter(
       JSON.parse(
         JSON.stringify(
@@ -52,7 +61,7 @@ const ThingCollection = class ThingCollection extends Thing {
       ),
       function(o) {
         if (!o) return false;
-
+        if (!o.position) return false;
         return (
           o.position.x == cell.position.x &&
           o.position.y == cell.position.y &&
@@ -60,6 +69,7 @@ const ThingCollection = class ThingCollection extends Thing {
         );
       }
     );
+
     return thingsInCell;
   }
 

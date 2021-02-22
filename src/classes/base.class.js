@@ -9,14 +9,20 @@ const Base = class Base {
       .split('(' || /s+/)[0]
       .split(' ' || /s+/)[1];
 
-    this.storeName = storeName ? storeName : this.className.toLowerCase();
+    this.updateTime = new Date().toISOString();
+    this._storeName = storeName ? storeName : this.className.toLowerCase();
 
-    this.config = config || {};
+    this.config = config ? config : { id: null };
+
     this.id = uuidv4();
   }
 
   get engine() {
     return window.GameEngine;
+  }
+
+  get storeName() {
+    return this._storeName ? this._storeName : this.className.toLowerCase();
   }
 
   get store() {
@@ -46,6 +52,10 @@ const Base = class Base {
     this.getKeyData(state, this);
   }
 
+  save() {
+    this.saveState();
+  }
+
   saveState() {
     if (!this.storeName)
       return this.engine.log(`${this.className} is not a persistant class.`);
@@ -53,7 +63,7 @@ const Base = class Base {
       this.engine.log('This is a collection class');
       return false;
     }
-
+    this.updateTime = new Date().toISOString();
     this.store.commit(`${this.storeName}/saveState`, this.getKeyData(this));
   }
 

@@ -24,6 +24,7 @@ export default {
   components: {
     Home,
   },
+
   async beforeCreate() {},
   async created() {
     window.addEventListener('keyup', this.keyup);

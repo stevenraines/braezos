@@ -1,4 +1,5 @@
 import Point from '../helpers/point.class';
+import Item from '../things/item.class';
 
 const Cell = class Cell {
   constructor(coordinates, level) {
@@ -38,6 +39,12 @@ const Cell = class Cell {
     // is anything blocking it?
 
     return true;
+  }
+
+  get inventory() {
+    let ownedItems = Item.filter({ position: this.position }, 'item');
+    this.itemCount = ownedItems.length;
+    return ownedItems;
   }
 
   $getWorldPosition() {

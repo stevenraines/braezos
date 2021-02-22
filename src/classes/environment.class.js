@@ -9,14 +9,18 @@ export default class Environment extends Base {
     this.level = this.getLevelByIndex(this.engine.Player.position.d);
 
     if (this.engine.Player.position.x == null) {
-      this.engine.Player.setPosition(this.level.startingCell.position);
+      this.engine.Player.setPosition(this.level.startingCell);
     }
 
     // add default items next to the player
     new Item({
       name: 'Dagger',
       position: this.level.startingCell.position,
-    });
+    }).save();
+    new Item({
+      name: 'Cloak',
+      position: this.level.startingCell.position,
+    }).save();
   }
 
   getLevelByIndex(levelIndex) {
