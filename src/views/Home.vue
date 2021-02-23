@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { EventBus } from '../eventbus.js';
 import _ from 'lodash';
 export default {
   name: 'Home',
@@ -42,7 +43,17 @@ export default {
       return _.get(window, 'GameEngine.Networking.peer.id');
     },
   },
-
+  created() {
+    EventBus.$on('clientRegister', function(data) {
+      console.log(`clientRegistered. Id:`, data);
+    });
+    EventBus.$on('clientData', function(data) {
+      console.log(`receivedData from ${data.clientId}`, data);
+    });
+    EventBus.$on('serverData', function(data) {
+      console.log(`receivedData from server`, data);
+    });
+  },
   methods: {
     hostGame: function() {
       window.GameEngine.Networking.startHosting();

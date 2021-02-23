@@ -1,11 +1,13 @@
 import Peer from 'peerjs';
-//import EventBus from '../eventbus';
+import { EventBus } from '../eventbus.js';
 import _ from 'lodash';
 export default class Networking {
   constructor() {
     this.peer = null;
 
-    this.connections = [];
+    this.server = null; // client reference to the server we connected to
+
+    this.clients = []; //server reference to connected clients
 
     this.conn = null;
     this.lastPeerId = null;
@@ -18,58 +20,88 @@ export default class Networking {
     this.status = status;
   }
 
-  startHosting(serverId) {
-    serverId = 'alphabetsoup';
-    //  console.log('startHosting: ' + serverId);
-
-    this.isHost = true;
-    this._initializePeer(true, serverId);
-  }
-
   endHosting() {}
 
+  startHosting(serverId) {
+    serverId = 'alphabetsoup';
+    this.isHost = true;
+    this._initializePeer(serverId);
+  }
   joinHost(serverToken) {
     // console.log('joinHost: ' + serverToken);
     this._initializePeer();
     this._initializeClient(serverToken);
   }
 
+  _initializePeer(serverId) {
+    // Create own peer object with connection to shared PeerJS server
+    // console.log('_initializePeer');
+
+    this.peer = null;
+    this.lastPeerId = null;
+
+    this.peer = new Peer(serverId, {
+      debug: 2,
+    });
+
+    // USED ON CLIENT & SERVER
+    this.peer.on('open', this._peerOpen.bind(this));
+
+    if (this.isHost) {
+      //console.log('setting up connection handler for server');
+      this.peer.on('connection', this._peerServerConnection.bind(this));
+    } else {
+      // console.log('setting up connection handler for client');
+      this.peer.on('connection', this._peerClientConnection.bind(this));
+    }
+    this.peer.on('disconnected', this._peerDisconnected.bind(this));
+    this.peer.on('close', this._peerClose.bind(this));
+    this.peer.on('error', this._peerError.bind(this));
+  }
+
   broadcast(msg) {
     for (
       let connectionIndex = 0;
-      connectionIndex < this.connections.length;
+      connectionIndex < this.clients.length;
       connectionIndex++
     ) {
-      this.connections[connectionIndex].send(msg);
+      this.clients[connectionIndex].send(msg);
     }
   }
 
   send(msg, conn) {
-    if (!conn) return this.broadcast(msg);
-    conn.send(msg);
-    console.log('sent: ' + msg + ' to ' + conn.id);
+    if (this.isHost && !conn) {
+      return this.broadcast(msg);
+    }
+
+    if (this.isHost && conn) {
+      return conn.send(msg);
+    }
+
+    this.server.send(msg);
   }
 
   /**** START OF PEER CLASS IMPLEMENTATION ****/
 
-  _peerOpen() {
-    // console.log('_peerOpen');
-    // console.log('ID: ' + this.peer.id);
-  }
+  _peerOpen() {}
 
   _getConnection(conn) {
-    let connIndex = _.indexOf(this.connections, { id: conn.id });
+    let connIndex = _.findIndex(this.clients, function(o) {
+      return o.peer == conn.peer;
+    });
 
-    if (connIndex == -1) return null;
-    return this.connections[connIndex];
+    if (connIndex == -1) {
+      return null;
+    }
+
+    return this.clients[connIndex];
   }
 
+  // server receives a connection from a client
   _peerServerConnection(conn) {
-    // console.log('_peerServerConnection');
-
     if (!this._getConnection(conn)) {
-      conn.on('data', this._connServerData.bind(this));
-      this.connections.push(conn);
+      this.clients.push(conn);
+      this._connOpen(conn);
     }
 
     // console.log('Connected to: ' + this.conn.peer);
@@ -78,12 +110,13 @@ export default class Networking {
 
   _peerClientConnection() {
     // console.log('_peerClientConnection');
+    /*
     if (this.peer.id === null) {
-      console.log('Received null id from peer open');
       this.peer.id = this.lastPeerId;
     } else {
       this.lastPeerId = this.peer.id;
     }
+    */
     // console.log('Client Id: ' + this.peer.id);
   }
 
@@ -105,48 +138,14 @@ export default class Networking {
     console.log(err);
   }
 
-  _initializePeer(isHost, serverId) {
-    // Create own peer object with connection to shared PeerJS server
-    // console.log('_initializePeer');
-
-    this.peer = null;
-    this.lastPeerId = null;
-
-    this.peer = new Peer(serverId, {
-      debug: 2,
-    });
-
-    // USED ON CLIENT & SERVER
-    this.peer.on('open', this._peerOpen.bind(this));
-
-    if (this.isHost) {
-      //console.log('setting up connection handler for server');
-      this.peer.on('connection', this._peerServerConnection.bind(this));
-    } else {
-      // console.log('setting up connection handler for client');
-      this.peer.on('connection', this._peerClientConnection.bind(this));
-    }
-
-    this.peer.on('disconnected', this._peerDisconnected.bind(this));
-    this.peer.on('close', this._peerClose.bind(this));
-    this.peer.on('error', this._peerError.bind(this));
-  }
-
   _connOpen(conn) {
-    //console.log('_connOpen', conn);
     //console.log('Connected to: ' + conn.peer);
 
     if (this.isHost) {
-      conn.on('data', this._connServerData.bind(this));
+      conn.on('data', this._connServerData);
       conn.on('close', this._connClose.bind(this));
 
-      conn.send('ACK', conn);
-
-      if (!this._getConnection(conn)) {
-        this.connections.push(conn);
-      }
-    } else {
-      //  this.conn.on('data', this._connClientData.bind(this));
+      conn.send('ACK from Server');
     }
   }
   _connClose() {
@@ -154,33 +153,41 @@ export default class Networking {
     //console.log('Connection Closed');
   }
 
+  // data received from the client
   _connServerData(data) {
-    console.log('Server Received Data', data);
+    if (data.event == 'ready') {
+      return EventBus.$emit('clientRegister', data.clientId);
+    }
 
+    EventBus.$emit('clientData', {
+      data: data,
+      clientId: this.peer,
+    });
     // EventBus.$emit({ data: data });
   }
 
   _connClientData(data) {
-    console.log('Client received Data', data);
+    EventBus.$emit('serverData', { data: data });
   }
 
   _initializeClient(serverToken) {
     // console.log('_initializeClient', serverToken);
 
     //TODO: something better than guessing the seconds.
+
     setTimeout(
       function() {
-        let conn = this.peer.connect(serverToken.trim());
-
         //  console.log('conn', this.conn);
-        conn.on('open', this._connOpen.bind(this));
-
-        conn.on('data', this._connClientData.bind(this));
-
-        conn.send('ACK from Server', conn);
-        if (!this._getConnection(conn)) this.connections.push(conn);
+        this.server = this.peer.connect(serverToken.trim());
+        this.server.on(
+          'open',
+          function() {
+            this.server.on('data', this._connClientData.bind(this));
+            this.server.send({ event: 'ready', clientId: this.server.peer });
+          }.bind(this)
+        );
       }.bind(this),
-      2000
+      1000
     );
   }
 
