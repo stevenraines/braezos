@@ -10,6 +10,7 @@ import { EventBus } from './eventbus.js';
 import Environment from './classes/environment.class';
 import Player from './classes/things/actors/player.class';
 import Input from './classes/input.class';
+import Networking from './classes/networking.class';
 import params from '../params.config';
 
 Vue.config.productionTip = false;
@@ -22,6 +23,7 @@ new Vue({
   render: h => h(App),
   data: function() {
     return {
+      Networking: null,
       Player: null,
       Environment: null,
       Input: null,
@@ -33,6 +35,7 @@ new Vue({
     window.GameEngine = this;
 
     // instantiate core classes
+    this.Networking = new Networking();
     this.Player = new Player();
     this.Input = new Input();
     this.Environment = new Environment(params);

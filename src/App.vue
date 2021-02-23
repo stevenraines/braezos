@@ -1,17 +1,11 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center"></div>
-      <v-spacer></v-spacer>
-      <v-btn v-on:click="newGame()">New Game</v-btn>
-    </v-app-bar>
     <v-main>
-      <Home :key="homekey" />
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 <script>
-import Home from './views/Home';
 import { EventBus } from './eventbus.js';
 
 export default {
@@ -21,9 +15,7 @@ export default {
       homekey: 0,
     };
   },
-  components: {
-    Home,
-  },
+  components: {},
 
   async beforeCreate() {},
   async created() {

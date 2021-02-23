@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const _ = require('lodash');
-const fs = require('fs');
-
-const defaultParams = require('../params.config');
 
 async function initialize() {}
 
@@ -14,10 +11,11 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
+router.get('/t', function(req, res) {
+  res.send('t');
+});
+
 // define the home page route
 
-router.get('*', function(req, res) {
-  res.send('no valid endpoint');
-});
 initialize();
 module.exports = router;

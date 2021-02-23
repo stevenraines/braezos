@@ -1,86 +1,68 @@
 <template>
   <v-container fluid fill-height>
-    {{ currentTab }}
-    <v-tabs v-model="currentTab" value="Cell">
-      <v-tab id="Cell">World</v-tab>
-      <v-tab id="Inventory">Inventory</v-tab>
-      <v-tab id="Character">Character</v-tab>
-    </v-tabs>
+    <v-app-bar app color="primary" dark>
+      <div class="d-flex align-center"></div>
+      <v-spacer></v-spacer>
+      {{ peerId }}
+      <v-btn v-if="!peerId" v-on:click="hostGame()">Host Game</v-btn>
+      <v-btn v-if="peerId" v-on:click="endGame()">End Game</v-btn>
+      <v-spacer />
+      <v-btn v-on:click="newGame()">New Game</v-btn>
+    </v-app-bar>
     <v-row fill-height>
       <v-col>
-        {{ player.currentCell.terrainType.name }}
-        <hr />
-        <Inventory
-          v-show="currentTab == 0"
-          @pickupItem="pickupItem"
-          @dropItem="dropItem"
-          v-bind:items="player.currentCell.inventory"
-        ></Inventory>
-        <Inventory
-          v-show="currentTab == 1"
-          @pickupItem="pickupItem"
-          @dropItem="dropItem"
-          v-bind:items="player.inventory"
-        ></Inventory>
-        <div :key="player.updateTime" v-show="currentTab == 2">
-          {{ player }}
-        </div>
-      </v-col>
-      <v-col class="sideColumn">
-        <Level />
-        <Console class="console"></Console>
+        <v-card v-if="offer">
+          <v-text-field v-model="msg" />
+          <v-btn v-on:click="sendMessage()">send Message</v-btn>
+        </v-card>
+        <v-card v-if="offer">
+          {{ offer }}
+        </v-card>
+        <v-card>
+          Join a Game
+          <v-text-field v-model="remotePeerId" />
+          <v-btn v-on:click="joinGame()">Join Game</v-btn>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-// @ is an alias to /src
-import Level from '@/components/Level.vue';
-import Inventory from '@/components/Inventory.vue';
-import Console from '@/components/Console.vue';
-
+import _ from 'lodash';
 export default {
   name: 'Home',
   data: function() {
     return {
-      currentTab: 'Cell',
+      msg: 'hello',
+      remotePeerId: 'alphabetsoup',
     };
   },
-  components: {
-    Level,
-    Console,
-    Inventory,
-  },
+  components: {},
   computed: {
-    player: function() {
-      return window.GameEngine.Player;
+    peerId() {
+      return _.get(window, 'GameEngine.Networking.server.id');
+    },
+    offer() {
+      return _.get(window, 'GameEngine.Networking.offer');
     },
   },
+
   methods: {
-    pickupItem(item) {
-      this.player.pickup(item);
+    hostGame: function() {
+      window.GameEngine.Networking.startHosting();
     },
-    dropItem(item) {
-      console.log('drop');
-      this.player.drop(item);
+    endGame: function() {
+      window.GameEngine.Networking.endHosting();
+    },
+    joinGame: function() {
+      window.GameEngine.Networking.joinGame(this.msg);
+    },
+    sendMessage: function() {
+      window.GameEngine.Networking.send(this.msg);
     },
   },
 };
 </script>
 
-<style>
-.sideColumn {
-  display: flex;
-  flex-direction: column;
-}
-
-.console {
-  flex: 4;
-}
-
-.locationDetail {
-  flex: 6;
-  background-color: #000;
-}
-</style>
+<style></style>
