@@ -11,17 +11,15 @@
     </v-app-bar>
     <v-row fill-height>
       <v-col>
-        <v-card v-if="offer">
-          <v-text-field v-model="msg" />
-          <v-btn v-on:click="sendMessage()">send Message</v-btn>
-        </v-card>
-        <v-card v-if="offer">
-          {{ offer }}
-        </v-card>
         <v-card>
           Join a Game
           <v-text-field v-model="remotePeerId" />
           <v-btn v-on:click="joinGame()">Join Game</v-btn>
+        </v-card>
+
+        <v-card>
+          <v-text-field v-model="msg" />
+          <v-btn v-on:click="sendMessage()">send Message</v-btn>
         </v-card>
       </v-col>
     </v-row>
@@ -41,10 +39,7 @@ export default {
   components: {},
   computed: {
     peerId() {
-      return _.get(window, 'GameEngine.Networking.server.id');
-    },
-    offer() {
-      return _.get(window, 'GameEngine.Networking.offer');
+      return _.get(window, 'GameEngine.Networking.peer.id');
     },
   },
 
@@ -56,7 +51,7 @@ export default {
       window.GameEngine.Networking.endHosting();
     },
     joinGame: function() {
-      window.GameEngine.Networking.joinGame(this.msg);
+      window.GameEngine.Networking.joinHost(this.remotePeerId);
     },
     sendMessage: function() {
       window.GameEngine.Networking.send(this.msg);
