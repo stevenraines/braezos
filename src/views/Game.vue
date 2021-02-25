@@ -1,13 +1,13 @@
 <template>
-  <v-container fluid fill-height>
+  <v-layout row wrap fluid fill-height>
     {{ currentTab }}
     <v-tabs v-model="currentTab" value="Cell">
       <v-tab id="Cell">World</v-tab>
       <v-tab id="Inventory">Inventory</v-tab>
       <v-tab id="Character">Character</v-tab>
     </v-tabs>
-    <v-row fill-height>
-      <v-col>
+    <v-row>
+      <v-col fill-height>
         {{ player.currentCell.terrainType.name }}
         <hr />
         <Inventory
@@ -31,7 +31,7 @@
         <Console class="console"></Console>
       </v-col>
     </v-row>
-  </v-container>
+  </v-layout>
 </template>
 
 <script>
