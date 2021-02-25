@@ -1,39 +1,86 @@
 <template>
-  <v-layout row wrap fluid fill-height>
-    {{ currentTab }}
-    <v-tabs v-model="currentTab" value="Cell">
-      <v-tab id="Cell">World</v-tab>
-      <v-tab id="Inventory">Inventory</v-tab>
-      <v-tab id="Character">Character</v-tab>
-    </v-tabs>
-    <v-row>
-      <v-col fill-height>
-        {{ player.currentCell.terrainType.name }}
-        <hr />
-        <Inventory
-          v-show="currentTab == 0"
-          @pickupItem="pickupItem"
-          @dropItem="dropItem"
-          v-bind:items="player.currentCell.inventory"
-        ></Inventory>
-        <Inventory
-          v-show="currentTab == 1"
-          @pickupItem="pickupItem"
-          @dropItem="dropItem"
-          v-bind:items="player.inventory"
-        ></Inventory>
-        <div :key="player.updateTime" v-show="currentTab == 2">
-          {{ player }}
+  <v-layout>
+    <v-flex d-flex flex xs12 fill-height style="width: 99vw;">
+      <!-- LEFT COLUMN -->
+      <v-layout
+        column
+        wrap
+        style="width: 50px;text-align: center"
+        class="full-height-flex-column flex-grow-0 flex-shrink-0 bar"
+      >
+        <v-flex style="padding:5px;flex:1">
+          <v-icon @click="quitGame()">mdi-exit-to-app</v-icon>
+        </v-flex>
+        <v-flex style="padding:5px;flex:11; text-align: center"></v-flex>
+      </v-layout>
+
+      <!-- CENTER COLUMN -->
+      <v-layout column wrap class="full-height-flex-column">
+        <v-flex style="padding:5px;flex:1;border-bottom:1px solid #000">
+          {{ currentTab }}
+        </v-flex>
+        <v-flex style="flex:11;overflow: auto;border-right:1px solid #000">
+          <Level
+            style="position:relative; top:0;left:0"
+            v-if="currentTab == 0"
+          ></Level>
+          <div style="padding:5px;">
+            <Inventory
+              v-show="currentTab == 1"
+              @pickupItem="pickupItem"
+              @dropItem="dropItem"
+              v-bind:items="player.inventory"
+            ></Inventory>
+          </div>
+        </v-flex>
+        <div style="" class="bar">
+          <v-tabs v-model="currentTab" value="Cell">
+            <v-icon name="level" @click="issueCommand('m')">mdi-map</v-icon>
+            <v-icon name="character" @click="issueCommand('c')"
+              >mdi-human</v-icon
+            >
+            <v-icon name="inventory" @click="issueCommand('i')"
+              >mdi-bag-personal-outline</v-icon
+            >
+            <v-icon name="equipment" @click="issueCommand('e')"
+              >mdi-sword</v-icon
+            >
+            <v-icon name="magic" @click="issueCommand('s')"
+              >mdi-auto-fix</v-icon
+            >
+            <v-icon name="crafting" @click="issueCommand('s')"
+              >mdi-hammer-wrench</v-icon
+            >
+            <v-icon name="journal" @click="issueCommand('j')"
+              >mdi-book-open-variant</v-icon
+            >
+
+            <v-tab id="Cell">World</v-tab>
+            <v-tab id="Inventory">Inventory</v-tab>
+            <v-tab id="Character">Character</v-tab>
+          </v-tabs>
         </div>
-      </v-col>
-      <v-col class="sideColumn">
-        <Level />
-        <Console class="console"></Console>
-      </v-col>
-    </v-row>
+      </v-layout>
+
+      <!-- RIGHT COLUMN -->
+      <v-layout
+        style="min-width:200px; max-width: 300px"
+        column
+        wrap
+        class="flex-grow-0 flex-shrink-0 full-height-flex-column"
+      >
+        <v-flex
+          style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"
+        >
+        </v-flex>
+        <v-flex style="padding:5px;flex:11; overflow: auto">
+          <Console class="console"></Console>
+        </v-flex>
+        <div style="padding:5px;height:2em;" class="bar">A.D</div>
+      </v-layout>
+    </v-flex>
   </v-layout>
 </template>
-
 <script>
 // @ is an alias to /src
 import Level from '@/components/Level.vue';
@@ -58,6 +105,9 @@ export default {
     },
   },
   methods: {
+    quitGame() {
+      this.$router.push('/');
+    },
     pickupItem(item) {
       this.player.pickup(item);
     },

@@ -3,6 +3,8 @@ import VueRouter from 'vue-router';
 import Sample from '../views/Sample.vue';
 import Home from '../views/Home.vue';
 import Game from '../views/Game.vue';
+import Generate from '../views/Generate.vue';
+import CreateCharacter from '../views/CreateCharacter.vue';
 Vue.use(VueRouter);
 
 const routes = [
@@ -10,6 +12,16 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/generate',
+    name: 'Generate',
+    component: Generate,
+  },
+  {
+    path: '/createcharacter',
+    name: 'CreateCharacter',
+    component: CreateCharacter,
   },
   {
     path: '/game',

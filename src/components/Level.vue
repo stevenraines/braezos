@@ -85,7 +85,7 @@ export default {
 <style>
 .level {
   padding: 0px;
-  max-height: 75vh;
-  max-width: 75vw;
+  background-color: #000000;
+  height: 75vh;
 }
 </style>

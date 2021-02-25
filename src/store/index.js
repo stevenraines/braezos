@@ -40,7 +40,7 @@ let store = new Vuex.Store({
 });
 
 store.subscribe(() => {
-  //  localStorage.setItem('store', JSON.stringify(store.state));
+  localStorage.setItem('store', JSON.stringify(store.state));
 });
 
 export default store;

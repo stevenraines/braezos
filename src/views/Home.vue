@@ -1,101 +1,34 @@
 <template>
-  <v-layout fill-height>
-    <v-flex d-flex flex x12 class="db-1">
-      <h1>Title</h1>
+  <v-layout>
+    <v-flex d-flex flex xs12 fill-height>
+      <!-- LEFT COLUMN -->
+      <div style="width:20vw"></div>
+      <!-- CENTER COLUMN -->
+      <v-layout xs4 column wrap class="full-height-flex-column">
+        <v-flex style="flex:1"></v-flex>
+        <v-flex style="flex:1; style:padding:5px; text-align:center">
+          <H1>Title</H1>
+        </v-flex>
+        <v-flex style="flex:2; style:padding:5px; text-align:center">
+          <div>
+            <v-btn v-on:click="newGame()">New</v-btn>
+          </div>
+          <div>
+            <v-btn v-on:click="continueGame()">Continue</v-btn>
+          </div>
+          <div>
+            <v-btn disabled v-on:click="continueGame()">Load</v-btn>
+          </div>
+          <hr />
+          <div></div>
+        </v-flex>
+        <v-flex style="flex:1"></v-flex>
+      </v-layout>
+
+      <!-- RIGHT COLUMN -->
+      <div style="width:20vw"></div>
     </v-flex>
   </v-layout>
-  <!--
-  <v-container fluid grid-list-md box class="db-1">
-    <v-layout row>
-      <v-flex d-flex xs3>
-        <v-layout row wrap>
-          <v-card color="orange lighten-2" tile flat>
-            <v-card-text>
-              Join a Game
-              <v-text-field v-model="remotePeerId" />
-              <v-btn v-on:click="joinGame()">Join Game</v-btn>
-            </v-card-text>
-          </v-card>
-
-          <v-divider></v-divider>
-
-          <v-card color="orange lighten-2" tile flat>
-            <v-card-text> {{ peerId }}</v-card-text>
-          </v-card>
-
-          <v-divider></v-divider>
-
-          <v-card color="orange lighten-2" tile flat>
-            <v-card-text>
-              <v-text-field v-model="msg" />
-              <v-btn v-on:click="sendMessage()"
-                >send Message</v-btn
-              ></v-card-text
-            >
-          </v-card>
-
-          <v-divider></v-divider>
-
-          <v-card color="orange lighten-2" tile flat>
-            <v-card-text>X</v-card-text>
-          </v-card>
-        </v-layout>
-      </v-flex>
-
-      <v-flex d-flex xs9>
-        <v-layout row wrap>
-          <v-layout row>
-            <v-flex d-flex>
-              <v-card color="blue-grey" dark tile flat>
-                <v-card-text>{{ lorem }}</v-card-text>
-              </v-card>
-            </v-flex>
-
-            <v-flex d-flex>
-              <v-card color="blue-grey" dark tile flat>
-                <v-card-text>{{ lorem }}</v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-
-          <v-layout row>
-            <v-flex d-flex xs9>
-              <v-card color="blue-grey" dark tile flat>
-                <v-card-text>{{ lorem }}</v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-layout>
-      </v-flex>
-    </v-layout>
-    -->
-
-  <!--
-  <v-container fluid fill-height class="db-1">
- 
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center"></div>
-      <v-spacer></v-spacer>
-   
-      <v-btn v-if="!peerId" v-on:click="hostGame()">Host Game</v-btn>
-      <v-btn v-if="peerId" v-on:click="endGame()">End Game</v-btn>
-      <v-spacer />
-      <v-btn v-on:click="newGame()">New Game</v-btn>
-    </v-app-bar>
- 
-    <v-row fill-height class=".flex-column db-2">
-      <v-col>
-        <h1>Title</h1>
-
-       
-
-        <v-card>
-      
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-  -->
 </template>
 
 <script>
@@ -127,6 +60,12 @@ export default {
     });
   },
   methods: {
+    newGame: function() {
+      this.$router.push('Generate');
+    },
+    continueGame: function() {
+      this.$router.push('Game');
+    },
     hostGame: function() {
       window.GameEngine.Networking.startHosting();
     },
