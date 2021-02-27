@@ -16,10 +16,10 @@
 
       <!-- CENTER COLUMN -->
       <v-layout column wrap class="full-height-flex-column">
-        <v-flex style="padding:5px;flex:1;border-bottom:1px solid #000">
+        <v-flex style="padding:5px;flex:1;solid #000">
           {{ currentTab }}
         </v-flex>
-        <v-flex style="flex:11;overflow: auto;border-right:1px solid #000">
+        <v-flex style="flex:11; padding:5px; overflow: auto;">
           <Level
             style="position:relative; top:0;left:0"
             v-if="currentTab == 0"
@@ -64,7 +64,7 @@
 
       <!-- RIGHT COLUMN -->
       <v-layout
-        style="min-width:200px; max-width: 300px"
+        style="min-width:300px; max-width: 500px"
         column
         wrap
         class="flex-grow-0 flex-shrink-0 full-height-flex-column"
@@ -73,10 +73,11 @@
           style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"
         >
         </v-flex>
-        <v-flex style="padding:5px;flex:11; overflow: auto">
-          <Console class="console"></Console>
-        </v-flex>
-        <div style="padding:5px;height:2em;" class="bar">A.D</div>
+
+        <Console
+          style="padding:5px;flex:11; overflow: auto"
+          class="console"
+        ></Console>
       </v-layout>
     </v-flex>
   </v-layout>

@@ -16,7 +16,7 @@ export default {
   data: function() {
     return {
       levelIndex: 0,
-
+      display: null,
       renderedMapImg: null,
     };
   },
