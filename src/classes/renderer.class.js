@@ -37,8 +37,24 @@ const Renderer = class Renderer {
     }
   }
 
-  renderPlayer(svg, player) {
-    this.renderAscii(svg, '@', player.position);
+  renderCellActors(svg, actors) {
+    console.log(this.stor);
+    console.log('renderActors', actors);
+
+    if (actors.length > 0) {
+      svg.append('g');
+
+      for (let actorIndex = 0; actorIndex < actors.length; actorIndex++) {
+        let actor = actors[actorIndex];
+        let icon = 'M';
+
+        if (actor.className == 'Player') {
+          icon = '@';
+        }
+
+        this.renderAscii(svg, icon, actor.position);
+      }
+    }
   }
 
   renderAscii(

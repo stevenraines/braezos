@@ -5,6 +5,7 @@ import Renderer from '../renderer.class';
 import Cell from './cell.class';
 import TerrainGenerator from '../terrainGenerator.class';
 import Item from '../things/item.class';
+import Actor from '../things/actor.class';
 
 const Level = class Level extends Base {
   constructor(levelIndex, chunk) {
@@ -120,6 +121,7 @@ const Level = class Level extends Base {
     let svg = btoa(this.renderLevel(player, renderArea));
     return `data:image/svg+xml;base64,${svg}`;
   }
+
   renderLevel(player, renderArea) {
     let renderer = new Renderer(this.cellSize);
     let levelSvg = d3.create('svg').attr('id', 'map');
@@ -155,11 +157,12 @@ const Level = class Level extends Base {
       Item.getThingsInCells(cellList, Item.className.toLowerCase())
     );
 
-    // render the player's icoon on screen
-    renderer.renderPlayer(levelSvg, player);
+    renderer.renderCellActors(
+      levelSvg,
+      Actor.getThingsInCells(cellList, Actor.className.toLowerCase())
+    );
 
     // render what the player can see.
-
     if (renderArea) this.setRenderArea(renderArea);
     this.scrollToPlace(levelSvg, player.position);
 
