@@ -107,8 +107,10 @@ export default {
   },
   created() {
     if (!window.GameEngine.Environment) {
-      this.$router.push('Generate');
+      return this.$router.push('Generate');
     }
+
+    window.GameEngine.Environment.registerActor(window.GameEngine.Player);
   },
   methods: {
     quitGame() {
