@@ -27,20 +27,38 @@
 </template>
 <script>
 import { mapState } from 'vuex';
-
+import { EventBus } from '../eventbus.js';
 export default {
   name: 'Console',
   data: function() {
     return {
-      maxHistoryLength: 10,
+      maxHistoryLength: 100,
       commandText: '',
       history: [],
     };
+  },
+  created() {
+    EventBus.$on('LogToPlayerConsole', this.logMessage);
+  },
+  beforeDestroy() {
+    EventBus.$off('LogToPlayerConsole', this.logMessage);
   },
   mounted() {
     this.scrollConsoleToBottom();
   },
   methods: {
+    logMessage(msg) {
+      console.log('PlayerConsole', msg);
+      if (this.history.length >= this.maxHistoryLength) this.history.shift();
+      let newIndex = 0;
+      if (this.history.length > 0) {
+        newIndex = parseInt(this.history[this.history.length - 1].id) + 1;
+      }
+      this.history = this.history.concat([{ id: newIndex, text: msg }]);
+      this.commandText = '';
+
+      this.scrollConsoleToBottom();
+    },
     focusCommandLine() {
       this.$refs.commandline.focus();
     },
@@ -56,17 +74,7 @@ export default {
     CommandLineEnter(key) {
       this.maxHistoryLength = 100;
       if (key.code == 'Enter') {
-        if (this.history.length >= this.maxHistoryLength) this.history.shift();
-        let newIndex = 0;
-        if (this.history.length > 0) {
-          newIndex = parseInt(this.history[this.history.length - 1].id) + 1;
-        }
-        this.history = this.history.concat([
-          { id: newIndex, text: this.commandText },
-        ]);
-        this.commandText = '';
-
-        this.scrollConsoleToBottom();
+        this.logMessage(this.commandText);
       }
     },
   },

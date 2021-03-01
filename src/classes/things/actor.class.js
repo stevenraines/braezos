@@ -1,7 +1,8 @@
-import ThingCollection from '../thingCollection.class';
 import Item from './item.class';
+import ThingCollection from '../thingCollection.class';
 import { EventBus } from '../../eventbus.js';
 import MOVE_VECTORS from '../../enums/moveVectors';
+
 export default class Actor extends ThingCollection {
   constructor(config, storeName) {
     console.log('config', config);
@@ -44,7 +45,9 @@ export default class Actor extends ThingCollection {
   }
 
   act() {
-    window.GameEngine.Environment.eventEngine.lock();
+    window.GameEngine.Environment.lock();
+
+    EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
 
     if (this.lastMove == MOVE_VECTORS.W) {
       this.move(MOVE_VECTORS.E);
@@ -53,9 +56,8 @@ export default class Actor extends ThingCollection {
       this.move(MOVE_VECTORS.W);
       this.lastMove = MOVE_VECTORS.W;
     }
-    console.log('lastMove', this.lastMove);
 
-    window.GameEngine.Environment.eventEngine.unlock();
+    window.GameEngine.Environment.unlock();
   }
 
   load(id) {

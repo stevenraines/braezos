@@ -83,12 +83,13 @@
   </v-layout>
 </template>
 <script>
+import Point from '../classes/helpers/point.class';
+import Actor from '../classes/things/actor.class';
 // @ is an alias to /src
 import Level from '@/components/Level.vue';
 import Inventory from '@/components/Inventory.vue';
 import Console from '@/components/Console.vue';
-import Point from '../classes/helpers/point.class';
-import Actor from '../classes/things/actor.class';
+
 export default {
   name: 'Game',
   data: function() {
@@ -113,11 +114,14 @@ export default {
 
     window.GameEngine.Player.register();
 
+    console.log('created');
     let enemyPosition = new Point(window.GameEngine.Player.position);
     enemyPosition.x += 3;
 
-    new Actor({ name: 'enemy', position: new Point() });
-    // enemy.register();
+    let enemy = new Actor({ name: 'enemy', position: enemyPosition });
+    enemy.save();
+    enemy.register();
+    console.log('enemy', enemy);
   },
   methods: {
     quitGame() {

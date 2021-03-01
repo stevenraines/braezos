@@ -18,6 +18,12 @@ const Point = class Point {
     };
   }
 
+  applyVector(vector) {
+    this.x += vector.x;
+    this.y += vector.y;
+    this.d += vector.d;
+  }
+
   distanceFromInCells(otherPoint) {
     return MathHelper.calculate2DDistance(this, otherPoint);
   }

@@ -69,7 +69,6 @@ export default {
     newGame: function() {
       window.GameEngine.Environment = null;
       window.GameEngine.Player = null;
-
       this.$store.dispatch('resetGame');
     },
     continueGame: function() {

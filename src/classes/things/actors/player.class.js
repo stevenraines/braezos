@@ -1,5 +1,6 @@
 import Actor from '../actor.class';
 import Input from '../../input.class';
+import { EventBus } from '../../../eventbus.js';
 export default class Player extends Actor {
   constructor(config) {
     super(config, 'actor');
@@ -13,28 +14,32 @@ export default class Player extends Actor {
 
   act() {
     window.GameEngine.Environment.lock();
-    console.log(`player's turn`);
-    /* wait for user input; do stuff when user hits a key */
+    EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
     window.addEventListener('keydown', this);
-    window.addEventListener('keyup', this);
   }
 
   handleEvent(e) {
     /* process user input */
 
-    // add key to queue
+    // if we are on a text area, do nothing.
+    if (e.srcElement.tagName == 'TEXTAREA' || e.srcElement.tagName == 'INPUT') {
+      return;
+    }
+
+    // if this isn't a valid command key, do nothing
+    if (!Input.validActionKey(e.key)) return;
+
     if (e.type == 'keydown') {
       if (!this.keyQueue) this.keyQueue = [];
       this.keyQueue.push(e.key);
+      window.addEventListener('keyup', this);
     }
 
     if (e.type == 'keyup') {
-      // handle key
-
-      Input.handleKeys(this.keyQueue, e);
-
       window.removeEventListener('keyup', this);
       window.removeEventListener('keydown', this);
+
+      Input.handleKeys(this.keyQueue, e);
       this.keyQueue = null;
       window.GameEngine.Environment.unlock();
     }

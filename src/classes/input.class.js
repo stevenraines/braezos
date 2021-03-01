@@ -1,6 +1,6 @@
 import Base from './base.class';
 import { EventBus } from '../eventbus.js';
-import _ from 'lodash';
+
 import MOVE_VECTORS from '../enums/moveVectors';
 
 const Input = class Input extends Base {
@@ -28,37 +28,14 @@ const Input = class Input extends Base {
     };
   }
 
-  async handleKeyEvent(message) {
-    let event = message.event;
-    let status = {
-      renderLevel: false,
-    };
-
-    if (!Input.keybindings[event.key]) return;
-    if (
-      event.srcElement.tagName != 'TEXTAREA' &&
-      event.srcElement.tagName != 'INPUT'
-    ) {
-      status = _.merge(
-        status,
-        await Input.keybindings[event.key].fn(
-          event,
-          Input.keybindings[event.key].data
-        )
-      );
-    }
-
-    if (status.renderLevel) EventBus.$emit('RenderLevel');
+  static validActionKey(key) {
+    return Input.keybindings[key] != null;
   }
 
   static handleKeys(keyQueue, event) {
     if (!keyQueue || keyQueue.length == 0) return;
-    if (
-      event.srcElement.tagName == 'TEXTAREA' &&
-      event.srcElement.tagName == 'INPUT'
-    ) {
-      return;
-    }
+
+    console.log(event);
 
     for (let keyIndex = 0; keyIndex < keyQueue.length; keyIndex++) {
       let keyBinding = Input.keybindings[keyQueue[keyIndex]];
