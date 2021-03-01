@@ -1,10 +1,14 @@
+import VuexReset from '@ianwalter/vuex-reset';
+
 const EnvironmentStore = {
+  plugins: [VuexReset()],
   namespaced: true,
   state: {
     singleton: true,
     params: null,
   },
   mutations: {
+    reset: () => {},
     setParams(state, data) {
       state.params = data;
     },

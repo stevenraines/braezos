@@ -49,6 +49,8 @@ export default {
     },
   },
   created() {
+    EventBus.$on('GameStateReset', this.continueGame);
+    /*
     EventBus.$on('clientRegister', function(data) {
       console.log(`clientRegistered. Id:`, data);
     });
@@ -58,13 +60,27 @@ export default {
     EventBus.$on('serverData', function(data) {
       console.log(`receivedData from server`, data);
     });
+  */
+  },
+  beforeDestroy() {
+    EventBus.$off('GameStateReset', this.continueGame);
   },
   methods: {
     newGame: function() {
-      this.$router.push('Generate');
+      window.GameEngine.Environment = null;
+      window.GameEngine.Player = null;
+
+      this.$store.dispatch('resetGame');
     },
     continueGame: function() {
-      this.$router.push('Game');
+      console.log('continue game');
+
+      window.setTimeout(
+        function() {
+          this.$router.push('Generate');
+        }.bind(this),
+        1000
+      );
     },
     hostGame: function() {
       window.GameEngine.Networking.startHosting();

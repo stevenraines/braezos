@@ -9,6 +9,8 @@
     "start": "nodemon --exec 'vue-cli-service serve'"
   },
   "dependencies": {
+    "@ianwalter/vuex-reset": "^4.3.4",
+    "add": "^2.0.6",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "d3": "^6.5.0",

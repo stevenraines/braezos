@@ -10,11 +10,9 @@ const Base = class Base {
       .split(' ' || /s+/)[1];
 
     this.updateTime = new Date().toISOString();
-    this._storeName = storeName ? storeName : this.className.toLowerCase();
-
+    this._storeName = storeName;
     this.config = config ? config : { id: null };
-
-    this.id = uuidv4();
+    this.id = this.config.id ? this.config.id : uuidv4();
   }
 
   get engine() {

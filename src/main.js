@@ -7,11 +7,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import { EventBus } from './eventbus.js';
 
-import Environment from './classes/environment.class';
-import Player from './classes/things/actors/player.class';
-import Input from './classes/input.class';
 import Networking from './classes/networking.class';
-import params from '../params.config';
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
@@ -26,7 +22,6 @@ new Vue({
       Networking: null,
       Player: null,
       Environment: null,
-      Input: null,
     };
   },
 
@@ -36,15 +31,8 @@ new Vue({
 
     // instantiate core classes
     this.Networking = new Networking();
-    this.Player = new Player();
-    this.Input = new Input();
-    this.Environment = new Environment(params);
-
     // load any existing state
     await this.$store.dispatch('init');
-
-    // broadcast set-up complete message to components
-    EventBus.$emit('setupComplete', { success: true });
   },
   methods: {
     log(message, type) {

@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import Player from '../classes/things/actors/player.class';
 export default {
   name: 'CreateCharacter',
   data: function() {
@@ -33,8 +34,28 @@ export default {
   },
   components: {},
   computed: {},
-  beforeCreate() {},
-  created() {},
+
+  created() {
+    if (!window.GameEngine.Environment) return this.$router.replace('Generate');
+
+    console.log('player', window.GameEngine.Player);
+    if (window.GameEngine.Player) return this.startGame();
+
+    window.GameEngine.Player = Player.getUsersPlayer();
+
+    if (!window.GameEngine.Player) {
+      window.GameEngine.Player = new Player({
+        name: 'player1',
+        position: window.GameEngine.Environment.level.startingCell.position,
+      });
+      console.log('Player', window.GameEngine.Player);
+      window.GameEngine.Player.save();
+      return;
+    }
+
+    return this.$router.push('Game');
+  },
+
   methods: {
     startGame: function() {
       this.$router.push('Game');

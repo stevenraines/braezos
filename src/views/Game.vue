@@ -1,5 +1,5 @@
 <template>
-  <v-layout>
+  <v-layout v-if="player">
     <v-flex d-flex flex xs12 fill-height style="width: 99vw;">
       <!-- LEFT COLUMN -->
       <v-layout
@@ -104,6 +104,11 @@ export default {
     player: function() {
       return window.GameEngine.Player;
     },
+  },
+  created() {
+    if (!window.GameEngine.Environment) {
+      this.$router.push('Generate');
+    }
   },
   methods: {
     quitGame() {

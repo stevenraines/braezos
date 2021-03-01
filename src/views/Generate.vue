@@ -22,6 +22,10 @@
 </template>
 
 <script>
+import Environment from '../classes/environment.class';
+import params from '../../params.config';
+import { EventBus } from '../eventbus.js';
+
 export default {
   name: 'Generate',
   data: function() {
@@ -29,16 +33,26 @@ export default {
   },
   components: {},
   computed: {},
-  beforeCreate() {},
-  created() {
-    setTimeout(
-      function() {
-        this.$router.push('CreateCharacter');
-      }.bind(this),
-      1000
-    );
+  beforeCreate() {
+    // set-up the environment
   },
-  methods: {},
+  created() {
+    if (!window.GameEngine.Environment) {
+      EventBus.$on('EnvironmentSetupComplete', this.setupEnvironmentComplete);
+      window.GameEngine.Environment = new Environment(params);
+    } else {
+      this.setupEnvironmentComplete();
+    }
+  },
+  beforeDestroy() {
+    EventBus.$off('EnvironmentSetupComplete', this.continueGame);
+  },
+  methods: {
+    setupEnvironmentComplete() {
+      console.log('setupEnvironmentComplete');
+      this.$router.push('CreateCharacter');
+    },
+  },
 };
 </script>
 

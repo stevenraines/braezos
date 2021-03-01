@@ -68,8 +68,9 @@ export default {
       let mapDistance = (player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
       let mapSize = mapDistance * window.GameEngine.Environment.level.cellSize;
 
+      console.log(window.GameEngine.Player);
       this.renderedMapImg = window.GameEngine.Environment.level.renderLevelAsImgSrc(
-        player,
+        window.GameEngine.Player,
         {
           width: mapSize,
           height: mapSize,

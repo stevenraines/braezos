@@ -1,13 +1,15 @@
 import Base from './base.class';
 import Chunk from '../classes/places/chunk.class';
-import Item from '../classes/things/item.class';
-
+import { EventBus } from '../eventbus.js';
 export default class Environment extends Base {
   constructor(config) {
     super(config);
     this.saveState();
-    this.level = this.getLevelByIndex(this.engine.Player.position.d);
 
+    let currentLevel = 0;
+    this.level = this.getLevelByIndex(currentLevel);
+
+    /*
     if (this.engine.Player.position.x == null) {
       this.engine.Player.setPosition(this.level.startingCell);
     }
@@ -21,6 +23,10 @@ export default class Environment extends Base {
       name: 'Cloak',
       position: this.level.startingCell.position,
     }).save();
+    */
+
+    console.log('send done');
+    EventBus.$emit('EnvironmentSetupComplete');
   }
 
   getLevelByIndex(levelIndex) {

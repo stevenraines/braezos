@@ -3,8 +3,8 @@ import Point from './helpers/point.class';
 import Item from './things/item.class';
 
 export default class Thing extends Base {
-  constructor(config) {
-    super(config);
+  constructor(config, storeName) {
+    super(config, storeName);
     this.position = this.config.position
       ? new Point(this.config.position)
       : null; // the position of the thing in the world. Null if possessed by another.
