@@ -51,7 +51,24 @@ const Input = class Input extends Base {
     if (status.renderLevel) EventBus.$emit('RenderLevel');
   }
 
-  static async handlePlayerMove(event, vector) {
+  static handleKeys(keyQueue, event) {
+    if (!keyQueue || keyQueue.length == 0) return;
+    if (
+      event.srcElement.tagName == 'TEXTAREA' &&
+      event.srcElement.tagName == 'INPUT'
+    ) {
+      return;
+    }
+
+    for (let keyIndex = 0; keyIndex < keyQueue.length; keyIndex++) {
+      let keyBinding = Input.keybindings[keyQueue[keyIndex]];
+      if (!keyBinding) continue;
+
+      keyBinding.fn(keyBinding.data);
+    }
+  }
+
+  static async handlePlayerMove(vector) {
     await window.GameEngine.Player.move(vector);
     return {
       renderLevel: !(vector == MOVE_VECTORS.NONE),

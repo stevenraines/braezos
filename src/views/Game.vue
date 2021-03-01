@@ -87,7 +87,8 @@
 import Level from '@/components/Level.vue';
 import Inventory from '@/components/Inventory.vue';
 import Console from '@/components/Console.vue';
-
+import Point from '../classes/helpers/point.class';
+import Actor from '../classes/things/actor.class';
 export default {
   name: 'Game',
   data: function() {
@@ -110,7 +111,13 @@ export default {
       return this.$router.push('Generate');
     }
 
-    window.GameEngine.Environment.registerActor(window.GameEngine.Player);
+    window.GameEngine.Player.register();
+
+    let enemyPosition = new Point(window.GameEngine.Player.position);
+    enemyPosition.x += 3;
+
+    new Actor({ name: 'enemy', position: new Point() });
+    // enemy.register();
   },
   methods: {
     quitGame() {

@@ -49,7 +49,6 @@ export default {
   },
   methods: {
     setupEnvironmentComplete() {
-      console.log('setupEnvironmentComplete');
       this.$router.push('CreateCharacter');
     },
   },

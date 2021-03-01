@@ -1,5 +1,5 @@
 import Actor from '../actor.class';
-
+import Input from '../../input.class';
 export default class Player extends Actor {
   constructor(config) {
     super(config, 'actor');
@@ -16,13 +16,28 @@ export default class Player extends Actor {
     console.log(`player's turn`);
     /* wait for user input; do stuff when user hits a key */
     window.addEventListener('keydown', this);
+    window.addEventListener('keyup', this);
   }
 
   handleEvent(e) {
     /* process user input */
-    console.log(e);
-    window.removeEventListener('keydown', this);
-    window.GameEngine.Environment.unlock();
+
+    // add key to queue
+    if (e.type == 'keydown') {
+      if (!this.keyQueue) this.keyQueue = [];
+      this.keyQueue.push(e.key);
+    }
+
+    if (e.type == 'keyup') {
+      // handle key
+
+      Input.handleKeys(this.keyQueue, e);
+
+      window.removeEventListener('keyup', this);
+      window.removeEventListener('keydown', this);
+      this.keyQueue = null;
+      window.GameEngine.Environment.unlock();
+    }
   }
 
   static getUsersPlayer() {

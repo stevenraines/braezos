@@ -1,8 +1,9 @@
 import ThingCollection from '../thingCollection.class';
 
 export default class Item extends ThingCollection {
-  constructor(config) {
-    super(config);
+  constructor(config, storeName) {
+    console.log('item', config);
+    super(config, storeName);
     this.owner = this.config.owner ? this.config.owner : null;
   }
 

@@ -38,7 +38,6 @@ export default {
   created() {
     if (!window.GameEngine.Environment) return this.$router.replace('Generate');
 
-    console.log('player', window.GameEngine.Player);
     if (window.GameEngine.Player) return this.startGame();
 
     window.GameEngine.Player = Player.getUsersPlayer();
@@ -48,7 +47,7 @@ export default {
         name: 'player1',
         position: window.GameEngine.Environment.level.startingCell.position,
       });
-      console.log('Player', window.GameEngine.Player);
+
       window.GameEngine.Player.save();
       return;
     }

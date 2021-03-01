@@ -27,15 +27,15 @@ export default {
   created() {
     EventBus.$on('RenderLevel', this.renderLevel);
     EventBus.$on('click', this.handleGlobalEvent);
-    EventBus.$on('setupComplete', this.setupComplete);
+  },
+  beforeDestroy() {
+    EventBus.$off('RenderLevel', this.renderLevel);
+    EventBus.$off('click', this.handleGlobalEvent);
   },
   mounted() {
     this.renderLevel();
   },
   methods: {
-    setupComplete: function() {
-      this.renderLevel();
-    },
     handleLevelClick(event) {
       let scaleX =
         window.GameEngine.Environment.level.renderArea.width /
@@ -67,8 +67,6 @@ export default {
 
       let mapDistance = (player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
       let mapSize = mapDistance * window.GameEngine.Environment.level.cellSize;
-
-      console.log(window.GameEngine.Player);
       this.renderedMapImg = window.GameEngine.Environment.level.renderLevelAsImgSrc(
         window.GameEngine.Player,
         {

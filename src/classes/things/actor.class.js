@@ -4,9 +4,9 @@ import { EventBus } from '../../eventbus.js';
 import MOVE_VECTORS from '../../enums/moveVectors';
 export default class Actor extends ThingCollection {
   constructor(config, storeName) {
+    console.log('config', config);
     super(config, storeName);
     this.viewDistance = 10;
-    this.name = config.name;
   }
 
   async move(vector) {
@@ -15,8 +15,9 @@ export default class Actor extends ThingCollection {
     if (!cell || !cell.isCellTraverable(this)) return;
     this.currentCell = cell;
     this.position = cell.position;
-
     this.save();
+
+    EventBus.$emit('RenderLevel');
   }
 
   async drop(itemToDrop) {
@@ -65,6 +66,6 @@ export default class Actor extends ThingCollection {
 
   register() {
     console.log(`registering ${this.name}`, this);
-    window.GameEngine.Environment.addActor(this);
+    window.GameEngine.Environment.registerActor(this);
   }
 }
