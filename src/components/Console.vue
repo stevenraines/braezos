@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="console" ref="console" id="console">
+    <div class="console" ref="console" id="console" :key="maxLineId">
       <div
         v-bind:id="'history_' + line.id"
         v-for="line in composedHistory"
@@ -48,7 +48,6 @@ export default {
   },
   methods: {
     logMessage(msg) {
-      console.log('PlayerConsole', msg);
       if (this.history.length >= this.maxHistoryLength) this.history.shift();
       let newIndex = 0;
       if (this.history.length > 0) {
@@ -81,6 +80,10 @@ export default {
   computed: {
     composedHistory() {
       return this.history;
+    },
+    maxLineId() {
+      if (this.history.length == 0) return -1;
+      return this.history[this.history.length - 1].id;
     },
   },
   ...mapState({

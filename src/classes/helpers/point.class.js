@@ -22,6 +22,8 @@ const Point = class Point {
     this.x += vector.x;
     this.y += vector.y;
     this.d += vector.d;
+
+    return this;
   }
 
   distanceFromInCells(otherPoint) {

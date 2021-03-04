@@ -43,6 +43,45 @@ const ThingCollection = class ThingCollection extends Thing {
     }
   }
 
+  static createOrLoad(config, classReference, storeName) {
+    let thingData = null;
+    let isNewThing = true;
+
+    if (config.id) {
+      let possibleThings = ThingCollection.filter(
+        {
+          id: config.id,
+        },
+        storeName
+      );
+      if (possibleThings.length == 1) thingData = possibleThings[0];
+    }
+
+    if (!thingData && config.name) {
+      let possibleThings = ThingCollection.filter(
+        {
+          name: config.name,
+        },
+        storeName
+      );
+      if (possibleThings.length == 1) thingData = possibleThings[0];
+    }
+
+    if (!thingData) {
+      isNewThing = true;
+      thingData = config;
+    }
+
+    let thing = new classReference(thingData);
+
+    for (const [key, value] of Object.entries(thingData)) {
+      thing[key] = value;
+    }
+
+    if (isNewThing) thing.save();
+    return thing;
+  }
+
   static filter(conditions, storeName) {
     return _.filter(
       window.GameEngine.$store.state[storeName].collection,

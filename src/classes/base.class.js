@@ -13,6 +13,7 @@ const Base = class Base {
     this._storeName = storeName;
     this.config = config ? config : { id: null };
     this.id = this.config.id ? this.config.id : uuidv4();
+    this.name = this.config.name ? this.config.name : this.id;
   }
 
   get engine() {

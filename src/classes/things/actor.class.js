@@ -2,10 +2,10 @@ import Item from './item.class';
 import ThingCollection from '../thingCollection.class';
 import { EventBus } from '../../eventbus.js';
 import MOVE_VECTORS from '../../enums/moveVectors';
+import Brain from '../brain.class';
 
 export default class Actor extends ThingCollection {
   constructor(config, storeName) {
-    console.log('config', config);
     super(config, storeName);
     this.viewDistance = 10;
   }
@@ -44,11 +44,30 @@ export default class Actor extends ThingCollection {
     EventBus.$emit('RenderLevel');
   }
 
+  preAct() {
+    // EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
+    console.log(`${this.name}'s turn`);
+  }
+
   act() {
-    window.GameEngine.Environment.lock();
+    let delay = 0;
 
-    EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
+    window.GameEngine.EventManager.lock();
 
+    this.preAct();
+    window.setTimeout(
+      function() {
+        let brain = new Brain(this);
+
+        brain.observe();
+        brain.resolve();
+        window.GameEngine.EventManager.unlock();
+      }.bind(this),
+      delay
+    );
+  }
+
+  randomMove() {
     if (this.lastMove == MOVE_VECTORS.W) {
       this.move(MOVE_VECTORS.E);
       this.lastMove = MOVE_VECTORS.E;
@@ -56,18 +75,14 @@ export default class Actor extends ThingCollection {
       this.move(MOVE_VECTORS.W);
       this.lastMove = MOVE_VECTORS.W;
     }
-
-    window.GameEngine.Environment.unlock();
   }
 
   load(id) {
     super.load(id);
-
-    console.log(`loading ${this.name}`, this);
   }
 
   register() {
     console.log(`registering ${this.name}`, this);
-    window.GameEngine.Environment.registerActor(this);
+    window.GameEngine.EventManager.registerActor(this);
   }
 }

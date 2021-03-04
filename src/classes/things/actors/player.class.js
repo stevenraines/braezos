@@ -1,6 +1,7 @@
 import Actor from '../actor.class';
 import Input from '../../input.class';
-import { EventBus } from '../../../eventbus.js';
+
+//import { EventBus } from '../../../eventbus.js';
 export default class Player extends Actor {
   constructor(config) {
     super(config, 'actor');
@@ -13,8 +14,8 @@ export default class Player extends Actor {
   }
 
   act() {
-    window.GameEngine.Environment.lock();
-    EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
+    this.preAct();
+    window.GameEngine.EventManager.lock();
     window.addEventListener('keydown', this);
   }
 
@@ -41,7 +42,7 @@ export default class Player extends Actor {
 
       Input.handleKeys(this.keyQueue, e);
       this.keyQueue = null;
-      window.GameEngine.Environment.unlock();
+      window.GameEngine.EventManager.unlock();
     }
   }
 

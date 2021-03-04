@@ -1,6 +1,6 @@
 import Base from './base.class';
 import { EventBus } from '../eventbus.js';
-
+import SCREENS from '../enums/screens';
 import MOVE_VECTORS from '../enums/moveVectors';
 
 const Input = class Input extends Base {
@@ -13,16 +13,56 @@ const Input = class Input extends Base {
   static get keybindings() {
     return {
       ArrowUp: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.N },
-      w: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.N },
       ArrowDown: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.S },
-      s: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.S },
       ArrowLeft: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.W },
-      a: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.W },
       ArrowRight: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.E },
-      d: { fn: Input.handlePlayerMove, data: MOVE_VECTORS.E },
       g: {
         fn: function() {
           window.GameEngine.Player.pickup();
+        },
+      },
+      d: {
+        fn: function() {
+          EventBus.$emit('SetScreen', {
+            command: 'DROP',
+            validScreens: [SCREENS.WORLD],
+          });
+        },
+      },
+      // screen switch commands
+      i: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.INVENTORY });
+        },
+      },
+      e: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.EQUIPMENT });
+        },
+      },
+      a: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.CHARACTER });
+        },
+      },
+      m: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.WORLD });
+        },
+      },
+      c: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.CRAFTING });
+        },
+      },
+      s: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.MAGIC });
+        },
+      },
+      j: {
+        fn: function() {
+          EventBus.$emit('SetScreen', { screen: SCREENS.JOURNAL });
         },
       },
     };

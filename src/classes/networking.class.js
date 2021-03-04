@@ -16,7 +16,6 @@ export default class Networking {
   }
 
   setStatus(status) {
-    // console.log('status', status);
     this.status = status;
   }
 
@@ -28,14 +27,12 @@ export default class Networking {
     this._initializePeer(serverId);
   }
   joinHost(serverToken) {
-    // console.log('joinHost: ' + serverToken);
     this._initializePeer();
     this._initializeClient(serverToken);
   }
 
   _initializePeer(serverId) {
     // Create own peer object with connection to shared PeerJS server
-    // console.log('_initializePeer');
 
     this.peer = null;
     this.lastPeerId = null;
@@ -48,10 +45,8 @@ export default class Networking {
     this.peer.on('open', this._peerOpen.bind(this));
 
     if (this.isHost) {
-      //console.log('setting up connection handler for server');
       this.peer.on('connection', this._peerServerConnection.bind(this));
     } else {
-      // console.log('setting up connection handler for client');
       this.peer.on('connection', this._peerClientConnection.bind(this));
     }
     this.peer.on('disconnected', this._peerDisconnected.bind(this));
@@ -103,13 +98,9 @@ export default class Networking {
       this.clients.push(conn);
       this._connOpen(conn);
     }
-
-    // console.log('Connected to: ' + this.conn.peer);
-    // console.log('Server Id: ' + this.peer.id);
   }
 
   _peerClientConnection() {
-    // console.log('_peerClientConnection');
     /*
     if (this.peer.id === null) {
       this.peer.id = this.lastPeerId;
@@ -117,21 +108,15 @@ export default class Networking {
       this.lastPeerId = this.peer.id;
     }
     */
-    // console.log('Client Id: ' + this.peer.id);
   }
 
   _peerDisconnected() {
-    // console.log('_peerDisconnected');
-
     // Workaround for peer.reconnect deleting previous id
     this.peer.id = this.lastPeerId;
     this.peer._lastServerId = this.lastPeerId;
     this.reconnect();
   }
-  _peerClose() {
-    // console.log('_peerClose');
-    // console.log('Connection destroyed');
-  }
+  _peerClose() {}
 
   _peerError(err) {
     console.log('_peerError');
@@ -139,8 +124,6 @@ export default class Networking {
   }
 
   _connOpen(conn) {
-    //console.log('Connected to: ' + conn.peer);
-
     if (this.isHost) {
       conn.on('data', this._connServerData);
       conn.on('close', this._connClose.bind(this));
@@ -148,10 +131,7 @@ export default class Networking {
       conn.send('ACK from Server');
     }
   }
-  _connClose() {
-    //console.log('_connClose', conn);
-    //console.log('Connection Closed');
-  }
+  _connClose() {}
 
   // data received from the client
   _connServerData(data) {
@@ -171,13 +151,10 @@ export default class Networking {
   }
 
   _initializeClient(serverToken) {
-    // console.log('_initializeClient', serverToken);
-
     //TODO: something better than guessing the seconds.
 
     setTimeout(
       function() {
-        //  console.log('conn', this.conn);
         this.server = this.peer.connect(serverToken.trim());
         this.server.on(
           'open',

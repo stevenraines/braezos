@@ -18,7 +18,7 @@ export default class Thing extends Base {
     const adjacentPosition = new Point({
       x: vector.x + this.position.x,
       y: vector.y + this.position.y,
-      d: vector.z + this.position.d,
+      d: vector.d + this.position.d,
     });
 
     let cell = this.engine.Environment.level.getCellByPosition(

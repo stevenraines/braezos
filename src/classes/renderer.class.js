@@ -38,9 +38,6 @@ const Renderer = class Renderer {
   }
 
   renderCellActors(svg, actors) {
-    console.log(this.stor);
-    console.log('renderActors', actors);
-
     if (actors.length > 0) {
       svg.append('g');
 

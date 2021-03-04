@@ -33,10 +33,8 @@ let store = new Vuex.Store({
       commit('actor/reset');
       commit('item/reset');
       commit('environment/reset');
-
       dispatch('init');
 
-      console.log('reset state');
       EventBus.$emit('GameStateReset');
     },
   },

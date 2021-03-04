@@ -6,6 +6,7 @@ import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import { EventBus } from './eventbus.js';
+import EventManager from '././classes/eventManager.class';
 
 import Networking from './classes/networking.class';
 
@@ -22,6 +23,7 @@ new Vue({
       Networking: null,
       Player: null,
       Environment: null,
+      EventManager: null,
     };
   },
 
@@ -31,6 +33,8 @@ new Vue({
 
     // instantiate core classes
     this.Networking = new Networking();
+
+    this.EventManager = new EventManager();
     // load any existing state
     await this.$store.dispatch('init');
   },
