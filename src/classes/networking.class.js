@@ -164,7 +164,7 @@ export default class Networking {
           }.bind(this)
         );
       }.bind(this),
-      1000
+      0
     );
   }
 

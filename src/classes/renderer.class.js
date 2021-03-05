@@ -16,13 +16,18 @@ const Renderer = class Renderer {
   renderCell(svg, cell, player) {
     if (!cell.visibleFrom(player.position, player.viewDistance)) return;
 
+    let cellColor = cell.terrainType.color;
+    if (cell.structure) {
+      cellColor = '#cccccc';
+    }
+
     svg
       .append('rect')
       .attr('x', cell.worldPosition.x - cell.cellSize)
       .attr('y', cell.worldPosition.y - cell.cellSize)
       .attr('width', cell.cellSize)
       .attr('height', cell.cellSize)
-      .attr('fill', cell.terrainType.color)
+      .attr('fill', cellColor)
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 0.1)
       .attr('stroke', 'blue');

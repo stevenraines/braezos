@@ -72,10 +72,10 @@ const Input = class Input extends Base {
     return Input.keybindings[key] != null;
   }
 
-  static handleKeys(keyQueue, event) {
+  static handleKeys(keyQueue) {
     if (!keyQueue || keyQueue.length == 0) return;
 
-    console.log(event);
+    //console.log(event);
 
     for (let keyIndex = 0; keyIndex < keyQueue.length; keyIndex++) {
       let keyBinding = Input.keybindings[keyQueue[keyIndex]];

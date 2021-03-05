@@ -1,5 +1,8 @@
 import Point from '../helpers/point.class';
 import Item from '../things/item.class';
+import Actor from '../things/actor.class';
+import { EventBus } from '../../eventbus.js';
+import _ from 'lodash';
 
 const Cell = class Cell {
   constructor(coordinates, level) {
@@ -8,6 +11,7 @@ const Cell = class Cell {
     this.territoryIndex = null;
     this.terrainType = { name: 'none', color: 'black' };
     this.worldPosition = this.$getWorldPosition();
+    this.structure = null;
   }
 
   get data() {
@@ -25,6 +29,16 @@ const Cell = class Cell {
     if (!actor) return false;
 
     if (this.terrainType.name == 'ocean') return false;
+
+    // we hit a blocking cell
+    if (_.get(this, 'structure.type.blocking', false) == true) return false;
+
+    // we hit an actor
+
+    if (this.actors.length > 0) {
+      EventBus.$emit('Interaction', { source: actor, target: this.actors[0] });
+      return false;
+    }
 
     return true;
   }
@@ -45,6 +59,11 @@ const Cell = class Cell {
     let ownedItems = Item.filter({ position: this.position }, 'item');
     this.itemCount = ownedItems.length;
     return ownedItems;
+  }
+
+  get actors() {
+    let actors = Actor.filter({ position: this.position }, 'actor');
+    return actors;
   }
 
   $getWorldPosition() {

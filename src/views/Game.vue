@@ -122,6 +122,8 @@
 import Point from '../classes/helpers/point.class';
 import Actor from '../classes/things/actor.class';
 import Item from '../classes/things/item.class';
+import Structure from '../classes/things/structure.class';
+
 import { EventBus } from '../eventbus.js';
 
 import _ from 'lodash';
@@ -155,17 +157,22 @@ export default {
     }
 
     this.setupGame();
+
     window.GameEngine.EventManager.start();
     EventBus.$on('SetScreen', this.setScreen);
+    EventBus.$on('Interaction', this.manageInteraction);
   },
   beforeDestroy() {
     EventBus.$off('SetScreen', this.setScreen);
-
+    EventBus.$off('Interaction', this.manageInteraction);
     window.GameEngine.EventManager.stop();
   },
   methods: {
     quitGame() {
       this.$router.push('/');
+    },
+    manageInteraction(data) {
+      console.log(`${data.source.name} interacted with ${data.target.name}`);
     },
     setScreen(screenData) {
       if (parseInt(screenData.screen) >= -1) {
@@ -198,6 +205,19 @@ export default {
         },
         Actor,
         'actor'
+      ).register();
+
+      new Structure.createOrLoad(
+        {
+          name: 'building1',
+          position: new Point(window.GameEngine.Player.position).applyVector({
+            x: -5,
+            y: 0,
+            d: 0,
+          }),
+        },
+        Structure,
+        'structure'
       ).register();
 
       new Item.createOrLoad(

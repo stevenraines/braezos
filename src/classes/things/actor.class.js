@@ -11,11 +11,13 @@ export default class Actor extends ThingCollection {
   }
 
   async move(vector) {
-    let cell = this.getAdjacentCell(vector);
+    let destinationCell = this.getAdjacentCell(vector);
 
-    if (!cell || !cell.isCellTraverable(this)) return;
-    this.currentCell = cell;
-    this.position = cell.position;
+    if (!destinationCell || !destinationCell.isCellTraverable(this)) return;
+
+    if (this.currentCell) this.currentCell.occupied = false;
+    this.currentCell = destinationCell;
+    this.position = destinationCell.position;
     this.save();
 
     EventBus.$emit('RenderLevel');
@@ -46,25 +48,19 @@ export default class Actor extends ThingCollection {
 
   preAct() {
     // EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
-    console.log(`${this.name}'s turn`);
+    //   console.log(`${this.name}'s turn`);
   }
 
   act() {
-    let delay = 0;
-
     window.GameEngine.EventManager.lock();
 
     this.preAct();
-    window.setTimeout(
-      function() {
-        let brain = new Brain(this);
 
-        brain.observe();
-        brain.resolve();
-        window.GameEngine.EventManager.unlock();
-      }.bind(this),
-      delay
-    );
+    let brain = new Brain(this);
+
+    brain.observe();
+    brain.resolve();
+    window.GameEngine.EventManager.unlock();
   }
 
   randomMove() {

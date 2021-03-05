@@ -77,7 +77,6 @@ const ThingCollection = class ThingCollection extends Thing {
     for (const [key, value] of Object.entries(thingData)) {
       thing[key] = value;
     }
-
     if (isNewThing) thing.save();
     return thing;
   }

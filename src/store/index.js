@@ -6,6 +6,7 @@ import VueAxios from 'vue-axios';
 import ActorModule from './modules/actor.module';
 import EnvironmentModule from './modules/environment.module';
 import ItemsModule from './modules/item.module';
+import StructureModule from './modules/structure.module';
 import VuexReset from '@ianwalter/vuex-reset';
 import { EventBus } from '../eventbus.js';
 Vue.use(VueAxios, axios);
@@ -42,6 +43,7 @@ let store = new Vuex.Store({
     actor: ActorModule,
     environment: EnvironmentModule,
     item: ItemsModule,
+    structure: StructureModule,
   },
 });
 

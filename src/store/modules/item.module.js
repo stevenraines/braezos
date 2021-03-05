@@ -1,29 +1,19 @@
-import _ from 'lodash';
-import VuexReset from '@ianwalter/vuex-reset';
+import Collection from './collection.module';
+const collection = new Collection();
 
-const ItemsStore = {
-  plugins: [VuexReset()],
+export default {
+  plugins: collection.plugins,
   namespaced: true,
   state: {
-    singleton: false,
-    collection: [],
+    ...collection.state,
   },
-  getters: {},
+  getters: {
+    ...collection.getters,
+  },
   mutations: {
-    reset: () => {},
-    add(state, entity) {
-      state.collection.push(entity);
-    },
-    update(state, entity) {
-      let entityIndex = _.findIndex(state.collection, { id: entity.id });
-      state.collection[entityIndex] = entity;
-    },
-    remove(state, entity) {
-      state.collection = _.remove(state.collection, function(o) {
-        o.id = entity.id;
-      });
-    },
+    ...collection.mutations,
+  },
+  actions: {
+    ...collection.actions,
   },
 };
-
-export default ItemsStore;
