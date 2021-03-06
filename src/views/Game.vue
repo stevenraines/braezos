@@ -196,7 +196,7 @@ export default {
 
       new Actor.createOrLoad(
         {
-          name: 'enemy1',
+          name: `enemy1`,
           position: new Point(window.GameEngine.Player.position).applyVector({
             x: 2,
             y: 2,

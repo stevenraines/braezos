@@ -2,8 +2,8 @@ module.exports = {
   terrain: {
     seed: 0.10440970585212783,
     npts: 100, //75, //16384,
-    height: 1600,
-    width: 1600,
+    height: 2400,
+    width: 2400,
     terrainIterations: 5,
     peakCount: 4,
     ncities: 0, //15,
