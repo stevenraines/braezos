@@ -1,3 +1,5 @@
+import STRUCTURE_ELEMENTS from '../enums/structureElements';
+import _ from 'lodash';
 const Renderer = class Renderer {
   constructor(cellSize) {
     this.cellSize = cellSize;
@@ -18,7 +20,13 @@ const Renderer = class Renderer {
 
     let cellColor = cell.terrainType.color;
     if (cell.structure) {
-      cellColor = '#cccccc';
+      //  console.log('PORTAL', window.GameEngine.cleanObservable(cell.structure));
+
+      if (_.isEqual(cell.structure.type, STRUCTURE_ELEMENTS.PORTAL)) {
+        cellColor = '#ffffff';
+      } else {
+        cellColor = '#cccccc';
+      }
     }
 
     svg

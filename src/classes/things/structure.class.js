@@ -2,6 +2,7 @@ import ThingCollection from '../thingCollection.class';
 //import { EventBus } from '../../eventbus.js';
 import Point from '../helpers/point.class';
 import STRUCTURE_ELEMENTS from '../../enums/structureElements';
+
 export default class Structure extends ThingCollection {
   constructor(config, storeName) {
     super(config, storeName);
@@ -31,12 +32,23 @@ export default class Structure extends ThingCollection {
 
     // default is rectangle 3x3
 
+    let doorCellPosition = new Point({
+      x: width - 1,
+      y: Math.floor(height / 2),
+      d: this.position.d,
+    });
+
     if (!configShape) {
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
+          let type = STRUCTURE_ELEMENTS.WALL;
+
+          if (doorCellPosition.x == x && doorCellPosition.y == y) {
+            type = STRUCTURE_ELEMENTS.PORTAL;
+          }
           this.shape.push({
             offset: new Point({ x: x, y: y, d: 0 }),
-            type: STRUCTURE_ELEMENTS.WALL,
+            type: type,
           });
         }
       }

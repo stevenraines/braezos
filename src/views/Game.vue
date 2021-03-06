@@ -2,32 +2,11 @@
   <v-layout v-if="player">
 
     <v-dialog
+      ref="dialog"
       v-model="dialog"
       width="50vw"
     >
-    
-      <v-card>
-        <v-card-title class="headline grey lighten-2">
-          Privacy Policy
-        </v-card-title>
-
-        <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="dialog = false"
-          >
-            I accept
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <component :is="currentDialog" @action="dialogAction" v-bind="currentDialogProps"></component>
     </v-dialog>
 
     <v-flex d-flex flex xs12 fill-height style="width: 99vw;">
@@ -132,6 +111,7 @@ import _ from 'lodash';
 import Level from '@/components/Level.vue';
 import Inventory from '@/components/Inventory.vue';
 import Console from '@/components/Console.vue';
+import InventoryDialog from '@/components/dialogs/Inventory.vue';
 
 export default {
   name: 'Game',
@@ -139,12 +119,15 @@ export default {
     return {
       currentScreen: 'Cell',
       dialog: false,
+      currentDialog: null,
+      currentDialogProps: null,
     };
   },
   components: {
     Level,
     Console,
     Inventory,
+    InventoryDialog,
   },
   computed: {
     player: function() {
@@ -154,6 +137,7 @@ export default {
   created() {
     EventBus.$on('SetScreen', this.setScreen);
     EventBus.$on('Interaction', this.manageInteraction);
+    window.GameEngine.EventManager.stop();
   },
   mounted() {
     if (!window.GameEngine.Environment) {
@@ -182,10 +166,27 @@ export default {
       // handle screen specific commands
 
       if (screenData.command) {
-        if (_.find(screenData.validScreens, this.currentScreen)) {
-          this.dialog = true;
+        if (_.indexOf(screenData.validScreens, this.currentScreen) > -1) {
+          this.openDialog('InventoryDialog', {
+            items: window.GameEngine.Player.inventory,
+          });
         }
       }
+    },
+
+    openDialog(dialogName, props) {
+      this.currentDialog = dialogName;
+      this.currentDialogProps = props;
+      this.dialog = true;
+    },
+    closeDialog() {
+      this.currentDialog = null;
+      this.currentDialogProps = null;
+      this.dialog = false;
+    },
+    dialogAction(action) {
+      console.log('dialogAction', action);
+      this[action.type](action.data);
     },
     setupGame() {
       window.GameEngine.Environment.register();
@@ -237,7 +238,10 @@ export default {
       this.player.pickup(item);
     },
     dropItem(item) {
+      console.log('drop in game');
       this.player.drop(item);
+      this.closeDialog();
+      EventBus.$emit('RenderLevel');
     },
   },
 };

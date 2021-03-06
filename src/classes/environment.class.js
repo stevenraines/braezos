@@ -22,7 +22,6 @@ export default class Environment extends Base {
 
   // perform the per turn actions of the environment. should be first thing registered
   act() {
-    console.log(`the environment's turn`);
     this.turns += 1;
 
     try {

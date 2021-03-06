@@ -1,6 +1,6 @@
 <template>
   <v-flex d-flex child-flex>
-    {{this.turns}}
+
     <img
       class="level"
       v-on:click="handleLevelClick"
