@@ -8,7 +8,6 @@ export default class Environment extends Base {
 
     this.turns = this.turn ? this.turns : 0;
     this.name = 'environment';
-    this.saveState();
 
     let currentLevel = 0;
     this.level = this.getLevelByIndex(currentLevel);
@@ -23,9 +22,15 @@ export default class Environment extends Base {
 
   // perform the per turn actions of the environment. should be first thing registered
   act() {
-    // console.log(`the environment's turn`);
+    console.log(`the environment's turn`);
     this.turns += 1;
-    this.saveState();
+
+    try {
+      EventBus.$emit('RenderLevel');
+    } catch (ex) {
+      console.log(ex);
+    }
+    // EventBus.$emit('RenderLevel');
   }
 
   register() {

@@ -14,6 +14,10 @@ const EnvironmentStore = {
     },
     saveState(state, data) {
       delete data.storeName;
+      delete data.level.cells;
+      delete data.level.terrain;
+      delete data.level.terrainGenerator;
+
       for (const [key, value] of Object.entries(data)) {
         state[key] = value;
       }

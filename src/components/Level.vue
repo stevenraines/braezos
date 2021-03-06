@@ -1,8 +1,10 @@
 <template>
   <v-flex d-flex child-flex>
+    {{this.turns}}
     <img
       class="level"
       v-on:click="handleLevelClick"
+      :key="this.turns"
       :src="this.renderedMapImg"
     />
   </v-flex>
@@ -22,19 +24,23 @@ export default {
   },
 
   components: {},
-
+  computed: {
+    turns() {
+      return window.GameEngine.Environment.turns;
+    },
+  },
   beforeCreate() {},
   created() {
+    console.log('Level created');
     EventBus.$on('RenderLevel', this.renderLevel);
     EventBus.$on('click', this.handleGlobalEvent);
+    window.GameEngine.EventManager.start();
   },
   beforeDestroy() {
     EventBus.$off('RenderLevel', this.renderLevel);
     EventBus.$off('click', this.handleGlobalEvent);
   },
-  mounted() {
-    this.renderLevel();
-  },
+  mounted() {},
   methods: {
     handleLevelClick(event) {
       let scaleX =
@@ -63,9 +69,8 @@ export default {
     },
     renderLevel: async function() {
       if (!window.GameEngine.Environment.level) return;
-      let player = window.GameEngine.Player;
 
-      let mapDistance = (player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
+      let mapDistance = (window.GameEngine.Player.viewDistance + 1) * 2; // set this to be one bigger than the player's view size so there is always a border
       let mapSize = mapDistance * window.GameEngine.Environment.level.cellSize;
       this.renderedMapImg = window.GameEngine.Environment.level.renderLevelAsImgSrc(
         window.GameEngine.Player,

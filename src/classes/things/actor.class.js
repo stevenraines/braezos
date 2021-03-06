@@ -1,13 +1,13 @@
 import Item from './item.class';
 import ThingCollection from '../thingCollection.class';
-import { EventBus } from '../../eventbus.js';
+//import { EventBus } from '../../eventbus.js';
 import MOVE_VECTORS from '../../enums/moveVectors';
 import Brain from '../brain.class';
 
 export default class Actor extends ThingCollection {
   constructor(config, storeName) {
     super(config, storeName);
-    this.viewDistance = 10;
+    this.viewDistance = 8;
   }
 
   async move(vector) {
@@ -19,8 +19,6 @@ export default class Actor extends ThingCollection {
     this.currentCell = destinationCell;
     this.position = destinationCell.position;
     this.save();
-
-    EventBus.$emit('RenderLevel');
   }
 
   async drop(itemToDrop) {
@@ -28,7 +26,6 @@ export default class Actor extends ThingCollection {
     item.load(itemToDrop.id);
     item.drop(this);
     console.log('render on drop');
-    EventBus.$emit('RenderLevel');
   }
   async pickup(itemToPickup) {
     let items = [itemToPickup];
@@ -42,8 +39,6 @@ export default class Actor extends ThingCollection {
       item.take(this);
       await this.save();
     }
-
-    EventBus.$emit('RenderLevel');
   }
 
   preAct() {

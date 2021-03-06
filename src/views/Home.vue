@@ -78,7 +78,7 @@ export default {
         function() {
           this.$router.push('Generate');
         }.bind(this),
-        1000
+        0
       );
     },
     hostGame: function() {
@@ -97,4 +97,5 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

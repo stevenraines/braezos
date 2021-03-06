@@ -152,15 +152,15 @@ export default {
     },
   },
   created() {
+    EventBus.$on('SetScreen', this.setScreen);
+    EventBus.$on('Interaction', this.manageInteraction);
+  },
+  mounted() {
     if (!window.GameEngine.Environment) {
       return this.$router.push('Generate');
     }
 
     this.setupGame();
-
-    window.GameEngine.EventManager.start();
-    EventBus.$on('SetScreen', this.setScreen);
-    EventBus.$on('Interaction', this.manageInteraction);
   },
   beforeDestroy() {
     EventBus.$off('SetScreen', this.setScreen);
@@ -172,7 +172,7 @@ export default {
       this.$router.push('/');
     },
     manageInteraction(data) {
-      console.log(`${data.source.name} interacted with ${data.target.name}`);
+      console.log(`${data.source.name} interacted with ${data.target[0].name}`);
     },
     setScreen(screenData) {
       if (parseInt(screenData.screen) >= -1) {
