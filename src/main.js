@@ -20,6 +20,8 @@ new Vue({
   render: h => h(App),
   data: function() {
     return {
+      World: null,
+      Renderer: null,
       Networking: null,
       Player: null,
       Environment: null,
@@ -33,7 +35,6 @@ new Vue({
 
     // instantiate core classes
     this.Networking = new Networking();
-
     this.EventManager = new EventManager();
     // load any existing state
     await this.$store.dispatch('init');

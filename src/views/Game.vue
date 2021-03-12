@@ -1,11 +1,6 @@
 <template>
   <v-layout v-if="player">
-
-    <v-dialog
-      ref="dialog"
-      v-model="dialog"
-      width="50vw"
-    >
+    <v-dialog ref="dialog" v-model="dialog" width="50vw">
       <component :is="currentDialog" @action="dialogAction" v-bind="currentDialogProps"></component>
     </v-dialog>
 
@@ -26,14 +21,9 @@
 
       <!-- CENTER COLUMN -->
       <v-layout column wrap class="full-height-flex-column">
-        <v-flex style="padding:5px;flex:1;solid #000">
-          {{ currentScreen }}
-        </v-flex>
+        <v-flex style="padding:5px;flex:1;solid #000">{{ currentScreen }}</v-flex>
         <v-flex style="flex:11; padding:5px; overflow: auto;">
-          <Level
-            style="position:relative; top:0;left:0"
-            v-if="currentScreen == 0"
-          ></Level>
+          <Level style="position:relative; top:0;left:0" v-if="currentScreen == 0"></Level>
           <div style="padding:5px;">
             <Inventory
               v-show="currentScreen == 1"
@@ -43,8 +33,8 @@
             ></Inventory>
           </div>
         </v-flex>
-        <div style="" class="bar">
-          <v-tabs  dark centered icons-and-text v-model="currentScreen" value="Cell">
+        <div style class="bar">
+          <v-tabs dark centered icons-and-text v-model="currentScreen" value="Cell">
             <v-tab id="Cell">
               Map
               <v-icon>mdi-map</v-icon>
@@ -65,8 +55,8 @@
               Spellbook
               <v-icon>mdi-auto-fix</v-icon>
             </v-tab>
-             <v-tab id="Crafting">
-               Crafting
+            <v-tab id="Crafting">
+              Crafting
               <v-icon>mdi-hammer-wrench</v-icon>
             </v-tab>
             <v-tab id="Journal">
@@ -84,15 +74,9 @@
         wrap
         class="flex-grow-0 flex-shrink-0 full-height-flex-column"
       >
-        <v-flex
-          style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"
-        >
-        </v-flex>
+        <v-flex style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"></v-flex>
 
-        <Console
-          style="padding:5px;flex:11; overflow: auto"
-          class="console"
-        ></Console>
+        <Console style="padding:5px;flex:11; overflow: auto" class="console"></Console>
       </v-layout>
     </v-flex>
   </v-layout>
@@ -115,7 +99,7 @@ import InventoryDialog from '@/components/dialogs/Inventory.vue';
 
 export default {
   name: 'Game',
-  data: function() {
+  data: function () {
     return {
       currentScreen: 'Cell',
       dialog: false,
@@ -130,7 +114,7 @@ export default {
     InventoryDialog,
   },
   computed: {
-    player: function() {
+    player: function () {
       return window.GameEngine.Player;
     },
   },

@@ -22,10 +22,10 @@
 </template>
 
 <script>
-import Environment from '../classes/environment.class';
-import params from '../../params.config';
+//import Environment from '../classes/environment.class';
+//import params from '../../params.config';
 import { EventBus } from '../eventbus.js';
-
+import World from '../classes/places/world.class';
 export default {
   name: 'Generate',
   data: function() {
@@ -37,22 +37,36 @@ export default {
     // set-up the environment
   },
   created() {
-    if (!window.GameEngine.Environment) {
-      EventBus.$on('EnvironmentSetupComplete', this.setupEnvironmentComplete);
-      window.GameEngine.Environment = new Environment(params);
-    } else {
-      this.setupEnvironmentComplete();
-    }
+    if (!window.GameEngine.World)
+      window.GameEngine.World = this.generateWorld();
+
+    window.setTimeout(
+      function() {
+        this.setupEnvironmentComplete();
+      }.bind(this),
+      1000
+    );
   },
   beforeDestroy() {
     EventBus.$off('EnvironmentSetupComplete', this.continueGame);
   },
   methods: {
+    generateWorld() {
+      let params = {
+        seed: 1,
+      };
+
+      let world = new World(params);
+
+      console.log(world);
+      return world;
+    },
     setupEnvironmentComplete() {
-      this.$router.push('CreateCharacter');
+      this.$router.push('WorldExplorer');
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

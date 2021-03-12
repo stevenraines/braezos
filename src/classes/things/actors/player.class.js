@@ -42,6 +42,9 @@ export default class Player extends Actor {
 
       Input.handleKeys(this.keyQueue, e);
       this.keyQueue = null;
+
+      // this needs to wait until we are done doing whatever actioon we are doing so you
+      // can't move around while in a dialog
       window.GameEngine.EventManager.unlock();
     }
   }

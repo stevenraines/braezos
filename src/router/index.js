@@ -5,6 +5,7 @@ import Home from '../views/Home.vue';
 import Game from '../views/Game.vue';
 import Generate from '../views/Generate.vue';
 import CreateCharacter from '../views/CreateCharacter.vue';
+import WorldExplorer from '../views/WorldExplorer.vue';
 Vue.use(VueRouter);
 
 const routes = [
@@ -22,6 +23,11 @@ const routes = [
     path: '/createcharacter',
     name: 'CreateCharacter',
     component: CreateCharacter,
+  },
+  {
+    path: '/worldexplorer',
+    name: 'WorldExplorer',
+    component: WorldExplorer,
   },
   {
     path: '/game',
