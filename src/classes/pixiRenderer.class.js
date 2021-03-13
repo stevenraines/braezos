@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import Biomes from './places/biomes.class';
-
+//import _ from 'lodash';
 export default class PIXIRenderer {
   constructor(el, params) {
     if (!el) return;
@@ -23,43 +23,33 @@ export default class PIXIRenderer {
     el.appendChild(this.app.view);
   }
 
+  // render the visible portion of the world
   renderWorld(x, y, d, world) {
     if (!this.el) return;
-
     let startX = x - Math.floor(this.params.width / 2);
     let startY = y - Math.floor(this.params.height / 2);
-    if (!d) d = 0;
 
-    let mapTiles = new PIXI.Container();
     let currentPositionData = null;
+    let mapTiles = new PIXI.Container();
 
     for (var yTileIndex = 0; yTileIndex < this.params.height; yTileIndex++) {
       for (var xTileIndex = 0; xTileIndex < this.params.width; xTileIndex++) {
-        let positionData = world.getPositionData(
+        let position = world.getWorldPosition(
           startX + xTileIndex,
           startY + yTileIndex,
-          0,
-          (this.params.width * world.resolution) / 2,
-          (this.params.height * world.resolution) / 2
+          d
         );
 
-        let biomeData = this.biomes.selectBiome(
-          positionData.elevation,
-          positionData.moisture
-        );
-
-        let cellColor = `0x${biomeData.r.toString(16)}${biomeData.g.toString(
+        let cellColor = `0x${position.biome.r.toString(
           16
-        )}${biomeData.b.toString(16)}`;
+        )}${position.biome.g.toString(16)}${position.biome.b.toString(16)}`;
         let lineStyle = null;
 
-        let isCenterCell = startX + xTileIndex == x && startY + yTileIndex == y;
+        let isCenterCell = position.x == x && position.y == y;
 
         if (isCenterCell) {
+          currentPositionData = position;
           cellColor = '0x000000';
-          currentPositionData = positionData;
-          currentPositionData.biome = biomeData;
-          currentPositionData.biome.name = this.biomes.biomeName(biomeData);
         }
 
         mapTiles.addChild(

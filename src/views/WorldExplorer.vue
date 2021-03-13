@@ -64,17 +64,17 @@
 
 <script>
 import PixiRenderer from '../classes/pixiRenderer.class';
+
 export default {
   name: 'WorldExplorer',
   data: function () {
     return {
       positionData: {},
       PIXI: null,
+
       x: 0,
       y: 0,
       d: 0,
-
-      exponent: 1,
     };
   },
   components: {},
@@ -85,15 +85,25 @@ export default {
     },
     worldMapSize() {
       if (!window.GameEngine.World) return 0;
-      return window.GameEngine.World.chunkSize * 5;
+      return (
+        window.GameEngine.World.chunkSize *
+        window.GameEngine.World.islandRadiusInChunks *
+        2 *
+        3
+      );
     },
   },
-  created() {
-    // if (!window.GameEngine.Environment) return this.$router.replace('Generate');
-  },
-  mounted() {
+
+  async mounted() {
     if (!window.GameEngine.World) return this.$router.replace('Generate');
-    window.GameEngine.World.renderToCanvas(this.x, this.y, this.$refs.map);
+
+    let startPosition = window.GameEngine.World.getStartPosition();
+
+    this.x = startPosition.x;
+    this.y = startPosition.y;
+    this.d = startPosition.d;
+
+    this.renderWorldMap();
 
     this.PIXI = new PixiRenderer(this.$refs.renderer, {
       antialias: false,
@@ -101,29 +111,25 @@ export default {
       resolution: window.GameEngine.World.resolution,
     });
 
-    this.renderWorld();
+    this.renderPlayerMap();
   },
   methods: {
+    renderWorldMap() {
+      window.GameEngine.World.renderToCanvas(0, 0, this.$refs.map);
+    },
     async movePosition(vector) {
       this.x = parseInt(this.x) + vector.x;
       this.y = parseInt(this.y) + vector.y;
-      this.renderWorld();
+      this.renderPlayerMap();
     },
+
     regenerateWorld() {
       window.GameEngine.World = null;
       this.$router.replace('Generate');
     },
-    renderWorld() {
+    renderPlayerMap() {
       if (!window.GameEngine.World) return;
 
-      /*
-      if (
-        this.x % (this.chunkSize / 2) == 0 ||
-        this.y % (this.chunkSize / 2) == 0
-      ) {
-        window.GameEngine.World.renderToCanvas(this.x, this.y, this.$refs.map);
-      }
-*/
       this.positionData = this.PIXI.renderWorld(
         this.x,
         this.y,

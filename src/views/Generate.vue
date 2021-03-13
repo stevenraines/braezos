@@ -8,6 +8,7 @@
         <v-flex style="flex:1"></v-flex>
         <v-flex style="flex:1; style:padding:5px; text-align:center">
           <H1>Generating</H1>
+          <h2>{{status}}</h2>
         </v-flex>
         <v-flex style="flex:2; style:padding:5px; text-align:center">
           <div></div>
@@ -28,32 +29,41 @@ import { EventBus } from '../eventbus.js';
 import World from '../classes/places/world.class';
 export default {
   name: 'Generate',
-  data: function() {
-    return {};
+  data: function () {
+    return {
+      status: null,
+    };
   },
   components: {},
   computed: {},
   beforeCreate() {
     // set-up the environment
   },
+
   created() {
+    EventBus.$on('generation_status', this.showGenerationStatus);
+
     if (!window.GameEngine.World)
       window.GameEngine.World = this.generateWorld();
 
     window.setTimeout(
-      function() {
+      function () {
         this.setupEnvironmentComplete();
       }.bind(this),
-      1000
+      100
     );
   },
   beforeDestroy() {
     EventBus.$off('EnvironmentSetupComplete', this.continueGame);
+    EventBus.$off('generation_status', this.showGenerationStatus);
   },
   methods: {
+    showGenerationStatus(data) {
+      this.status = data;
+    },
     generateWorld() {
       let params = {
-        seed: 1,
+        seed: 5,
       };
 
       let world = new World(params);
