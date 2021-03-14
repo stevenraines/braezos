@@ -1,8 +1,9 @@
-import SimplexNoise from 'simplex-noise';
-import * as ROT from 'rot-js';
-import { EventBus } from '../../eventbus';
-import Biomes from './biomes.class';
-import WorldChunk from './worldChunk.class';
+const SimplexNoise = require('simplex-noise');
+const ROT = require('rot-js');
+const { createCanvas } = require('canvas');
+const Biomes = require('./biomes');
+const WorldChunk = require('./worldChunk');
+const WorldPosition = require('./worldPosition');
 /* 
 The world made with a series of seeded procedural algorithms layered on top of one another. 
 Because these are reproducible we don't need to store them, or generate them all in advance.
@@ -15,16 +16,18 @@ This position is not the center of a chunk, but the meeting point of 4 chunks.
 
 */
 
-export default class World {
+module.exports = class World {
   constructor(params) {
     this.seed = params.seed || 1; // what seed are we using for this world?
     this.chunkSize = 64; // how large is a single chunk?
-    this.resolution = params.resolution || 40;
-    this.islandRadiusInChunks = 2; // what is the maximum number of chunks we can get to before it's all ocean?
+
+    this.islandRadiusInChunks = 6; // what is the maximum number of chunks we can get to before it's all ocean?
 
     this.isIsland = params.isIsland || false;
-    this.width = this.chunkSize * (this.islandRadiusInChunks * 2);
-    this.height = this.chunkSize * (this.islandRadiusInChunks * 2);
+    this.width =
+      this.chunkSize * (this.islandRadiusInChunks * 2) + this.chunkSize * 3;
+    this.height =
+      this.chunkSize * (this.islandRadiusInChunks * 2) + this.chunkSize * 3;
 
     // assign world seed to generator
     ROT.RNG.setSeed(this.seed);
@@ -34,20 +37,17 @@ export default class World {
     this.moistureSeed = ROT.RNG.getUniform();
 
     // generate simplex for terrain elevation and set-up parameters for easing
-    EventBus.$emit('generation_status', 'Generating Terrain Elevation');
     this.simplexElevation = new SimplexNoise(this.elevationSeed);
     this.elevationOctaveArray = [2, 4, 6, 10, 25, 150];
+    this.exponent = 1;
 
     // generate simplex for moisture and set-up parameters for easing
-    EventBus.$emit('generation_status', 'Generating Terrain Moisture');
+
     this.simplexMoisture = new SimplexNoise(this.moistureSeed);
-    this.moistureOctaveArray = [3, 4, 6, 10, 25];
-    // cache local class instances
+    this.moistureOctaveArray = [3, 4, 6, 10, 25, 450];
+    // cache local class instances4
 
-    EventBus.$emit('generation_status', 'Calculating Biomes');
     this.biome = new Biomes();
-
-    EventBus.$emit('generation_status', 'Rendering World');
   }
 
   getWorldChunkFromWorldPosition(world, x, y, d) {
@@ -60,7 +60,6 @@ export default class World {
   }
 
   getStartPosition() {
-    EventBus.$emit('generation_status', 'Locating start position');
     let position = { x: 0, y: 0, d: 0 };
 
     position.x = this.islandRadiusInChunks * 1.75 * this.chunkSize;
@@ -77,26 +76,34 @@ export default class World {
     return position;
   }
 
-  getChunksInArea(visibleArea) {
-    let topLeftChunkX = Math.floor(visibleArea.topLeft.x / this.chunkSize);
-    let topLeftChunkY = Math.floor(visibleArea.topLeft.y / this.chunkSize);
-    let bottomRightChunkX = Math.floor(
-      visibleArea.bottomRight.x / this.chunkSize
-    );
-    let bottomRightChunkY = Math.floor(
-      visibleArea.bottomRight.y / this.chunkSize
-    );
+  /* 
+  Return all the positions the specified area
+  Area: { 
+          topLeft: { x: <val>, y: <val>: d: <val>},
+          bottomRight: { x: <val>, y: <val>: d: <val>},
+  }
 
-    let chunks = [];
+*/
+  getWorldPositions(area) {
+    let topLeftX = Math.floor(area.topLeft.x);
+    let topLeftY = Math.floor(area.topLeft.y);
+    let bottomRightX = Math.floor(area.bottomRight.x);
+    let bottomRightY = Math.floor(area.bottomRight.y);
 
-    let chunkD = visibleArea.topLeft.d;
-    for (let chunkY = bottomRightChunkY; chunkY >= topLeftChunkY; chunkY--) {
-      for (let chunkX = bottomRightChunkX; chunkX >= topLeftChunkX; chunkX--) {
-        chunks.push(new WorldChunk(this, chunkX, chunkY, chunkD));
+    let rows = [];
+    let posD = area.topLeft.d;
+    for (let posY = topLeftY; posY <= bottomRightY; posY++) {
+      let columns = [];
+      for (let posX = topLeftX; posX <= bottomRightX; posX++) {
+        let wp = this.getWorldPosition(posX, posY, posD);
+        delete wp.world;
+        columns.push(wp);
       }
+
+      rows.push(columns);
     }
 
-    return chunks;
+    return rows;
   }
 
   getWorldPosition(x, y, d) {
@@ -184,11 +191,10 @@ export default class World {
   }
 
   getElevation(x, y) {
-    let xval = x / this.width;
-    let yval = y / this.height;
+    let xval = x / (this.width / 4);
+    let yval = y / (this.height / 4);
 
     let elevation = this.simplexElevation.noise2D(xval, yval);
-
     for (
       let octaveIndex = 0;
       octaveIndex < this.elevationOctaveArray.length;
@@ -202,21 +208,31 @@ export default class World {
         );
     }
 
-    elevation = this.normalizeSimplex(elevation);
+    // elevation = elevation / divisor;
+    //elevation = Math.pow(elevation, this.exponent);
+
     // adjust for islandize
     this.isIsland = true;
-
+    elevation = this.normalizeSimplex(elevation);
     elevation = this.compressToIsland(x, y, elevation, function(d) {
       return Math.sqrt(Math.pow(d, 0.6)) * Math.sqrt(Math.pow(d, 0.6)) - 0.3;
     });
+
+    elevation = Math.round(elevation * 48) / 48;
 
     return elevation;
   }
 
   compressToIsland(x, y, val, dFn) {
     // get the distance from 0,0
-    let nx = x / (this.islandRadiusInChunks * this.chunkSize);
-    let ny = y / (this.islandRadiusInChunks * this.chunkSize);
+    let nx =
+      x /
+      ((this.islandRadiusInChunks * this.chunkSize) /
+        (this.islandRadiusInChunks / 2.5));
+    let ny =
+      y /
+      ((this.islandRadiusInChunks * this.chunkSize) /
+        (this.islandRadiusInChunks / 2.5));
 
     let d = Math.sqrt(nx * nx + ny * ny) / Math.sqrt(0.5);
 
@@ -239,7 +255,21 @@ export default class World {
     return data;
   }
 
-  renderToCanvas(xPos, yPos, canvas) {
+  iterateOverWorld(fn) {
+    if (!fn) return;
+
+    for (var y = 0; y < this.height; y++) {
+      for (var x = 0; x < this.width; x++) {
+        fn(x, y);
+      }
+    }
+  }
+
+  renderToImage() {
+    let xPos = 0;
+    let yPos = 0;
+    const canvas = createCanvas(this.width, this.height);
+
     let ctx = canvas.getContext('2d');
 
     // get the coordinates so that out view is in the center of the map.
@@ -250,8 +280,8 @@ export default class World {
 
     let imgdata = ctx.createImageData(canvas.width, canvas.height);
 
-    for (var y = 0; y < canvas.height; y++) {
-      for (var x = 0; x < canvas.width; x++) {
+    this.iterateOverWorld(
+      function(x, y) {
         const index = (x + y * canvas.width) * 4;
 
         let positionData = this.getPositionData(
@@ -271,9 +301,11 @@ export default class World {
         imgdata.data[index + 1] = biomeData[1];
         imgdata.data[index + 2] = biomeData[2];
         imgdata.data[index + 3] = biomeData[3];
-      }
-    }
+      }.bind(this)
+    );
 
     ctx.putImageData(imgdata, 0, 0);
+
+    return canvas.toBuffer('image/png');
   }
-}
+};

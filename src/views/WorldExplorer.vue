@@ -8,12 +8,7 @@
     <v-flex columns flex xs6 fill-height>
       <v-flex d-flex flex fill-height>
         {{chunkSize}}
-        <canvas
-          v-bind:height="worldMapSize"
-          v-bind:width="worldMapSize"
-          ref="map"
-          id="map"
-        ></canvas>
+        <img id="worldMap" src="/api/worldMap" />
       </v-flex>
 
       <v-flex d-flex flex fill-height>
@@ -52,8 +47,8 @@
             </tr>
           </table>
 
-          <v-text-field @change="renderWorld()" v-model="x"></v-text-field>
-          <v-text-field @change="renderWorld()" v-model="y"></v-text-field>
+          <v-text-field @change="renderPlayerMap()" v-model="x"></v-text-field>
+          <v-text-field @change="renderPlayerMap()" v-model="y"></v-text-field>
           <v-btn @click="regenerateWorld()">Regenerate</v-btn>
           <v-btn @click="quit()">Quit</v-btn>
         </div>
@@ -71,10 +66,10 @@ export default {
     return {
       positionData: {},
       PIXI: null,
-
-      x: 0,
-      y: 0,
-      d: 0,
+      x: null,
+      y: null,
+      d: null,
+      drawRadius: 10,
     };
   },
   components: {},
@@ -95,46 +90,38 @@ export default {
   },
 
   async mounted() {
-    if (!window.GameEngine.World) return this.$router.replace('Generate');
-
-    let startPosition = window.GameEngine.World.getStartPosition();
-
-    this.x = startPosition.x;
-    this.y = startPosition.y;
-    this.d = startPosition.d;
-
-    this.renderWorldMap();
-
     this.PIXI = new PixiRenderer(this.$refs.renderer, {
       antialias: false,
       transparent: false,
-      resolution: window.GameEngine.World.resolution,
+      drawRadius: this.drawRadius,
     });
 
-    this.renderPlayerMap();
+    if (this.x == null) {
+      let response = await this.axios.get('/api/player/start');
+      this.x = response.data.x;
+      this.y = response.data.y;
+      this.d = response.data.d;
+    }
+
+    await this.renderPlayerMap();
   },
   methods: {
-    renderWorldMap() {
-      window.GameEngine.World.renderToCanvas(0, 0, this.$refs.map);
-    },
     async movePosition(vector) {
       this.x = parseInt(this.x) + vector.x;
       this.y = parseInt(this.y) + vector.y;
-      this.renderPlayerMap();
+      await this.renderPlayerMap();
     },
 
-    regenerateWorld() {
-      window.GameEngine.World = null;
-      this.$router.replace('Generate');
-    },
-    renderPlayerMap() {
-      if (!window.GameEngine.World) return;
+    async renderPlayerMap() {
+      let response = await this.axios.get('/api/worldPositions', {
+        params: { x: this.x, y: this.y, d: this.d, radius: this.drawRadius },
+      });
 
       this.positionData = this.PIXI.renderWorld(
         this.x,
         this.y,
         this.d,
-        window.GameEngine.World
+        response.data
       );
     },
     quit() {
@@ -145,14 +132,12 @@ export default {
 </script>
 
 <style scoped>
-#map {
+#worldMap {
   height: 300px;
   width: 300px;
   border: 1px solid #000;
 }
 #renderer {
-  height: 642px;
-  width: 642px;
   border: 1px solid #000;
 }
 </style>

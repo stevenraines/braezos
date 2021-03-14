@@ -1,6 +1,6 @@
-import WorldPosition from './worldPosition.class';
+const WorldPosition = require('./worldPosition');
 
-export default class WorldChunk {
+module.exports = class WorldChunk {
   constructor(world, chunkX, chunkY, chunkD) {
     this.world = world;
     this.x = chunkX;
@@ -23,4 +23,4 @@ export default class WorldChunk {
     }
     return positions;
   }
-}
+};

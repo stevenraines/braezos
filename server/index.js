@@ -2,10 +2,12 @@ const { resolve } = require('path');
 const history = require('connect-history-api-fallback');
 const express = require('express');
 
-const configureAPI = require('./configure');
+const configureAPI = require('./configure.js');
 const app = express();
 
 const { PORT = 3000 } = process.env;
+
+require('dotenv').config();
 
 // API
 

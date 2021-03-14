@@ -1,4 +1,4 @@
-export default class WorldPosition {
+module.exports = class WorldPosition {
   constructor(world, data) {
     this.world = world;
     this.x = data.x;
@@ -8,4 +8,4 @@ export default class WorldPosition {
     this.moisture = data.moisture;
     this.biome = data.biome;
   }
-}
+};

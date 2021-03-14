@@ -1,12 +1,13 @@
-import _ from 'lodash';
-
-export default class Biomes {
+const _ = require('lodash');
+module.exports = class Biomes {
   constructor() {
     this.waterTable = 0.05;
   }
 
   selectBiome(e, m) {
+    if (e < 0) return this.biomes.ABYSS;
     if (e < this.waterTable) return this.biomes.OCEAN;
+    if (e < this.waterTable + 0.03) return this.biomes.SHALLOWS;
     if (e < this.waterTable + 0.04) {
       if (m < 0.2) return this.biomes.BARE;
       if (m < 0.8) return this.biomes.BEACH;
@@ -45,7 +46,9 @@ export default class Biomes {
 
   get biomes() {
     return {
-      OCEAN: { r: 54, g: 189, b: 226, passable: false },
+      ABYSS: { r: 28, g: 124, b: 157, passable: false },
+      OCEAN: { r: 64, g: 172, b: 209, passable: false },
+      SHALLOWS: { r: 150, g: 226, b: 252, passable: true },
       BEACH: { r: 255, g: 240, b: 174, a: 150, passable: true },
       SCORCHED: { r: 205, g: 125, b: 52, a: 150, passable: true },
       BARE: { r: 175, g: 175, b: 175, a: 150, passable: true },
@@ -64,4 +67,4 @@ export default class Biomes {
       SNOW: { r: 255, g: 255, b: 255, passable: true },
     };
   }
-}
+};

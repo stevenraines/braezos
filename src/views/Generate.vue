@@ -26,7 +26,7 @@
 //import Environment from '../classes/environment.class';
 //import params from '../../params.config';
 import { EventBus } from '../eventbus.js';
-import World from '../classes/places/world.class';
+
 export default {
   name: 'Generate',
   data: function () {
@@ -43,8 +43,8 @@ export default {
   created() {
     EventBus.$on('generation_status', this.showGenerationStatus);
 
-    if (!window.GameEngine.World)
-      window.GameEngine.World = this.generateWorld();
+    // if (!window.GameEngine.World)
+    //window.GameEngine.World = this.generateWorld();
 
     window.setTimeout(
       function () {
@@ -62,14 +62,14 @@ export default {
       this.status = data;
     },
     generateWorld() {
+      /*
       let params = {
         seed: 5,
       };
-
-      let world = new World(params);
-
-      console.log(world);
-      return world;
+*/
+      //   let world = new World(params);
+      //  console.log(world);
+      //   return world;
     },
     setupEnvironmentComplete() {
       this.$router.push('WorldExplorer');

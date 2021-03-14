@@ -1,4 +1,4 @@
-const configureAPI = require('./server/configure');
+const configureAPI = require('./server/configure.js');
 
 module.exports = {
   configureWebpack: {

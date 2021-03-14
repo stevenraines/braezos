@@ -1,6 +1,4 @@
 import * as PIXI from 'pixi.js';
-import Biomes from './places/biomes.class';
-//import _ from 'lodash';
 export default class PIXIRenderer {
   constructor(el, params) {
     if (!el) return;
@@ -8,37 +6,30 @@ export default class PIXIRenderer {
     this.params = params || {
       antialias: false,
       transparent: false,
-      resolution: 32,
     }; // default: 800 // default: 600 // default: false // default: false // default: 1});
 
-    this.lineWeightConstant = 0.000975;
+    let tileSize = Math.floor(el.clientWidth / (this.params.drawRadius * 2));
 
-    this.params.tileSize = this.el.clientWidth / this.params.resolution;
-    this.params.width = this.el.clientWidth / this.params.resolution;
-    this.params.height = this.el.clientHeight / this.params.resolution;
+    console.log(tileSize);
 
-    this.biomes = new Biomes();
+    this.params.tileSize = tileSize;
+    this.params.width = this.params.drawRadius * 2 * this.params.tileSize;
+    this.params.height = this.params.drawRadius * 2 * this.params.tileSize;
 
     this.app = new PIXI.Application(this.params);
     el.appendChild(this.app.view);
   }
 
   // render the visible portion of the world
-  renderWorld(x, y, d, world) {
+  renderWorld(x, y, d, tiles) {
     if (!this.el) return;
-    let startX = x - Math.floor(this.params.width / 2);
-    let startY = y - Math.floor(this.params.height / 2);
 
     let currentPositionData = null;
     let mapTiles = new PIXI.Container();
 
-    for (var yTileIndex = 0; yTileIndex < this.params.height; yTileIndex++) {
-      for (var xTileIndex = 0; xTileIndex < this.params.width; xTileIndex++) {
-        let position = world.getWorldPosition(
-          startX + xTileIndex,
-          startY + yTileIndex,
-          d
-        );
+    for (var row = 0; row < tiles.length; row++) {
+      for (var column = 0; column < tiles[row].length; column++) {
+        let position = tiles[row][column];
 
         let cellColor = `0x${position.biome.r.toString(
           16
@@ -53,21 +44,20 @@ export default class PIXIRenderer {
         }
 
         mapTiles.addChild(
-          this.renderTile(
-            xTileIndex,
-            yTileIndex,
-            cellColor,
-            lineStyle,
-            mapTiles
-          )
+          this.renderTile(column, row, cellColor, lineStyle, mapTiles)
         );
       }
     }
-
+    /*
     while (this.app.stage.children[0]) {
       this.app.stage.removeChild(this.app.stage.children[0]);
     }
-    this.app.stage.addChild(mapTiles);
+  
+  */ this.app.stage.addChild(
+      mapTiles
+    );
+
+    console.log(currentPositionData);
 
     return currentPositionData;
   }
@@ -77,14 +67,20 @@ export default class PIXIRenderer {
 
     if (!lineStyle)
       lineStyle = {
-        weight: this.lineWeightConstant * this.params.resolution,
+        weight: 1,
         color: 0x000000,
       };
     graphics.beginFill(cellColor);
     graphics.lineStyle(lineStyle.weight, lineStyle.color);
 
     // draw a rectangle
-    graphics.drawRect(localX, localY, 1, 1);
+    graphics.drawRect(
+      localX * this.params.tileSize,
+      localY * this.params.tileSize,
+      this.params.tileSize,
+      this.params.tileSize
+    );
+
     graphics.endFill();
     return graphics;
   }
