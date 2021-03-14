@@ -64,12 +64,14 @@ export default {
   name: 'WorldExplorer',
   data: function () {
     return {
+      tileCache: null,
       positionData: {},
       PIXI: null,
       x: null,
       y: null,
       d: null,
-      drawRadius: 10,
+      drawRadius: 8,
+      tileCacheRadius: 16,
     };
   },
   components: {},
@@ -103,9 +105,23 @@ export default {
       this.d = response.data.d;
     }
 
+    await this.updateTileCache();
+
     await this.renderPlayerMap();
   },
   methods: {
+    async updateTileCache() {
+      let response = await this.axios.get('/api/worldPositions', {
+        params: {
+          x: this.x,
+          y: this.y,
+          d: this.d,
+          radius: this.tileCacheRadius,
+        },
+      });
+
+      this.tileCache = response.data;
+    },
     async movePosition(vector) {
       this.x = parseInt(this.x) + vector.x;
       this.y = parseInt(this.y) + vector.y;
@@ -113,16 +129,15 @@ export default {
     },
 
     async renderPlayerMap() {
-      let response = await this.axios.get('/api/worldPositions', {
-        params: { x: this.x, y: this.y, d: this.d, radius: this.drawRadius },
-      });
-
       this.positionData = this.PIXI.renderWorld(
         this.x,
         this.y,
         this.d,
-        response.data
+        this.drawRadius,
+        this.tileCache
       );
+
+      this.updateTileCache();
     },
     quit() {
       return this.$router.replace('/');

@@ -10,8 +10,6 @@ export default class PIXIRenderer {
 
     let tileSize = Math.floor(el.clientWidth / (this.params.drawRadius * 2));
 
-    console.log(tileSize);
-
     this.params.tileSize = tileSize;
     this.params.width = this.params.drawRadius * 2 * this.params.tileSize;
     this.params.height = this.params.drawRadius * 2 * this.params.tileSize;
@@ -21,15 +19,19 @@ export default class PIXIRenderer {
   }
 
   // render the visible portion of the world
-  renderWorld(x, y, d, tiles) {
+  renderWorld(x, y, d, drawRadius, tiles) {
     if (!this.el) return;
 
+    let topLeftPosition = tiles[0][0];
+
+    let xOffset = x - topLeftPosition.x - drawRadius;
+    let yOffset = y - topLeftPosition.y - drawRadius;
     let currentPositionData = null;
     let mapTiles = new PIXI.Container();
 
-    for (var row = 0; row < tiles.length; row++) {
-      for (var column = 0; column < tiles[row].length; column++) {
-        let position = tiles[row][column];
+    for (var row = 0; row < drawRadius * 2; row++) {
+      for (var column = 0; column < drawRadius * 2; column++) {
+        let position = tiles[row + yOffset][column + xOffset];
 
         let cellColor = `0x${position.biome.r.toString(
           16
@@ -37,8 +39,16 @@ export default class PIXIRenderer {
         let lineStyle = null;
 
         let isCenterCell = position.x == x && position.y == y;
-
-        if (isCenterCell) {
+        /*   console.log(
+          position.x == x && position.y == y,
+          position.x,
+          x,
+          position.y,
+          y
+        );
+       */ if (
+          isCenterCell
+        ) {
           currentPositionData = position;
           cellColor = '0x000000';
         }
@@ -56,8 +66,6 @@ export default class PIXIRenderer {
   */ this.app.stage.addChild(
       mapTiles
     );
-
-    console.log(currentPositionData);
 
     return currentPositionData;
   }
