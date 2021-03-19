@@ -1,4 +1,4 @@
-import MathHelper from './math';
+const MathHelper = require('./math');
 
 const Point = class Point {
   constructor(coordinates) {
@@ -45,4 +45,4 @@ const Point = class Point {
   }
 };
 
-export default Point;
+module.exports = Point;

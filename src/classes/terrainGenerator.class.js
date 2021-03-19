@@ -7,8 +7,8 @@ import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { Delaunay } from 'd3-delaunay';
 import seedrandom from 'seedrandom';
-import TerrainTypes from '../enums/terrainTypes';
-import MathHelper from '../classes/helpers/math';
+import TerrainTypes from '../../shared/enums/terrainTypes';
+import MathHelper from '../../shared/classes/helpers/math';
 
 const TerrainGenerator = class TerrainGenerator {
   constructor(params) {

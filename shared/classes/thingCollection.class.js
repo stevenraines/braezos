@@ -1,6 +1,6 @@
 // base class for all entities in the system. Contains ONLY system related info
-import Thing from './thing.class';
-import _ from 'lodash';
+const Thing = require('./thing.class');
+const _ = require('lodash');
 
 const ThingCollection = class ThingCollection extends Thing {
   constructor(config, storeName) {
@@ -125,4 +125,4 @@ const ThingCollection = class ThingCollection extends Thing {
   }
 };
 
-export default ThingCollection;
+module.exports = ThingCollection;

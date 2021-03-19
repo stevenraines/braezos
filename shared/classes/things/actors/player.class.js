@@ -1,8 +1,7 @@
-import Actor from '../actor.class';
-import Input from '../../input.class';
+const Actor = require('../actor.class');
 
 //import { EventBus } from '../../../eventbus.js';
-export default class Player extends Actor {
+module.exports = class Player extends Actor {
   constructor(config) {
     super(config, 'actor');
     this.keyQueue = null;
@@ -13,6 +12,11 @@ export default class Player extends Actor {
     super.setPosition(cell.position);
   }
 
+  move(request) {
+    this.position = request.position;
+  }
+
+  /*
   act() {
     this.preAct();
     window.GameEngine.EventManager.lock();
@@ -20,7 +24,7 @@ export default class Player extends Actor {
   }
 
   handleEvent(e) {
-    /* process user input */
+    // process user input 
 
     // if we are on a text area, do nothing.
     if (e.srcElement.tagName == 'TEXTAREA' || e.srcElement.tagName == 'INPUT') {
@@ -49,6 +53,7 @@ export default class Player extends Actor {
     }
   }
 
+  */
   static getUsersPlayer() {
     let players = Actor.filter({ name: 'player1' }, 'actor');
     if (players.length == 1) {
@@ -60,4 +65,4 @@ export default class Player extends Actor {
 
     return null;
   }
-}
+};

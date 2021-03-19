@@ -7,17 +7,23 @@
       <v-layout xs4 column wrap class="full-height-flex-column">
         <v-flex style="flex:1"></v-flex>
         <v-flex style="flex:1; style:padding:5px; text-align:center">
-          <H1>Title</H1>
+          <H1 :key="existingPlayerId">{{existingPlayerId}}</H1>
         </v-flex>
         <v-flex style="flex:2; style:padding:5px; text-align:center">
           <div>
-            <v-btn v-on:click="newGame()">New</v-btn>
+            <v-text-field placeholder="Player Name" v-model="playerName"></v-text-field>
           </div>
           <div>
-            <v-btn v-on:click="continueGame()">Continue</v-btn>
+            <v-btn v-bind:disabled="!playerName" v-on:click="newGame()">New</v-btn>
           </div>
           <div>
-            <v-btn disabled v-on:click="continueGame()">Load</v-btn>
+            <v-btn
+              v-bind:disabled="playerName || !existingPlayerId"
+              v-on:click="continueGame()"
+            >Continue</v-btn>
+          </div>
+          <div>
+            <v-btn v-bind:disabled="!existingPlayerId" v-on:click="quitGame()">Quit</v-btn>
           </div>
           <hr />
           <div></div>
@@ -32,13 +38,14 @@
 </template>
 
 <script>
-import { EventBus } from '../eventbus.js';
+import ClientPlayer from '../classes/clientPlayer.class';
 import _ from 'lodash';
 export default {
   name: 'Home',
-  data: function() {
+  data: function () {
     return {
       msg: 'hello',
+      playerName: null,
       remotePeerId: 'alphabetsoup',
     };
   },
@@ -47,9 +54,11 @@ export default {
     peerId() {
       return _.get(window, 'GameEngine.Networking.peer.id');
     },
+    existingPlayerId() {
+      return this.$store.state.player.id;
+    },
   },
   created() {
-    EventBus.$on('GameStateReset', this.continueGame);
     /*
     EventBus.$on('clientRegister', function(data) {
       console.log(`clientRegistered. Id:`, data);
@@ -62,35 +71,61 @@ export default {
     });
   */
   },
-  beforeDestroy() {
-    EventBus.$off('GameStateReset', this.continueGame);
-  },
+  beforeDestroy() {},
   methods: {
-    newGame: function() {
+    newGame: async function () {
+      this.$store.dispatch('resetGame');
+
       window.GameEngine.Environment = null;
       window.GameEngine.Player = null;
-      this.$store.dispatch('resetGame');
-    },
-    continueGame: function() {
-      console.log('continue game');
 
-      window.setTimeout(
-        function() {
-          this.$router.push('Generate');
-        }.bind(this),
-        0
-      );
+      await this.initializePlayer();
+      this.$router.replace('WorldExplorer');
     },
-    hostGame: function() {
+    quitGame: async function () {
+      this.$store.dispatch('resetGame');
+
+      window.GameEngine.Environment = null;
+      window.GameEngine.Player = null;
+    },
+    continueGame: async function () {
+      await this.initializePlayer();
+      this.$router.replace('WorldExplorer');
+    },
+    async initializePlayer() {
+      let playerRequest = {
+        name: this.playerName,
+      };
+
+      if (this.$store.state.player.id) {
+        playerRequest = {
+          id: this.$store.state.player.id,
+        };
+      }
+
+      console.log(playerRequest);
+
+      let player = new ClientPlayer(playerRequest);
+
+      await player.syncFromServer();
+      console.log(player);
+      if (player.id) {
+        this.$store.commit('player/setId', player.id);
+      }
+
+      window.GameEngine.Player = player;
+    },
+
+    hostGame: function () {
       window.GameEngine.Networking.startHosting();
     },
-    endGame: function() {
+    endGame: function () {
       window.GameEngine.Networking.endHosting();
     },
-    joinGame: function() {
+    joinGame: function () {
       window.GameEngine.Networking.joinHost(this.remotePeerId);
     },
-    sendMessage: function() {
+    sendMessage: function () {
       window.GameEngine.Networking.send(this.msg);
     },
   },

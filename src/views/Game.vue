@@ -82,10 +82,10 @@
   </v-layout>
 </template>
 <script>
-import Point from '../classes/helpers/point.class';
-import Actor from '../classes/things/actor.class';
-import Item from '../classes/things/item.class';
-import Structure from '../classes/things/structure.class';
+import Point from 'shared/classes/helpers/point.class.js';
+import Actor from 'shared/classes/things/actor.class';
+import Item from 'shared/classes/things/item.class';
+import Structure from 'shared/classes/things/structure.class';
 
 import { EventBus } from '../eventbus.js';
 

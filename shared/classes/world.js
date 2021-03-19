@@ -1,9 +1,13 @@
+const Base = require('./base.class');
 const SimplexNoise = require('simplex-noise');
+
 const ROT = require('rot-js');
 const { createCanvas } = require('canvas');
 const Biomes = require('./biomes');
 const WorldChunk = require('./worldChunk');
-const WorldPosition = require('./worldPosition');
+const _ = require('lodash');
+const Player = require('./things/actors/player.class');
+
 /* 
 The world made with a series of seeded procedural algorithms layered on top of one another. 
 Because these are reproducible we don't need to store them, or generate them all in advance.
@@ -16,38 +20,68 @@ This position is not the center of a chunk, but the meeting point of 4 chunks.
 
 */
 
-module.exports = class World {
+module.exports = class World extends Base {
   constructor(params) {
+    super(params);
+
     this.seed = params.seed || 1; // what seed are we using for this world?
-    this.chunkSize = 64; // how large is a single chunk?
 
-    this.islandRadiusInChunks = 6; // what is the maximum number of chunks we can get to before it's all ocean?
+    this.__chunkSize = 32; // (32) how large is a single chunk?
+    this.__islandRadiusInChunks = 4; // (4)  what is the maximum number of chunks we can get to before it's all ocean?
 
-    this.isIsland = params.isIsland || false;
-    this.width =
-      this.chunkSize * (this.islandRadiusInChunks * 2) + this.chunkSize * 3;
-    this.height =
-      this.chunkSize * (this.islandRadiusInChunks * 2) + this.chunkSize * 3;
+    this.__isIsland = params.isIsland || false;
+    this.__width =
+      this.__chunkSize * (this.__islandRadiusInChunks * 2) +
+      this.__chunkSize * 3;
+    this.__height =
+      this.__chunkSize * (this.__islandRadiusInChunks * 2) +
+      this.__chunkSize * 3;
 
     // assign world seed to generator
     ROT.RNG.setSeed(this.seed);
 
     // capture environmental seeds in order for reproducibility
-    this.elevationSeed = ROT.RNG.getUniform();
-    this.moistureSeed = ROT.RNG.getUniform();
+    this.__elevationSeed = ROT.RNG.getUniform();
+    this.__moistureSeed = ROT.RNG.getUniform();
 
     // generate simplex for terrain elevation and set-up parameters for easing
-    this.simplexElevation = new SimplexNoise(this.elevationSeed);
-    this.elevationOctaveArray = [2, 4, 6, 10, 25, 150];
-    this.exponent = 1;
+    this.__simplexElevation = new SimplexNoise(this.__elevationSeed);
+    this.__elevationOctaveArray = [2, 4, 6, 10, 25, 150];
+    this.__exponent = 1;
 
     // generate simplex for moisture and set-up parameters for easing
 
-    this.simplexMoisture = new SimplexNoise(this.moistureSeed);
-    this.moistureOctaveArray = [3, 4, 6, 10, 25, 450];
+    this.__simplexMoisture = new SimplexNoise(this.moistureSeed);
+    this.__moistureOctaveArray = [3, 4, 6, 10, 25, 450];
     // cache local class instances4
 
-    this.biome = new Biomes();
+    this.__biome = new Biomes();
+
+    // players in the world
+    this.__players = [];
+    this.initializePlayers();
+  }
+
+  initializePlayers() {
+    console.log('initialize players');
+    this.__players = [];
+
+    // load players on start-up of world
+  }
+
+  getPlayer(params) {
+    let player = _.find(this.__players, params);
+
+    if (!player) {
+      player = new Player(params);
+      player.startPosition = this.getStartPosition();
+      this.__players.push(player);
+      let returnPlayer = _.clone(player);
+      returnPlayer.__isNew = true;
+      return returnPlayer;
+    }
+
+    return player;
   }
 
   getWorldChunkFromWorldPosition(world, x, y, d) {
@@ -62,9 +96,9 @@ module.exports = class World {
   getStartPosition() {
     let position = { x: 0, y: 0, d: 0 };
 
-    position.x = this.islandRadiusInChunks * 1.75 * this.chunkSize;
+    position.x = this.__islandRadiusInChunks * 1.75 * this.__chunkSize;
 
-    position.y = this.islandRadiusInChunks * 2 * this.chunkSize;
+    position.y = this.__islandRadiusInChunks * 2 * this.__chunkSize;
 
     while (
       !this.getWorldPosition(position.x, position.y, position.d).biome.passable
@@ -112,19 +146,19 @@ module.exports = class World {
 
   worldCoordinatesToChunkCoordinates(x, y) {
     return {
-      chunkX: Math.floor(x / this.chunkSize),
-      chunkY: Math.floor(y / this.chunkSize),
-      offsetX: x % this.chunkSize,
-      offsetY: y % this.chunkSize,
+      chunkX: Math.floor(x / this.__chunkSize),
+      chunkY: Math.floor(y / this.__chunkSize),
+      offsetX: x % this.__chunkSize,
+      offsetY: y % this.__chunkSize,
     };
   }
 
   chunkCoordinatesToWorldCoordinates(chunkX, chunkY) {
     return {
-      x: chunkX * this.chunkSize - this.chunkSize / 2,
-      y: chunkY * this.chunkSize - this.chunkSize / 2,
-      width: this.chunkSize,
-      height: this.chunkSize,
+      x: chunkX * this.__chunkSize - this.__chunkSize / 2,
+      y: chunkY * this.__chunkSize - this.__chunkSize / 2,
+      width: this.__chunkSize,
+      height: this.__chunkSize,
     };
   }
 
@@ -161,27 +195,27 @@ module.exports = class World {
       elevation: this.getElevation(x, y),
     };
 
-    data.biome = this.biome.selectBiome(data.elevation, data.moisture);
-    data.biome.name = this.biome.biomeName(data.biome);
+    data.biome = this.__biome.selectBiome(data.elevation, data.moisture);
+    data.biome.name = this.__biome.biomeName(data.biome);
     return data;
   }
 
   getMoisture(x, y) {
-    let xval = x / this.width;
-    let yval = y / this.height;
+    let xval = x / this.__width;
+    let yval = y / this.__height;
 
-    let moisture = this.simplexMoisture.noise2D(xval, yval);
+    let moisture = this.__simplexMoisture.noise2D(xval, yval);
 
     for (
       let octaveIndex = 0;
-      octaveIndex < this.moistureOctaveArray.length;
+      octaveIndex < this.__moistureOctaveArray.length;
       octaveIndex++
     ) {
       moisture +=
-        (1 / this.moistureOctaveArray[octaveIndex]) *
-        this.simplexMoisture.noise2D(
-          this.moistureOctaveArray[octaveIndex] * xval,
-          this.moistureOctaveArray[octaveIndex] * yval
+        (1 / this.__moistureOctaveArray[octaveIndex]) *
+        this.__simplexMoisture.noise2D(
+          this.__moistureOctaveArray[octaveIndex] * xval,
+          this.__moistureOctaveArray[octaveIndex] * yval
         );
     }
 
@@ -191,28 +225,28 @@ module.exports = class World {
   }
 
   getElevation(x, y) {
-    let xval = x / (this.width / 4);
-    let yval = y / (this.height / 4);
+    let xval = x / (this.__width / 4);
+    let yval = y / (this.__height / 4);
 
-    let elevation = this.simplexElevation.noise2D(xval, yval);
+    let elevation = this.__simplexElevation.noise2D(xval, yval);
     for (
       let octaveIndex = 0;
-      octaveIndex < this.elevationOctaveArray.length;
+      octaveIndex < this.__elevationOctaveArray.length;
       octaveIndex++
     ) {
       elevation +=
-        (1 / this.elevationOctaveArray[octaveIndex]) *
-        this.simplexElevation.noise2D(
-          this.elevationOctaveArray[octaveIndex] * xval,
-          this.elevationOctaveArray[octaveIndex] * yval
+        (1 / this.__elevationOctaveArray[octaveIndex]) *
+        this.__simplexElevation.noise2D(
+          this.__elevationOctaveArray[octaveIndex] * xval,
+          this.__elevationOctaveArray[octaveIndex] * yval
         );
     }
 
     // elevation = elevation / divisor;
-    //elevation = Math.pow(elevation, this.exponent);
+    //elevation = Math.pow(elevation, this.__exponent);
 
     // adjust for islandize
-    this.isIsland = true;
+    this.__isIsland = true;
     elevation = this.normalizeSimplex(elevation);
     elevation = this.compressToIsland(x, y, elevation, function(d) {
       return Math.sqrt(Math.pow(d, 0.6)) * Math.sqrt(Math.pow(d, 0.6)) - 0.3;
@@ -227,12 +261,12 @@ module.exports = class World {
     // get the distance from 0,0
     let nx =
       x /
-      ((this.islandRadiusInChunks * this.chunkSize) /
-        (this.islandRadiusInChunks / 2.5));
+      ((this.__islandRadiusInChunks * this.__chunkSize) /
+        (this.__islandRadiusInChunks / 2.5));
     let ny =
       y /
-      ((this.islandRadiusInChunks * this.chunkSize) /
-        (this.islandRadiusInChunks / 2.5));
+      ((this.__islandRadiusInChunks * this.__chunkSize) /
+        (this.__islandRadiusInChunks / 2.5));
 
     let d = Math.sqrt(nx * nx + ny * ny) / Math.sqrt(0.5);
 
@@ -244,7 +278,7 @@ module.exports = class World {
 
   getBiomeColors(e, m) {
     let data = Array(4);
-    let biome = this.biome.selectBiome(e, m);
+    let biome = this.__biome.selectBiome(e, m);
 
     let eColor = e < 0 ? 192 + 64 * -e : 256;
     data[0] = biome.r; // r
@@ -258,8 +292,8 @@ module.exports = class World {
   iterateOverWorld(fn) {
     if (!fn) return;
 
-    for (var y = 0; y < this.height; y++) {
-      for (var x = 0; x < this.width; x++) {
+    for (var y = 0; y < this.__height; y++) {
+      for (var x = 0; x < this.__width; x++) {
         fn(x, y);
       }
     }
@@ -268,7 +302,7 @@ module.exports = class World {
   renderToImage() {
     let xPos = 0;
     let yPos = 0;
-    const canvas = createCanvas(this.width, this.height);
+    const canvas = createCanvas(this.__width, this.__height);
 
     let ctx = canvas.getContext('2d');
 

@@ -1,6 +1,6 @@
 // base class for all entities in the system. Contains ONLY system related info
 
-import { v4 as uuidv4 } from 'uuid';
+const { v4: uuidv4 } = require('uuid');
 
 const Base = class Base {
   constructor(config, storeName) {
@@ -9,6 +9,7 @@ const Base = class Base {
       .split('(' || /s+/)[0]
       .split(' ' || /s+/)[1];
 
+    console.log('Base Config', config);
     this.updateTime = new Date().toISOString();
     this._storeName = storeName;
     this.config = config ? config : { id: null };
@@ -34,6 +35,19 @@ const Base = class Base {
 
   get controllers() {
     return window.GameEngine.$data.controllers;
+  }
+
+  serialize() {
+    return this.getKeyData(this);
+  }
+  deserialize(data) {
+    this.load(data);
+  }
+
+  static load(data) {
+    for (const [key, value] of Object.entries(data)) {
+      if (!key.startsWith('__')) this[key] = value;
+    }
   }
 
   loadState() {
@@ -69,7 +83,7 @@ const Base = class Base {
   getKeyData(obj, data) {
     if (!data) data = {};
     for (const [key, value] of Object.entries(obj)) {
-      data[key] = value;
+      if (!key.startsWith('__')) data[key] = value;
     }
     return data;
   }
@@ -83,4 +97,4 @@ const Base = class Base {
   }
 };
 
-export default Base;
+module.exports = Base;

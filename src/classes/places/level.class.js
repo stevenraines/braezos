@@ -1,11 +1,11 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
-import Base from '../base.class';
+import Base from '../../../shared/classes/base.class';
 import Renderer from '../renderer.class';
 import Cell from './cell.class';
 import TerrainGenerator from '../terrainGenerator.class';
-import Item from '../things/item.class';
-import Actor from '../things/actor.class';
+import Item from '../../../shared/classes/things/item.class';
+import Actor from '../../../shared/classes/things/actor.class';
 
 const Level = class Level extends Base {
   constructor(levelIndex, chunk) {

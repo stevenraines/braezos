@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import Player from '../classes/things/actors/player.class';
+import Player from 'shared/classes/things/actors/player.class';
 export default {
   name: 'CreateCharacter',
-  data: function() {
+  data: function () {
     return {};
   },
   components: {},
@@ -56,7 +56,7 @@ export default {
   },
 
   methods: {
-    startGame: function() {
+    startGame: function () {
       this.$router.push('Game');
     },
   },

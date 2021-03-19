@@ -47,8 +47,8 @@
             </tr>
           </table>
 
-          <v-text-field @change="renderPlayerMap()" v-model="x"></v-text-field>
-          <v-text-field @change="renderPlayerMap()" v-model="y"></v-text-field>
+          <v-text-field @change="renderPlayerMap()" v-model="position.x"></v-text-field>
+          <v-text-field @change="renderPlayerMap()" v-model="position.y"></v-text-field>
           <v-btn @click="regenerateWorld()">Regenerate</v-btn>
           <v-btn @click="quit()">Quit</v-btn>
         </div>
@@ -59,7 +59,7 @@
 
 <script>
 import PixiRenderer from '../classes/pixiRenderer.class';
-
+import _ from 'lodash';
 export default {
   name: 'WorldExplorer',
   data: function () {
@@ -67,15 +67,15 @@ export default {
       tileCache: null,
       positionData: {},
       PIXI: null,
-      x: null,
-      y: null,
-      d: null,
       drawRadius: 8,
-      tileCacheRadius: 16,
+      tileCacheRadius: 24,
     };
   },
   components: {},
   computed: {
+    position() {
+      return _.get(window.GameEngine.Player, 'position', { x: 0, y: 0 });
+    },
     chunkSize() {
       if (!window.GameEngine.World) return 0;
       return window.GameEngine.World.chunkSize;
@@ -92,30 +92,27 @@ export default {
   },
 
   async mounted() {
+    if (!window.GameEngine.Player) return this.setupPlayer();
     this.PIXI = new PixiRenderer(this.$refs.renderer, {
       antialias: false,
       transparent: false,
       drawRadius: this.drawRadius,
     });
 
-    if (this.x == null) {
-      let response = await this.axios.get('/api/player/start');
-      this.x = response.data.x;
-      this.y = response.data.y;
-      this.d = response.data.d;
-    }
-
     await this.updateTileCache();
 
     await this.renderPlayerMap();
   },
   methods: {
+    setupPlayer() {
+      this.$router.replace('/');
+    },
     async updateTileCache() {
       let response = await this.axios.get('/api/worldPositions', {
         params: {
-          x: this.x,
-          y: this.y,
-          d: this.d,
+          x: window.GameEngine.Player.position.x,
+          y: window.GameEngine.Player.position.y,
+          d: window.GameEngine.Player.position.d,
           radius: this.tileCacheRadius,
         },
       });
@@ -123,16 +120,16 @@ export default {
       this.tileCache = response.data;
     },
     async movePosition(vector) {
-      this.x = parseInt(this.x) + vector.x;
-      this.y = parseInt(this.y) + vector.y;
+      await window.GameEngine.Player.move(vector);
+
       await this.renderPlayerMap();
     },
 
     async renderPlayerMap() {
       this.positionData = this.PIXI.renderWorld(
-        this.x,
-        this.y,
-        this.d,
+        window.GameEngine.Player.position.x,
+        window.GameEngine.Player.position.y,
+        window.GameEngine.Player.position.d,
         this.drawRadius,
         this.tileCache
       );

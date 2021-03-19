@@ -1,10 +1,8 @@
-import Item from './item.class';
-import ThingCollection from '../thingCollection.class';
-//import { EventBus } from '../../eventbus.js';
-import MOVE_VECTORS from '../../enums/moveVectors';
-import Brain from '../brain.class';
-
-export default class Actor extends ThingCollection {
+const Item = require('./item.class');
+const ThingCollection = require('../thingCollection.class');
+const MOVE_VECTORS = require('../../enums/moveVectors');
+//const Brain = require('../brain.class');
+module.exports = class Actor extends ThingCollection {
   constructor(config, storeName) {
     super(config, storeName);
     this.viewDistance = 8;
@@ -45,7 +43,7 @@ export default class Actor extends ThingCollection {
     // EventBus.$emit('LogToPlayerConsole', `${this.name}'s turn`);
     //   console.log(`${this.name}'s turn`);
   }
-
+  /*
   act() {
     window.GameEngine.EventManager.lock();
 
@@ -57,7 +55,7 @@ export default class Actor extends ThingCollection {
     brain.resolve();
     window.GameEngine.EventManager.unlock();
   }
-
+*/
   randomMove() {
     if (this.lastMove == MOVE_VECTORS.W) {
       this.move(MOVE_VECTORS.E);
@@ -76,4 +74,4 @@ export default class Actor extends ThingCollection {
     console.log(`registering ${this.name}`, this);
     window.GameEngine.EventManager.registerActor(this);
   }
-}
+};

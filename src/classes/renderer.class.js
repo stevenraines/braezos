@@ -1,4 +1,4 @@
-import STRUCTURE_ELEMENTS from '../enums/structureElements';
+import STRUCTURE_ELEMENTS from '../../shared/enums/structureElements';
 import _ from 'lodash';
 const Renderer = class Renderer {
   constructor(cellSize) {

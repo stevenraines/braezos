@@ -1,6 +1,6 @@
-import Base from './base.class';
+const Base = require('./base.class');
 
-export default class Brain extends Base {
+module.exports = class Brain extends Base {
   constructor() {
     super();
     this.actionStack = []; // the stack of available options, ordered by priority.
@@ -16,4 +16,4 @@ export default class Brain extends Base {
   resolve() {
     return;
   }
-}
+};

@@ -1,4 +1,4 @@
-import Base from './base.class';
+import Base from 'shared/classes/base.class';
 import * as ROT from 'rot-js';
 //import { EventBus } from '../eventbus.js';
 export default class EventManager extends Base {

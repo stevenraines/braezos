@@ -1,6 +1,6 @@
-import ThingCollection from '../thingCollection.class';
+const ThingCollection = require('../thingCollection.class');
 
-export default class Item extends ThingCollection {
+module.exports = class Item extends ThingCollection {
   constructor(config, storeName) {
     super(config, storeName);
     this.owner = this.config.owner ? this.config.owner : null;
@@ -19,4 +19,4 @@ export default class Item extends ThingCollection {
     this.save();
     entity.itemCount -= 1;
   }
-}
+};

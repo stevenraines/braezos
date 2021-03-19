@@ -6,7 +6,9 @@ const World = require('../shared/classes/world.js');
 
 async function initialize() {
   console.log(`initializing world with seed ${process.env.WORLD_SEED}`);
+
   world = new World({ seed: process.env.WORLD_SEED });
+  console.log(world.serialize());
 }
 
 // middleware that is specific to this router
@@ -15,8 +17,20 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-router.get('/player/start', function(req, res) {
-  res.send(world.getStartPosition());
+router.post('/player/act', function(req, res) {
+  let player = world.getPlayer({ id: req.body.id });
+
+  if (player[req.body.action]) {
+    let resp = player[req.body.action](req.body);
+    return res.send(resp);
+  }
+
+  res.send(null);
+});
+
+router.post('/player', function(req, res) {
+  console.log('getPlayer params', req.body);
+  res.send(world.getPlayer(req.body));
 });
 
 router.get('/world', function(req, res) {

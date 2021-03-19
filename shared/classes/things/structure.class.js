@@ -1,9 +1,9 @@
-import ThingCollection from '../thingCollection.class';
+const ThingCollection = require('../thingCollection.class');
 //import { EventBus } from '../../eventbus.js';
-import Point from '../helpers/point.class';
-import STRUCTURE_ELEMENTS from '../../enums/structureElements';
+const Point = require('../helpers/point.class');
+const STRUCTURE_ELEMENTS = require('../../enums/structureElements');
 
-export default class Structure extends ThingCollection {
+module.exports = class Structure extends ThingCollection {
   constructor(config, storeName) {
     super(config, storeName);
     this.shape = [];
@@ -59,4 +59,4 @@ export default class Structure extends ThingCollection {
     if (this.position.d == window.GameEngine.Environment.level.levelIndex)
       this.applyStructure();
   }
-}
+};

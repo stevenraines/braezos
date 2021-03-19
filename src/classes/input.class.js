@@ -1,7 +1,7 @@
-import Base from './base.class';
+import Base from 'shared/classes/base.class';
 import { EventBus } from '../eventbus.js';
-import SCREENS from '../enums/screens';
-import MOVE_VECTORS from '../enums/moveVectors';
+import SCREENS from 'shared/enums/screens';
+import MOVE_VECTORS from 'shared/enums/moveVectors';
 
 const Input = class Input extends Base {
   constructor() {

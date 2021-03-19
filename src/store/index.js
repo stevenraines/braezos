@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
+import PlayerModule from './modules/player.module';
 import ActorModule from './modules/actor.module';
 import EnvironmentModule from './modules/environment.module';
 import ItemsModule from './modules/item.module';
@@ -40,6 +41,7 @@ let store = new Vuex.Store({
     },
   },
   modules: {
+    player: PlayerModule,
     actor: ActorModule,
     environment: EnvironmentModule,
     item: ItemsModule,

@@ -1,14 +1,16 @@
-import Base from './base.class';
-import Point from './helpers/point.class';
-import Item from './things/item.class';
+const Base = require('./base.class');
+const Point = require('./helpers/point.class');
+const Item = require('./things/item.class');
 
-export default class Thing extends Base {
+module.exports = class Thing extends Base {
   constructor(config, storeName) {
     super(config, storeName);
 
     this.position = this.config.position
       ? new Point(this.config.position)
       : null; // the position of the thing in the world. Null if possessed by another.
+
+    console.log('Thing This. Config', this.config);
     this.name = this.config.name ? this.config.name : this.id; // the name of the thing. Defaults to ID.
     this.hp = this.config.hp ? this.config.hp : 1; // number of HP the thing has.
     this.itemCount = 0;
@@ -38,4 +40,4 @@ export default class Thing extends Base {
     this.position = new Point(position);
     this.saveState();
   }
-}
+};

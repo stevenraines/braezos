@@ -1,4 +1,4 @@
-import Base from './base.class';
+import Base from '../../shared/classes/base.class';
 import Chunk from '../classes/places/chunk.class';
 
 import { EventBus } from '../eventbus.js';

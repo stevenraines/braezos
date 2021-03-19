@@ -46,5 +46,4 @@ const MathHelper = class MathHelper {
     return [x / pts.length, y / pts.length];
   }
 };
-
-export default MathHelper;
+module.exports = MathHelper;
