@@ -13,7 +13,6 @@ module.exports = function(app, server, compiler, PORT, prod) {
   console.log(origin);
 
   const io = require('socket.io')(httpServer, {
-    path: '/ws/',
     cors: {
       origin: origin,
       methods: ['GET', 'POST'],

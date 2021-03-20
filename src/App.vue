@@ -15,7 +15,6 @@ import Vue from 'vue';
 import VueSocketIO from 'vue-socket.io';
 import SocketIO from 'socket.io-client';
 const socketOptions = {
-  path: '/ws/',
   transport: ['websocket'],
   origins: 'localhost:*',
   withCredentials: true,
