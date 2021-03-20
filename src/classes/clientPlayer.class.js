@@ -9,14 +9,17 @@ export default class PlayerClient extends ClientBase {
   async syncFromServer() {
     let query = {
       name: this.name,
+      socketId: this.socketId,
     };
 
-    if (this.id) query = { id: this.id };
+    if (this.id) query.id = this.id;
     let res = await axios.post(this.apiBase, query);
     this.deserialize(res.data);
     if (!this.position && this.startPosition) {
       this.position = this.startPosition;
     }
+
+    console.log('player synced', this);
   }
 
   async move(vector) {

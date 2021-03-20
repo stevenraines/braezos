@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-flex d-flex flex xs12 fill-height>
+    <v-flex d-flex flex xs12 fill-height v-if="ready">
       <!-- LEFT COLUMN -->
       <div style="width:18vw"></div>
       <!-- CENTER COLUMN -->
@@ -14,18 +14,8 @@
             <v-text-field placeholder="Player Name" v-model="playerName"></v-text-field>
           </div>
           <div>
-            <v-btn v-bind:disabled="!playerName" v-on:click="newGame()">New</v-btn>
+            <v-btn v-bind:disabled="!playerName" v-on:click="newGame()">Connect</v-btn>
           </div>
-          <div>
-            <v-btn
-              v-bind:disabled="playerName || !existingPlayerId"
-              v-on:click="continueGame()"
-            >Continue</v-btn>
-          </div>
-          <div>
-            <v-btn v-bind:disabled="!existingPlayerId" v-on:click="quitGame()">Quit</v-btn>
-          </div>
-          <hr />
           <div></div>
         </v-flex>
         <v-flex style="flex:1"></v-flex>
@@ -39,94 +29,82 @@
 
 <script>
 import ClientPlayer from '../classes/clientPlayer.class';
-import _ from 'lodash';
+
 export default {
   name: 'Home',
   data: function () {
     return {
-      msg: 'hello',
       playerName: null,
-      remotePeerId: 'alphabetsoup',
+      ready: false,
     };
   },
   components: {},
   computed: {
-    peerId() {
-      return _.get(window, 'GameEngine.Networking.peer.id');
-    },
     existingPlayerId() {
       return this.$store.state.player.id;
     },
   },
-  created() {
-    /*
-    EventBus.$on('clientRegister', function(data) {
-      console.log(`clientRegistered. Id:`, data);
-    });
-    EventBus.$on('clientData', function(data) {
-      console.log(`receivedData from ${data.clientId}`, data);
-    });
-    EventBus.$on('serverData', function(data) {
-      console.log(`receivedData from server`, data);
-    });
-  */
+  mounted() {
+    if (!this.$store.state.player.id) {
+      this.ready = true;
+      return;
+    }
   },
+
   beforeDestroy() {},
+  sockets: {
+    async connect() {
+      await this.setupPlayer({
+        id: this.$store.state.player.id,
+        socketId: this.$socket.id,
+      });
+    },
+    disconnect() {
+      this.isConnected = false;
+      this.ready = true;
+    },
+    message: function (data) {
+      console.log(
+        'this method was fired by the socket server. eg: io.emit("message", data)',
+        data
+      );
+    },
+  },
   methods: {
     newGame: async function () {
-      this.$store.dispatch('resetGame');
-
-      window.GameEngine.Environment = null;
-      window.GameEngine.Player = null;
-
+      this.quitGame();
       await this.initializePlayer();
-      this.$router.replace('WorldExplorer');
     },
+
     quitGame: async function () {
       this.$store.dispatch('resetGame');
-
       window.GameEngine.Environment = null;
       window.GameEngine.Player = null;
     },
-    continueGame: async function () {
-      await this.initializePlayer();
-      this.$router.replace('WorldExplorer');
-    },
     async initializePlayer() {
-      let playerRequest = {
+      await this.setupPlayer({
         name: this.playerName,
-      };
+        socketId: this.$socket.id,
+      });
+    },
 
-      if (this.$store.state.player.id) {
-        playerRequest = {
-          id: this.$store.state.player.id,
-        };
-      }
-
-      console.log(playerRequest);
-
+    async setupPlayer(playerRequest) {
       let player = new ClientPlayer(playerRequest);
-
       await player.syncFromServer();
-      console.log(player);
       if (player.id) {
-        this.$store.commit('player/setId', player.id);
+        this.$store.commit('player/setPlayer', {
+          id: player.id,
+          name: player.name,
+        });
       }
 
       window.GameEngine.Player = player;
-    },
 
-    hostGame: function () {
-      window.GameEngine.Networking.startHosting();
-    },
-    endGame: function () {
-      window.GameEngine.Networking.endHosting();
-    },
-    joinGame: function () {
-      window.GameEngine.Networking.joinHost(this.remotePeerId);
-    },
-    sendMessage: function () {
-      window.GameEngine.Networking.send(this.msg);
+      if (player.isNew) {
+        return this.$router.replace('CreateCharacter');
+      }
+
+      this.$router.replace('WorldExplorer');
     },
   },
 };

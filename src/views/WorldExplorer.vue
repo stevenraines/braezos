@@ -49,7 +49,7 @@
 
           <v-text-field @change="renderPlayerMap()" v-model="position.x"></v-text-field>
           <v-text-field @change="renderPlayerMap()" v-model="position.y"></v-text-field>
-          <v-btn @click="regenerateWorld()">Regenerate</v-btn>
+
           <v-btn @click="quit()">Quit</v-btn>
         </div>
       </v-flex>
@@ -108,6 +108,7 @@ export default {
       this.$router.replace('/');
     },
     async updateTileCache() {
+      console.log('updateTileCache', window.GameEngine.Player);
       let response = await this.axios.get('/api/worldPositions', {
         params: {
           x: window.GameEngine.Player.position.x,
@@ -137,6 +138,9 @@ export default {
       this.updateTileCache();
     },
     quit() {
+      this.$store.dispatch('resetGame');
+      window.GameEngine.Player = null;
+      window.GameEngine.Environment = null;
       return this.$router.replace('/');
     },
   },

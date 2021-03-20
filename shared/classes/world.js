@@ -70,14 +70,16 @@ module.exports = class World extends Base {
   }
 
   getPlayer(params) {
+    console.log('params', params, this.__players);
     let player = _.find(this.__players, params);
 
+    console.log('player', player);
     if (!player) {
       player = new Player(params);
       player.startPosition = this.getStartPosition();
       this.__players.push(player);
       let returnPlayer = _.clone(player);
-      returnPlayer.__isNew = true;
+      returnPlayer.isNew = true;
       return returnPlayer;
     }
 

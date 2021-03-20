@@ -2,8 +2,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Sample from '../views/Sample.vue';
 import Home from '../views/Home.vue';
-import Game from '../views/Game.vue';
-import Generate from '../views/Generate.vue';
 import CreateCharacter from '../views/CreateCharacter.vue';
 import WorldExplorer from '../views/WorldExplorer.vue';
 Vue.use(VueRouter);
@@ -14,11 +12,7 @@ const routes = [
     name: 'Home',
     component: Home,
   },
-  {
-    path: '/generate',
-    name: 'Generate',
-    component: Generate,
-  },
+
   {
     path: '/createcharacter',
     name: 'CreateCharacter',
@@ -29,11 +23,7 @@ const routes = [
     name: 'WorldExplorer',
     component: WorldExplorer,
   },
-  {
-    path: '/game',
-    name: 'Game',
-    component: Game,
-  },
+
   {
     path: '/sample',
     name: 'Sample',

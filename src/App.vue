@@ -1,7 +1,8 @@
 <template>
   <v-app>
-    <div>
-      <p v-if="isConnected">connected to the server!</p>
+    <div :key="player.name">
+      PLAYER:{{player.name}}
+      <p v-if="isConnected">CONNECTED</p>
       <p>Message: "{{socketMessage}}"</p>
       <v-btn @click="pingServer()">Ping Server</v-btn>
     </div>
@@ -21,7 +22,6 @@ const socketOptions = {
 };
 
 const connection = `${location.protocol}//${location.host.split(':')[0]}:8081`;
-console.log(connection);
 
 Vue.use(
   new VueSocketIO({
@@ -41,10 +41,19 @@ export default {
       socketMessage: '',
     };
   },
+  computed: {
+    player() {
+      if (window.GameEngine && window.GameEngine.Player) {
+        return window.GameEngine.Player;
+      }
+      return { name: '', id: '' };
+    },
+  },
   sockets: {
     connect() {
       // Fired when the socket connects.
       this.isConnected = true;
+      window.GameEngine.socketId = this.$socket.id;
     },
 
     disconnect() {

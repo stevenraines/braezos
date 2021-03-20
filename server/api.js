@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const _ = require('lodash');
-let world = null;
-const World = require('../shared/classes/world.js');
 
-async function initialize() {
-  console.log(`initializing world with seed ${process.env.WORLD_SEED}`);
-
-  world = new World({ seed: process.env.WORLD_SEED });
-  console.log(world.serialize());
-}
+router.use(function checkWorld(req, res, next) {
+  if (!req.app.get('world').io && req.app.get('io')) {
+    req.app.get('world').io = req.app.get('io');
+  }
+  next();
+});
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -18,7 +16,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.post('/player/act', function(req, res) {
-  let player = world.getPlayer({ id: req.body.id });
+  let player = req.app.get('world').getPlayer({ id: req.body.id });
 
   if (player[req.body.action]) {
     let resp = player[req.body.action](req.body);
@@ -29,12 +27,25 @@ router.post('/player/act', function(req, res) {
 });
 
 router.post('/player', function(req, res) {
-  console.log('getPlayer params', req.body);
-  res.send(world.getPlayer(req.body));
+  let io = req.app.get('io');
+  let params = { id: req.body.id };
+  if (!req.body.id) params = { name: req.body.name };
+
+  let player = req.app.get('world').getPlayer(params);
+
+  if (req.body.socketId) {
+    player.__socket = io.of('/').sockets.get(req.body.socketId);
+    player.__socket.emit(
+      'message',
+      `Registered  ${player.name} (${player.id})`
+    );
+  }
+
+  res.send(player.serialize());
 });
 
 router.get('/world', function(req, res) {
-  let worldClone = _.clone(world);
+  let worldClone = _.clone(req.app.get('world'));
   delete worldClone.simplexElevation;
   delete worldClone.simplexMoisture;
   delete worldClone.elevationOctaveArray;
@@ -43,7 +54,7 @@ router.get('/world', function(req, res) {
 });
 
 router.get('/worldMap', function(req, res) {
-  let img = world.renderToImage();
+  let img = req.app.get('world').renderToImage();
   res.writeHead(200, {
     'Content-Type': 'image/png',
     'Content-Length': img.length,
@@ -62,11 +73,10 @@ router.get('/worldPositions', function(req, res) {
     bottomRight: { x: x + radius, y: y + radius, d: d },
   };
 
-  let worldSegment = world.getWorldPositions(area);
+  let worldSegment = req.app.get('world').getWorldPositions(area);
   res.send(JSON.stringify(worldSegment));
 });
 
 // define the home page route
 
-initialize();
 module.exports = router;

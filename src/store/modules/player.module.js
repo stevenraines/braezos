@@ -10,8 +10,9 @@ const PlayerStore = {
   mutations: {
     reset: () => {},
 
-    setId(state, id) {
-      state.id = id;
+    setPlayer(state, player) {
+      state.id = player.id;
+      state.name = player.name;
     },
   },
 };

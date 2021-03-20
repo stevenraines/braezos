@@ -1,4 +1,5 @@
 const socketHandler = require('./sockets.js');
+
 module.exports = function(app, server, compiler, PORT, prod) {
   // if we are in prod, do this:
   let httpServer = null;
@@ -10,7 +11,6 @@ module.exports = function(app, server, compiler, PORT, prod) {
   }
 
   let origin = `http://localhost:${PORT || 8080}`;
-  console.log(origin);
 
   const io = require('socket.io')(httpServer, {
     cors: {
@@ -24,4 +24,6 @@ module.exports = function(app, server, compiler, PORT, prod) {
   socketHandler(io);
 
   if (!prod) httpServer.listen(PORT || 8081);
+
+  app.set('io', io);
 };

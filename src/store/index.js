@@ -9,7 +9,7 @@ import EnvironmentModule from './modules/environment.module';
 import ItemsModule from './modules/item.module';
 import StructureModule from './modules/structure.module';
 import VuexReset from '@ianwalter/vuex-reset';
-import { EventBus } from '../eventbus.js';
+
 Vue.use(VueAxios, axios);
 Vue.use(Vuex);
 
@@ -36,8 +36,6 @@ let store = new Vuex.Store({
       commit('item/reset');
       commit('environment/reset');
       dispatch('init');
-
-      EventBus.$emit('GameStateReset');
     },
   },
   modules: {

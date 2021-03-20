@@ -14,12 +14,8 @@
 
       <!-- CENTER COLUMN -->
       <v-layout column wrap class="full-height-flex-column">
-        <v-flex style="padding:5px;flex:1;border-bottom:1px solid #000"
-          >A.B</v-flex
-        >
-        <v-flex
-          style="style:padding:5px;flex:11; overflow: auto;border-right:1px solid #000"
-        >
+        <v-flex style="padding:5px;flex:1;border-bottom:1px solid #000">A.B</v-flex>
+        <v-flex style="style:padding:5px;flex:11; overflow: auto;border-right:1px solid #000">
           <div style="padding:5px">{{ lorem }}</div>
         </v-flex>
         <div style="padding:5px;height:2em;" class="bar">A.D</div>
@@ -32,12 +28,8 @@
         wrap
         class="flex-grow-0 flex-shrink-0 full-height-flex-column"
       >
-        <v-flex
-          style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"
-        ></v-flex>
-        <v-flex style="padding:5px;flex:11; overflow: auto">
-          CONSOLE {{ lorem }}
-        </v-flex>
+        <v-flex style="padding:5px;flex:1; overflow: auto;border-bottom:1px solid #000"></v-flex>
+        <v-flex style="padding:5px;flex:11; overflow: auto">CONSOLE {{ lorem }}</v-flex>
         <div style="padding:5px;height:2em;" class="bar">A.D</div>
       </v-layout>
     </v-flex>
@@ -47,7 +39,7 @@
 <script>
 export default {
   name: 'Home',
-  data: function() {
+  data: function () {
     return {
       lorem: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec faucibus nulla ipsum, id luctus nunc egestas eget. Aliquam ac risus eu turpis pharetra porta nec commodo nibh. Nam in urna in est consectetur dignissim in sed ante. Quisque ultricies vehicula mauris, quis hendrerit felis. Ut sit amet auctor turpis. Mauris nec lorem quis ligula elementum pellentesque. Sed fermentum elit eget magna molestie, a fermentum turpis tempus. Nam mollis turpis erat, ac semper ante hendrerit sed. Sed vehicula dui enim, quis imperdiet nisi feugiat vel. In dapibus augue non lacus hendrerit gravida. Vestibulum venenatis ac massa vitae eleifend. Suspendisse venenatis dui in dignissim tincidunt.
 
