@@ -14,6 +14,7 @@
     "axios": "^0.21.1",
     "canvas": "^2.7.0",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
     "d3": "^6.5.0",
     "d3-delaunay": "^5.3.0",
     "d3-node": "^2.2.2",
@@ -30,13 +31,17 @@
     "seedrandom": "^3.0.5",
     "simple-peer": "^9.9.3",
     "simplex-noise": "^2.4.0",
+    "socket.io": "^4.0.0",
+    "socket.io-client": "^4.0.0",
     "tracery": "^1.0.3",
     "uuid": "^8.3.2",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.4",
     "vue-router": "^3.2.0",
+    "vue-socket.io": "^3.0.10",
     "vuetify": "^2.4.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "webpack-dev-middleware": "^4.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

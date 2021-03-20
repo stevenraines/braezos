@@ -1,5 +1,5 @@
 const configureAPI = require('./server/configure.js');
-
+const postConfigureAPI = require('./server/postconfigure.js');
 module.exports = {
   configureWebpack: {
     devtool: 'source-map',
@@ -15,7 +15,20 @@ module.exports = {
   },
   runtimeCompiler: true,
   devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers':
+        'Origin, X-Requested-With, Content-Type, Accept',
+    },
     before: configureAPI,
+    after: postConfigureAPI,
+    proxy: {
+      '^/api': {
+        target: '<url>',
+        ws: true,
+        changeOrigin: true,
+      },
+    },
   },
   transpileDependencies: ['vuetify'],
 };

@@ -34,6 +34,7 @@ new Vue({
     window.GameEngine = this;
 
     // instantiate core classes
+
     this.Networking = new Networking();
     this.EventManager = new EventManager();
     // load any existing state

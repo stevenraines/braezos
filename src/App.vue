@@ -1,37 +1,84 @@
 <template>
   <v-app>
+    <div>
+      <p v-if="isConnected">connected to the server!</p>
+      <p>Message: "{{socketMessage}}"</p>
+      <v-btn @click="pingServer()">Ping Server</v-btn>
+    </div>
     <v-main>
       <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 <script>
+import Vue from 'vue';
+import VueSocketIO from 'vue-socket.io';
+import SocketIO from 'socket.io-client';
+const socketOptions = {
+  path: '/ws/',
+  transport: ['websocket'],
+  origins: 'localhost:*',
+  withCredentials: true,
+};
+
+const connection = `${location.protocol}//${location.host.split(':')[0]}:8081`;
+console.log(connection);
+
+Vue.use(
+  new VueSocketIO({
+    connection: SocketIO(connection, socketOptions), //options object is Optional
+    debug: true,
+  })
+);
+
 import { EventBus } from './eventbus.js';
 
 export default {
   name: 'App',
-  data: function() {
+  data: function () {
     return {
       homekey: 0,
+      isConnected: false,
+      socketMessage: '',
     };
   },
-  components: {},
+  sockets: {
+    connect() {
+      // Fired when the socket connects.
+      this.isConnected = true;
+    },
 
+    disconnect() {
+      this.isConnected = false;
+    },
+    message: function (data) {
+      console.log(
+        'this method was fired by the socket server. eg: io.emit("message", data)',
+        data
+      );
+    },
+  },
+  components: {},
   async beforeCreate() {},
   async created() {
+    console.log(`${location.protocol}//${location.host}`);
     window.addEventListener('keyup', this.keyup);
   },
   beforeDestroy() {
     window.removeEventListener('keyup', this.keyup);
   },
   methods: {
-    keyup: async function(event) {
+    pingServer() {
+      // Send the "pingServer" event to the server.
+      this.$socket.emit('message', 'PING!');
+    },
+    keyup: async function (event) {
       EventBus.$emit('keyevent', {
         controllers: this.$root.$data.controllers,
         event: event,
       });
     },
-    newGame: async function() {
+    newGame: async function () {
       await this.$store.dispatch('resetGame');
       window.location.reload();
     },

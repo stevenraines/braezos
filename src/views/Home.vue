@@ -2,7 +2,7 @@
   <v-layout>
     <v-flex d-flex flex xs12 fill-height>
       <!-- LEFT COLUMN -->
-      <div style="width:20vw"></div>
+      <div style="width:18vw"></div>
       <!-- CENTER COLUMN -->
       <v-layout xs4 column wrap class="full-height-flex-column">
         <v-flex style="flex:1"></v-flex>
