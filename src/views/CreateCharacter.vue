@@ -34,10 +34,15 @@ export default {
   components: {},
   computed: {},
   created() {
-    if (!window.GameEngine.Player) return this.$router.push('/');
+    if (!window.GameEngine.Player || !window.GameEngine.Player.name)
+      return this.$router.push('/');
   },
   methods: {
     startGame: function () {
+      this.$store.commit('player/setPlayer', {
+        name: window.GameEngine.Player.name,
+      });
+
       this.$router.push('WorldExplorer');
     },
   },

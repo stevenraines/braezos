@@ -2,27 +2,32 @@ const Actor = require('../actor.class');
 
 //import { EventBus } from '../../../eventbus.js';
 module.exports = class Player extends Actor {
-  constructor(config) {
-    super(config, 'actor');
+  constructor(config, world) {
+    super(config, world);
+    this.__socket = null;
     this.keyQueue = null;
+    this.viewRadius = 8;
   }
 
-  setPosition(cell) {
-    this.currentCell = cell;
-    super.setPosition(cell.position);
+  async initialize() {
+    await super.initialize();
+    if (!this.position) this.position = this.world.getStartPosition();
+  }
+
+  sendMessage(type, data) {
+    if (this.__socket) return this.__socket.emit(type, data);
+    console.warning('Socket does not exist');
   }
 
   move(request) {
-    this.position = request.position;
+    super.move(request);
+    this.sendMessage(
+      `message`,
+      `player moved to ${JSON.stringify(request.position)}`
+    );
   }
 
   /*
-  act() {
-    this.preAct();
-    window.GameEngine.EventManager.lock();
-    window.addEventListener('keydown', this);
-  }
-
   handleEvent(e) {
     // process user input 
 

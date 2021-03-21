@@ -3,12 +3,11 @@
     <v-flex columns flex xs8 fill-height>
       <div id="renderer" ref="renderer"></div>
 
-      <v-flex d-flex flex fill-height>{{positionData}}</v-flex>
+      <v-flex d-flex flex fill-height>[{{position}}]</v-flex>
     </v-flex>
     <v-flex columns flex xs6 fill-height>
       <v-flex d-flex flex fill-height>
-        {{chunkSize}}
-        <img id="worldMap" src="/api/worldMap" />
+        <img id="worldMap" src="/api/world/map" />
       </v-flex>
 
       <v-flex d-flex flex fill-height>
@@ -67,7 +66,6 @@ export default {
       tileCache: null,
       positionData: {},
       PIXI: null,
-      drawRadius: 8,
       tileCacheRadius: 24,
     };
   },
@@ -76,19 +74,6 @@ export default {
     position() {
       return _.get(window.GameEngine.Player, 'position', { x: 0, y: 0 });
     },
-    chunkSize() {
-      if (!window.GameEngine.World) return 0;
-      return window.GameEngine.World.chunkSize;
-    },
-    worldMapSize() {
-      if (!window.GameEngine.World) return 0;
-      return (
-        window.GameEngine.World.chunkSize *
-        window.GameEngine.World.islandRadiusInChunks *
-        2 *
-        3
-      );
-    },
   },
 
   async mounted() {
@@ -96,12 +81,17 @@ export default {
     this.PIXI = new PixiRenderer(this.$refs.renderer, {
       antialias: false,
       transparent: false,
-      drawRadius: this.drawRadius,
+      drawRadius: window.GameEngine.Player.viewRadius,
     });
 
     await this.updateTileCache();
 
     await this.renderPlayerMap();
+  },
+  sockets: {
+    disconnect() {
+      return this.$router.replace('/');
+    },
   },
   methods: {
     setupPlayer() {
@@ -109,33 +99,29 @@ export default {
     },
     async updateTileCache() {
       console.log('updateTileCache', window.GameEngine.Player);
-      let response = await this.axios.get('/api/worldPositions', {
-        params: {
-          x: window.GameEngine.Player.position.x,
-          y: window.GameEngine.Player.position.y,
-          d: window.GameEngine.Player.position.d,
-          radius: this.tileCacheRadius,
-        },
+      let response = await this.axios.post('/api/player/tiles', {
+        name: window.GameEngine.Player.name,
+        x: window.GameEngine.Player.position.x,
+        y: window.GameEngine.Player.position.y,
+        d: window.GameEngine.Player.position.d,
       });
 
       this.tileCache = response.data;
+
+      console.log('tileCache', this.tileCache);
     },
     async movePosition(vector) {
+      console.log('movePosition');
       await window.GameEngine.Player.move(vector);
-
+      this.updateTileCache();
       await this.renderPlayerMap();
     },
 
     async renderPlayerMap() {
       this.positionData = this.PIXI.renderWorld(
-        window.GameEngine.Player.position.x,
-        window.GameEngine.Player.position.y,
-        window.GameEngine.Player.position.d,
-        this.drawRadius,
+        window.GameEngine.Player,
         this.tileCache
       );
-
-      this.updateTileCache();
     },
     quit() {
       this.$store.dispatch('resetGame');

@@ -7,7 +7,7 @@
       <v-layout xs4 column wrap class="full-height-flex-column">
         <v-flex style="flex:1"></v-flex>
         <v-flex style="flex:1; style:padding:5px; text-align:center">
-          <H1 :key="existingPlayerId">{{existingPlayerId}}</H1>
+          <H1 :key="existingPlayerName">{{existingPlayerName}}</H1>
         </v-flex>
         <v-flex style="flex:2; style:padding:5px; text-align:center">
           <div>
@@ -40,12 +40,12 @@ export default {
   },
   components: {},
   computed: {
-    existingPlayerId() {
-      return this.$store.state.player.id;
+    existingPlayerName() {
+      return this.$store.state.player.name;
     },
   },
   mounted() {
-    if (!this.$store.state.player.id) {
+    if (!this.$store.state.player.name) {
       this.ready = true;
       return;
     }
@@ -54,17 +54,19 @@ export default {
   beforeDestroy() {},
   sockets: {
     async connect() {
-      await this.setupPlayer({
-        id: this.$store.state.player.id,
-        socketId: this.$socket.id,
-      });
+      if (this.$store.state.player.name) {
+        await this.setupPlayer({
+          name: this.$store.state.player.name,
+          socketId: this.$socket.id,
+        });
+      }
     },
     disconnect() {
       this.isConnected = false;
       this.ready = true;
     },
     message: function (data) {
-      console.log(
+      console.info(
         'this method was fired by the socket server. eg: io.emit("message", data)',
         data
       );
@@ -93,7 +95,6 @@ export default {
       await player.syncFromServer();
       if (player.id) {
         this.$store.commit('player/setPlayer', {
-          id: player.id,
           name: player.name,
         });
       }

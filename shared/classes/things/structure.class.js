@@ -1,11 +1,11 @@
-const ThingCollection = require('../thingCollection.class');
+const Thing = require('../thing.class');
 //import { EventBus } from '../../eventbus.js';
 const Point = require('../helpers/point.class');
 const STRUCTURE_ELEMENTS = require('../../enums/structureElements');
 
-module.exports = class Structure extends ThingCollection {
-  constructor(config, storeName) {
-    super(config, storeName);
+module.exports = class Structure extends Thing {
+  constructor(config, world) {
+    super(config, world);
     this.shape = [];
     this.generateStructure();
   }

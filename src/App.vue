@@ -21,7 +21,10 @@ const socketOptions = {
   withCredentials: true,
 };
 
-const connection = `${location.protocol}//${location.host.split(':')[0]}:8081`;
+let connection = `${location.protocol}//${location.host}`;
+if (window.webpackHotUpdate) {
+  connection = `${location.protocol}//${location.host.split(':')[0]}:8081`;
+}
 
 Vue.use(
   new VueSocketIO({
@@ -60,7 +63,7 @@ export default {
       this.isConnected = false;
     },
     message: function (data) {
-      console.log(
+      console.info(
         'this method was fired by the socket server. eg: io.emit("message", data)',
         data
       );
@@ -69,7 +72,6 @@ export default {
   components: {},
   async beforeCreate() {},
   async created() {
-    console.log(`${location.protocol}//${location.host}`);
     window.addEventListener('keyup', this.keyup);
   },
   beforeDestroy() {

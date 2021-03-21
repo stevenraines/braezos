@@ -119,8 +119,7 @@ export default class Networking {
   _peerClose() {}
 
   _peerError(err) {
-    console.log('_peerError');
-    console.log(err);
+    console.error(err);
   }
 
   _connOpen(conn) {

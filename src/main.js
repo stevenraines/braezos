@@ -43,19 +43,10 @@ new Vue({
   methods: {
     log(message, type) {
       EventBus.$emit('log', { type: type, message: message });
-      console.log(message);
+      console.info(message);
     },
     cleanObservable: function(obj) {
       return JSON.parse(JSON.stringify(obj));
     },
   },
 }).$mount('#app');
-
-window.postMessage = function(event, msg) {
-  if (event && msg.event) {
-    window.GameEngine.log({ msg: msg, event: event });
-    EventBus.$emit(msg.event, msg);
-
-    if (event.stopPropagation) event.stopPropagation();
-  }
-};

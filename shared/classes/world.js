@@ -1,6 +1,9 @@
 const Base = require('./base.class');
 const SimplexNoise = require('simplex-noise');
 
+const storage = require('node-persist');
+//const path = require('path');
+
 const ROT = require('rot-js');
 const { createCanvas } = require('canvas');
 const Biomes = require('./biomes');
@@ -24,7 +27,19 @@ module.exports = class World extends Base {
   constructor(params) {
     super(params);
 
-    this.seed = params.seed || 1; // what seed are we using for this world?
+    this.seed = parseInt(params.seed) || 1; // what seed are we using for this world?
+    this.__storagePath = `data/worlds/${this.seed}`;
+
+    this.__storage = storage.create({
+      dir: this.__storagePath,
+      stringify: JSON.stringify,
+      parse: JSON.parse,
+      encoding: 'utf8',
+      logging: false, // can also be custom logging function
+      ttl: false, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS or a valid Javascript Date object
+      expiredInterval: 2 * 60 * 1000, // every 2 minutes the process will clean-up the expired cache
+      forgiveParseErrors: false,
+    });
 
     this.__chunkSize = 32; // (32) how large is a single chunk?
     this.__islandRadiusInChunks = 4; // (4)  what is the maximum number of chunks we can get to before it's all ocean?
@@ -37,8 +52,28 @@ module.exports = class World extends Base {
       this.__chunkSize * (this.__islandRadiusInChunks * 2) +
       this.__chunkSize * 3;
 
-    // assign world seed to generator
-    ROT.RNG.setSeed(this.seed);
+    // cache local class instances4
+
+    this.__biome = new Biomes();
+
+    // players in the world
+    this.__players = [];
+  }
+
+  async initialize() {
+    await this.__storage.init();
+    let storageWorld = await this.__storage.getItem('world');
+    if (storageWorld) {
+      this.deserialize(storageWorld);
+    } else {
+      // assign world seed to generator
+
+      ROT.RNG.setSeed(this.seed);
+      this.state = ROT.RNG.getState();
+      await this.__storage.setItem('world', this.serialize());
+    }
+
+    ROT.RNG.setState(this.state);
 
     // capture environmental seeds in order for reproducibility
     this.__elevationSeed = ROT.RNG.getUniform();
@@ -51,46 +86,34 @@ module.exports = class World extends Base {
 
     // generate simplex for moisture and set-up parameters for easing
 
-    this.__simplexMoisture = new SimplexNoise(this.moistureSeed);
+    this.__simplexMoisture = new SimplexNoise(this.__moistureSeed);
     this.__moistureOctaveArray = [3, 4, 6, 10, 25, 450];
-    // cache local class instances4
-
-    this.__biome = new Biomes();
-
-    // players in the world
-    this.__players = [];
-    this.initializePlayers();
   }
 
-  initializePlayers() {
-    console.log('initialize players');
-    this.__players = [];
-
-    // load players on start-up of world
-  }
-
-  getPlayer(params) {
-    console.log('params', params, this.__players);
+  async getPlayer(params) {
+    if (!params.name) return;
     let player = _.find(this.__players, params);
 
-    console.log('player', player);
-    if (!player) {
-      player = new Player(params);
-      player.startPosition = this.getStartPosition();
-      this.__players.push(player);
-      let returnPlayer = _.clone(player);
-      returnPlayer.isNew = true;
-      return returnPlayer;
-    }
+    if (player) return player;
 
-    return player;
+    player = new Player(params, this);
+
+    let isNew = _.isEmpty(player.position);
+
+    await player.initialize();
+    this.__players.push(player);
+
+    let returnPlayer = _.clone(player);
+    returnPlayer.isNew = isNew;
+
+    return returnPlayer;
   }
 
-  getWorldChunkFromWorldPosition(world, x, y, d) {
+  getWorldChunkFromWorldPosition(x, y, d) {
     return new WorldChunk(
-      world,
-      Math.floor(x / world.chunkSize),
-      Math.floor(y / world.chunkSize),
+      this,
+      Math.floor(x / this.__chunkSize),
+      Math.floor(y / this.__chunkSize),
       Math.floor(d)
     );
   }

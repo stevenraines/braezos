@@ -22,13 +22,6 @@ module.exports = {
     },
     before: configureAPI,
     after: postConfigureAPI,
-    proxy: {
-      '^/api': {
-        target: '<url>',
-        ws: true,
-        changeOrigin: true,
-      },
-    },
   },
   transpileDependencies: ['vuetify'],
 };

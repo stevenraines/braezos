@@ -1,11 +1,11 @@
-const ThingCollection = require('../thingCollection.class');
+const Thing = require('../thing.class');
 
-module.exports = class Item extends ThingCollection {
-  constructor(config, storeName) {
-    super(config, storeName);
+module.exports = class Item extends Thing {
+  constructor(config, world) {
+    super(config, world);
     this.owner = this.config.owner ? this.config.owner : null;
   }
-
+  /*
   take(entity) {
     this.owner = entity.id;
     this.position = null;
@@ -19,4 +19,5 @@ module.exports = class Item extends ThingCollection {
     this.save();
     entity.itemCount -= 1;
   }
+*/
 };

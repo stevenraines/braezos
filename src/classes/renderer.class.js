@@ -20,8 +20,6 @@ const Renderer = class Renderer {
 
     let cellColor = cell.terrainType.color;
     if (cell.structure) {
-      //  console.log('PORTAL', window.GameEngine.cleanObservable(cell.structure));
-
       if (_.isEqual(cell.structure.type, STRUCTURE_ELEMENTS.PORTAL)) {
         cellColor = '#ffffff';
       } else {

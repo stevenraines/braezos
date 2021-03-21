@@ -18,17 +18,15 @@ export default class PlayerClient extends ClientBase {
     if (!this.position && this.startPosition) {
       this.position = this.startPosition;
     }
-
-    console.log('player synced', this);
   }
 
   async move(vector) {
     this.position.x = parseInt(this.position.x) + vector.x;
     this.position.y = parseInt(this.position.y) + vector.y;
-
+    this.position.d = parseInt(this.position.d) + vector.d;
     let resp = await axios.post(this.apiBase + '/act', {
       action: 'move',
-      id: this.id,
+      name: this.name,
       position: this.position,
     });
 
