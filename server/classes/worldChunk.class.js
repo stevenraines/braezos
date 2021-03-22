@@ -1,4 +1,4 @@
-const WorldPosition = require('./worldPosition');
+const WorldPosition = require('./worldPosition.class');
 
 module.exports = class WorldChunk {
   constructor(world, chunkX, chunkY, chunkD) {

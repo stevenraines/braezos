@@ -92,7 +92,10 @@ export default {
 
     async setupPlayer(playerRequest) {
       let player = new ClientPlayer(playerRequest);
+
       await player.syncFromServer();
+      console.log(player, playerRequest);
+
       if (player.id) {
         this.$store.commit('player/setPlayer', {
           name: player.name,

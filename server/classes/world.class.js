@@ -7,7 +7,7 @@ const storage = require('node-persist');
 const ROT = require('rot-js');
 const { createCanvas } = require('canvas');
 const Biomes = require('./biomes');
-const WorldChunk = require('./worldChunk');
+const WorldChunk = require('./worldChunk.class');
 const _ = require('lodash');
 const Player = require('./things/actors/player.class');
 
@@ -97,15 +97,15 @@ module.exports = class World extends Base {
     if (player) return player;
 
     player = new Player(params, this);
-
-    let isNew = _.isEmpty(player.position);
-
+    console.log('player', player.serialize());
     await player.initialize();
+    let returnPlayer = _.clone(player);
+    player.isNew = false; // doing this b/c the player in memory isn't updated with "isNew" = false even after the character is created. This should be
+    // changed once we get character creation working
+
     this.__players.push(player);
 
-    let returnPlayer = _.clone(player);
-    returnPlayer.isNew = isNew;
-
+    console.log(returnPlayer);
     return returnPlayer;
   }
 

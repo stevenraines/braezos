@@ -1,4 +1,4 @@
-import Base from 'shared/classes/base.class';
+import Base from '~/server/classes/base.class';
 import { EventBus } from '../eventbus.js';
 import SCREENS from 'shared/enums/screens';
 import MOVE_VECTORS from 'shared/enums/moveVectors';
@@ -74,8 +74,6 @@ const Input = class Input extends Base {
 
   static handleKeys(keyQueue) {
     if (!keyQueue || keyQueue.length == 0) return;
-
-    //console.log(event);
 
     for (let keyIndex = 0; keyIndex < keyQueue.length; keyIndex++) {
       let keyBinding = Input.keybindings[keyQueue[keyIndex]];

@@ -1,14 +1,14 @@
 module.exports = function(io) {
   io.on('connection', socket => {
-    console.log('SOCKET CONNECTED');
+    console.info('SOCKET CONNECTED');
 
     socket.on('message', msg => {
-      console.log('client says: ' + msg);
+      console.info('client says: ' + msg);
       io.emit('message', 'hi');
     });
 
     socket.on('disconnect', () => {
-      console.log('user disconnected');
+      console.info('user disconnected');
     });
   });
 };

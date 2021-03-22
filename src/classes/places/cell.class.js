@@ -1,6 +1,6 @@
-import Point from '../../../shared/classes/helpers/point.class';
-import Item from '../../../shared/classes/things/item.class';
-import Actor from '../../../shared/classes/things/actor.class';
+import Point from '../../../server/classes/helpers/point.class';
+import Item from '../../../server/classes/things/item.class';
+import Actor from '../../../server/classes/things/actor.class';
 import { EventBus } from '../../eventbus.js';
 import _ from 'lodash';
 

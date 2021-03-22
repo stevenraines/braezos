@@ -4,7 +4,7 @@ const express = require('express');
 
 const configureAPI = require('./configure.js');
 
-//const postConfigureAPI = require('./postconfigure.js');
+const postConfigureAPI = require('./postconfigure.js');
 
 const app = express();
 
@@ -18,7 +18,7 @@ const staticConf = { maxAge: '1y', etag: false };
 const server = app.listen(PORT);
 configureAPI(app, server, null, PORT, true);
 
-//postConfigureAPI(app, server, null, PORT, true);
+postConfigureAPI(app, server, null, PORT, true);
 
 app.use(express.static(publicPath, staticConf));
 app.use('/', history());

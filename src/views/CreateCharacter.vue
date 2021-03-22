@@ -34,11 +34,15 @@ export default {
   components: {},
   computed: {},
   created() {
+    console.log('player', window.GameEngine.Player);
+    if (window.GameEngine.Player && !window.GameEngine.Player.isNew)
+      return this.startGame();
     if (!window.GameEngine.Player || !window.GameEngine.Player.name)
       return this.$router.push('/');
   },
   methods: {
     startGame: function () {
+      window.GameEngine.Player.isNew = false;
       this.$store.commit('player/setPlayer', {
         name: window.GameEngine.Player.name,
       });

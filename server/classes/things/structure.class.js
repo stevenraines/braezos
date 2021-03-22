@@ -1,7 +1,7 @@
 const Thing = require('../thing.class');
 //import { EventBus } from '../../eventbus.js';
 const Point = require('../helpers/point.class');
-const STRUCTURE_ELEMENTS = require('../../enums/structureElements');
+const STRUCTURE_ELEMENTS = require('../../../shared/enums/structureElements');
 
 module.exports = class Structure extends Thing {
   constructor(config, world) {

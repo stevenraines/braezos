@@ -58,9 +58,9 @@ export default {
       this.isConnected = true;
       window.GameEngine.socketId = this.$socket.id;
     },
-
     disconnect() {
       this.isConnected = false;
+      return this.$router.replace('/');
     },
     message: function (data) {
       console.info(

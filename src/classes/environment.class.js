@@ -1,4 +1,4 @@
-import Base from '../../shared/classes/base.class';
+import Base from '../../server/classes/base.class';
 import Chunk from '../classes/places/chunk.class';
 
 import { EventBus } from '../eventbus.js';
@@ -30,9 +30,5 @@ export default class Environment extends Base {
       console.log(ex);
     }
     // EventBus.$emit('RenderLevel');
-  }
-
-  register() {
-    window.GameEngine.EventManager.registerActor(this);
   }
 }

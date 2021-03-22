@@ -3,7 +3,11 @@
     <v-flex columns flex xs8 fill-height>
       <div id="renderer" ref="renderer"></div>
 
-      <v-flex d-flex flex fill-height>[{{position}}]</v-flex>
+      <v-flex d-flex flex fill-height>
+        [{{position}}]
+        <br />
+        {{player}}
+      </v-flex>
     </v-flex>
     <v-flex columns flex xs6 fill-height>
       <v-flex d-flex flex fill-height>
@@ -74,6 +78,9 @@ export default {
     position() {
       return _.get(window.GameEngine.Player, 'position', { x: 0, y: 0 });
     },
+    player() {
+      return _.get(window.GameEngine, 'Player', {});
+    },
   },
 
   async mounted() {
@@ -89,16 +96,13 @@ export default {
     await this.renderPlayerMap();
   },
   sockets: {
-    disconnect() {
-      return this.$router.replace('/');
-    },
+    disconnect() {},
   },
   methods: {
     setupPlayer() {
       this.$router.replace('/');
     },
     async updateTileCache() {
-      console.log('updateTileCache', window.GameEngine.Player);
       let response = await this.axios.post('/api/player/tiles', {
         name: window.GameEngine.Player.name,
         x: window.GameEngine.Player.position.x,
@@ -107,11 +111,8 @@ export default {
       });
 
       this.tileCache = response.data;
-
-      console.log('tileCache', this.tileCache);
     },
     async movePosition(vector) {
-      console.log('movePosition');
       await window.GameEngine.Player.move(vector);
       this.updateTileCache();
       await this.renderPlayerMap();

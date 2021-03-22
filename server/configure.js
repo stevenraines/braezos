@@ -3,7 +3,7 @@ const cors = require('cors');
 
 let world = null;
 let socketClients = [];
-const World = require('../shared/classes/world.js');
+const World = require('./classes/world.class');
 
 module.exports = async function(app) {
   let corsOptions = { credentials: true };
@@ -16,6 +16,7 @@ module.exports = async function(app) {
   world = new World({ seed: process.env.WORLD_SEED });
   world.initialize();
 
+  console.log('postinit');
   app.set('world', world);
 
   app.use('/api', require('./api.js'));
