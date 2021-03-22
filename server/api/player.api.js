@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/act', async function(req, res) {
-  let player = await req.app.get('world').getPlayer({ name: req.body.name });
+  let player = await global.world.getPlayer({ name: req.body.name });
 
   if (player[req.body.action]) {
     let resp = await player[req.body.action](req.body);
@@ -12,26 +12,27 @@ router.post('/act', async function(req, res) {
   res.send(null);
 });
 
-router.post('/', async function(req, res) {
-  let io = req.app.get('io');
-
+router.post('/registerSocket', async function(req, res) {
   let params = { name: req.body.name };
+  let player = await global.world.getPlayer(params);
+  player.registerSocket(req.body.socketId);
+  res.send();
+});
 
-  let player = await req.app.get('world').getPlayer(params);
-
+router.post('/', async function(req, res) {
+  let params = { name: req.body.name };
+  let player = await global.world.getPlayer(params);
   if (req.body.socketId) {
-    player.__socket = io.of('/').sockets.get(req.body.socketId);
-    player.__socket.emit(
-      'message',
-      `Registered  ${player.name} (${player.id})`
-    );
+    player.registerSocket(req.body.socketId);
+  } else {
+    console.warn('SOCKETID NOT PROVIDED');
   }
 
   res.send(player.serialize());
 });
 
 router.post('/tiles', async function(req, res) {
-  let player = await req.app.get('world').getPlayer({ name: req.body.name });
+  let player = await global.world.getPlayer({ name: req.body.name });
 
   // return the tiles the user can see.
 
@@ -48,7 +49,7 @@ router.post('/tiles', async function(req, res) {
     },
   };
 
-  let worldSegment = await req.app.get('world').getWorldPositions(area);
+  let worldSegment = await global.world.getWorldPositions(area);
 
   res.send(worldSegment);
 });

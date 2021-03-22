@@ -125,9 +125,10 @@ export default {
       );
     },
     quit() {
-      this.$store.dispatch('resetGame');
       window.GameEngine.Player = null;
       window.GameEngine.Environment = null;
+      this.$store.dispatch('resetGame');
+      this.$socket.emit('deregister', null);
       return this.$router.replace('/');
     },
   },

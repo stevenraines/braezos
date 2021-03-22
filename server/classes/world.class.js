@@ -90,6 +90,20 @@ module.exports = class World extends Base {
     this.__moistureOctaveArray = [3, 4, 6, 10, 25, 450];
   }
 
+  deregisterPlayer(player) {
+    this.__players = _.remove(this.__players, function(p) {
+      p.name = player.name;
+    });
+  }
+
+  async getPlayerBySocketId(socketId) {
+    if (!socketId) return;
+    let player = _.find(this.__players, { socketId: socketId });
+    if (player) return player;
+
+    return null;
+  }
+
   async getPlayer(params) {
     if (!params.name) return;
     let player = _.find(this.__players, params);
@@ -97,15 +111,12 @@ module.exports = class World extends Base {
     if (player) return player;
 
     player = new Player(params, this);
-    console.log('player', player.serialize());
     await player.initialize();
     let returnPlayer = _.clone(player);
     player.isNew = false; // doing this b/c the player in memory isn't updated with "isNew" = false even after the character is created. This should be
     // changed once we get character creation working
 
     this.__players.push(player);
-
-    console.log(returnPlayer);
     return returnPlayer;
   }
 

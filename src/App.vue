@@ -4,7 +4,7 @@
       PLAYER:{{player.name}}
       <p v-if="isConnected">CONNECTED</p>
       <p>Message: "{{socketMessage}}"</p>
-      <v-btn @click="pingServer()">Ping Server</v-btn>
+      <v-btn v-if="isConnected" @click="pingServer()">Ping Server</v-btn>
     </div>
     <v-main>
       <router-view></router-view>
@@ -15,6 +15,7 @@
 import Vue from 'vue';
 import VueSocketIO from 'vue-socket.io';
 import SocketIO from 'socket.io-client';
+import _ from 'lodash';
 const socketOptions = {
   transport: ['websocket'],
   origins: 'localhost:*',
@@ -57,10 +58,28 @@ export default {
       // Fired when the socket connects.
       this.isConnected = true;
       window.GameEngine.socketId = this.$socket.id;
+
+      if (!_.isEmpty(this.$store.state.player.name)) {
+        this.axios.post('/api/player', {
+          name: this.$store.state.player.name,
+          socketId: this.$socket.id,
+        });
+      }
     },
     disconnect() {
+      console.log(this.$route.name);
+      if (this.isConnected && this.$route.name != 'Home')
+        this.$router.replace('/');
       this.isConnected = false;
-      return this.$router.replace('/');
+    },
+    registrationNeeded: async function (msg) {
+      if (!_.isEmpty(this.$store.state.player.name)) {
+        await this.axios.post('/api/player', {
+          name: this.$store.state.player.name,
+          socketId: this.$socket.id,
+        });
+        this.$socket.emit(msg.type, msg.data);
+      }
     },
     message: function (data) {
       console.info(

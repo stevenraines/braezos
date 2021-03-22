@@ -23,7 +23,6 @@ module.exports = function(app, server, compiler, PORT, prod) {
 
   socketHandler(io);
 
-  if (!prod) httpServer.listen(PORT || 8081);
-
-  app.set('io', io);
+  if (!prod) httpServer.listen(8081);
+  global.world.__io = io;
 };

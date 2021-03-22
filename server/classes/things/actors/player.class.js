@@ -1,5 +1,5 @@
 const Actor = require('../actor.class');
-
+const _ = require('lodash');
 //import { EventBus } from '../../../eventbus.js';
 module.exports = class Player extends Actor {
   constructor(config, world) {
@@ -18,6 +18,19 @@ module.exports = class Player extends Actor {
       this.isNew = false;
     }
     this.save();
+  }
+
+  registerSocket(socketId) {
+    this.socketId = socketId;
+    this.__socket = this.__world.__io.of('/').sockets.get(this.socketId);
+    this.sendMessage(
+      'message',
+      `Registered  ${this.name} on (${this.socketId})`
+    );
+  }
+
+  deregister() {
+    this.__world.deregisterPlayer(this);
   }
 
   sendMessage(type, data) {

@@ -1,21 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-router.use(function checkWorld(req, res, next) {
-  if (!req.app.get('world').__io && req.app.get('io')) {
-    req.app.get('world').__io = req.app.get('io');
-  }
-  next();
-});
-
 router.get('/', function(req, res) {
-  let worldObj = req.app.get('world').serialize();
+  let worldObj = global.world.serialize();
 
   res.send(worldObj);
 });
 
 router.get('/map', function(req, res) {
-  let img = req.app.get('world').renderToImage();
+  let img = global.world.renderToImage();
 
   res.writeHead(200, {
     'Content-Type': 'image/png',
@@ -35,7 +28,7 @@ router.get('/positions', function(req, res) {
     bottomRight: { x: x + radius, y: y + radius, d: d },
   };
 
-  let worldSegment = req.app.get('world').getWorldPositions(area);
+  let worldSegment = global.world.getWorldPositions(area);
   res.send(JSON.stringify(worldSegment));
 });
 
