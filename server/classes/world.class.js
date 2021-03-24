@@ -10,6 +10,7 @@ const Biomes = require('./biomes');
 const WorldChunk = require('./worldChunk.class');
 const _ = require('lodash');
 const Player = require('./things/actors/player.class');
+const Environment = require('./environment.class');
 
 /* 
 The world made with a series of seeded procedural algorithms layered on top of one another. 
@@ -41,6 +42,12 @@ module.exports = class World extends Base {
       forgiveParseErrors: false,
     });
 
+    this.__scheduler = new ROT.Scheduler.Simple();
+    this.__engine = new ROT.Engine(this.__scheduler);
+    this.__running = false;
+    this.turns = 0;
+    this.turnDurationMS = 1000;
+
     this.__chunkSize = 32; // (32) how large is a single chunk?
     this.__islandRadiusInChunks = 4; // (4)  what is the maximum number of chunks we can get to before it's all ocean?
 
@@ -56,6 +63,7 @@ module.exports = class World extends Base {
 
     this.__biome = new Biomes();
 
+    this.__environment = new Environment({}, this);
     // players in the world
     this.__players = [];
   }
@@ -88,20 +96,20 @@ module.exports = class World extends Base {
 
     this.__simplexMoisture = new SimplexNoise(this.__moistureSeed);
     this.__moistureOctaveArray = [3, 4, 6, 10, 25, 450];
+
+    this.__scheduler.add(this.__environment, true);
+    this.__environment.__scheduled = true;
+    this.__engine.start();
   }
 
   deregisterPlayer(player) {
+    console.log(`deregisterPlayer ${player.name}`);
+
+    this.__scheduler.remove(player);
+
     this.__players = _.remove(this.__players, function(p) {
       p.name = player.name;
     });
-  }
-
-  async getPlayerBySocketId(socketId) {
-    if (!socketId) return;
-    let player = _.find(this.__players, { socketId: socketId });
-    if (player) return player;
-
-    return null;
   }
 
   async getPlayer(params) {
@@ -111,13 +119,26 @@ module.exports = class World extends Base {
     if (player) return player;
 
     player = new Player(params, this);
+    this.__players.push(player);
+
     await player.initialize();
     let returnPlayer = _.clone(player);
     player.isNew = false; // doing this b/c the player in memory isn't updated with "isNew" = false even after the character is created. This should be
     // changed once we get character creation working
 
-    this.__players.push(player);
+    console.log(`adding ${player.name} ${player.__scheduled}`);
+    this.__scheduler.add(player, true);
+    player.__scheduled = true;
+    //console.log(player.name, this.__scheduler);
     return returnPlayer;
+  }
+
+  async getPlayerBySocketId(socketId) {
+    if (!socketId) return;
+    let player = _.find(this.__players, { socketId: socketId });
+    if (player) return player;
+
+    return null;
   }
 
   getWorldChunkFromWorldPosition(x, y, d) {

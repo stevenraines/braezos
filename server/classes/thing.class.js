@@ -12,7 +12,18 @@ module.exports = class Thing extends Base {
     this.name = this.config.name ? this.config.name : this.id; // the name of the thing. Defaults to ID.
     this.hp = this.config.hp ? this.config.hp : 1; // number of HP the thing has.
     this.itemCount = 0;
+    this.__scheduled = false;
   }
+
+  act() {
+    if (!this.__world || !this.__world.__engine) return;
+    this.__world.__engine.lock();
+    //    console.log(`${this.name} is acting`);
+    // do the action from queue
+
+    this.__world.__engine.unlock();
+  }
+
   /*
   getAdjacentCell(vector) {
     const adjacentPosition = new Point({
